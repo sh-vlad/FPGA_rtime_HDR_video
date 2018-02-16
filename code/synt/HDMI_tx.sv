@@ -98,16 +98,17 @@ always @( posedge clk or negedge reset_n )
 	if ( !reset_n )	
 		string_num	<= 	13'h0;
 	else
+	
 		if ( asi_snk_startofpacket_i )
 			string_num	<= string_num  + 1'h1;
-		else if ( asi_snk_startofpacket_i == 13'd720 )
-			string_num	<= 	13'h1;
+		else if ( ( string_num == VACTIVE ) && asi_snk_endofpacket_i )
+			string_num	<= 	13'h0;
 
 always @( posedge clk )
-	if ( wrusedw <= HACTIVE + 1 )
-		asi_snk_ready_o <= 1'h1;
-	else
+	if ( asi_snk_endofpacket_i || ( string_num == 13'h0 && v_count > ( VBLANK - 1 ) ) )
 		asi_snk_ready_o <= 1'h0;
+	else if ( wrusedw < 11'd600 )
+		asi_snk_ready_o <= 1'h1;
 	
 resync_fifo_HDMI_tx resync_fifo_HDMI_tx_inst_0
 (
