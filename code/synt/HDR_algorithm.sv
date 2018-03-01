@@ -9,7 +9,6 @@ module HDR_algorithm
 (
 //clocks & reset
 	input wire							clk,
-	input wire							reset_n,
 //
 	input wire	[DATA_WIDTH-1: 0]		data_i0,
 	input wire	[DATA_WIDTH-1: 0]		data_i1,
@@ -36,7 +35,7 @@ module HDR_algorithm
 delay_rg
 #(
 	.W				( DATA_WIDTH	),
-	.D				( 1				)
+	.D				( 2				)
 )
 delay_rg_0
 (
@@ -48,7 +47,7 @@ delay_rg_0
 delay_rg
 #(
 	.W				( DATA_WIDTH	),
-	.D				( 1				)
+	.D				( 2				)
 )
 delay_rg_1
 (
@@ -82,7 +81,7 @@ calc_weight_coef_1
 delay_rg
 #(
 	.W				( DATA_WIDTH	),
-	.D				( 1				)
+	.D				( 2				)
 )
 delay_weight
 (
@@ -96,8 +95,8 @@ always @( posedge clk )
 	
 always @( posedge clk )
 	begin
-		mult_0	<= weight_coef_0*bright_delay_0;
-		mult_1	<= weight_coef_1*bright_delay_1;		
+		mult_0	<= weight_coef_sum*bright_delay_0;
+		mult_1	<= weight_coef_sum*bright_delay_1;		
 	end
 
 always @( posedge clk )
