@@ -124,13 +124,20 @@ always_ff @(posedge pclk or negedge reset_n)
 		running_trans_frame <= 1'b0;
 		
 		
-`include "../task_read_file.v"		
+//`include "../task_read_file.v"		
+//`include "task_read_file.v"
+`include "D:/Vlad/FPGA_rtime_HDR_video/code/tb/task_read_file.v"
 // read files components of image_1		
 initial begin
 	/* input files */
+/*	
 	integer file_Y1  = $fopen("../../tb/test_images/generate_component_YCbCR/Y1_comp.txt" ,"r");
 	integer file_Cb1 = $fopen("../../tb/test_images/generate_component_YCbCR/Cb1_comp.txt","r");
 	integer file_Cr1 = $fopen("../../tb/test_images/generate_component_YCbCR/Cr1_comp.txt","r");
+*/
+	integer file_Y1  = $fopen("test_images/generate_component_YCbCR/Y1_comp.txt" ,"r");
+	integer file_Cb1 = $fopen("test_images/generate_component_YCbCR/Cb1_comp.txt","r");
+	integer file_Cr1 = $fopen("test_images/generate_component_YCbCR/Cr1_comp.txt","r");		
 	@(posedge reset_n);
 	@(posedge pclk);
 	@(posedge run_test);
@@ -140,9 +147,14 @@ end
 
 // read files components of image_2
 initial begin
+/*	
 	integer file_Y2  = $fopen("../../tb/test_images/generate_component_YCbCR/Y2_comp.txt" ,"r");
     integer file_Cb2 = $fopen("../../tb/test_images/generate_component_YCbCR/Cb2_comp.txt","r");
     integer file_Cr2 = $fopen("../../tb/test_images/generate_component_YCbCR/Cr2_comp.txt","r");
+*/
+	integer file_Y2  = $fopen("test_images/generate_component_YCbCR/Y2_comp.txt" ,"r");
+    integer file_Cb2 = $fopen("test_images/generate_component_YCbCR/Cb2_comp.txt","r");
+    integer file_Cr2 = $fopen("test_images/generate_component_YCbCR/Cr2_comp.txt","r");
 	@(posedge reset_n);
 	@(posedge pclk);
 	@(posedge run_test);

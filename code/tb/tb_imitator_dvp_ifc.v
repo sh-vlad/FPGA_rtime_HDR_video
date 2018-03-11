@@ -112,7 +112,27 @@ always @(posedge clk_sys, negedge reset_n)
 	else if(last_data)
 		count_line <= count_line + 1;	
 
-
+integer test_file,test_file1;	
+initial
+	begin
+		test_file  = $fopen("../test_filez.txt","w");
+		test_file1  = $fopen("../test_file1z.txt","w");
+		forever @( posedge clk_sys )
+			begin
+				if (validY)
+					begin
+						$fwrite (test_file,Y1,"\n");
+						$fwrite (test_file1,CbCr1,"\n");
+					end
+				else if ( count_line == 720 )
+					begin
+						$fclose(test_file);
+						$fclose(test_file1);
+						$stop;
+					end
+			end   	
+	end
+	
 endmodule
 
 	            

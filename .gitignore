@@ -4,3 +4,11 @@ imp/output_files
 imp/*.txt
 *wlf
 wlf*
+*bsp
+*cmp
+*ppf
+*_sim
+*spb
+*txt
+*xml
+*vstf

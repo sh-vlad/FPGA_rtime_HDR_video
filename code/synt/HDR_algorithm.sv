@@ -111,10 +111,11 @@ HDR_divider HDR_divider_inst
 	.remain         ( remain				)
 );
 
+
 always @( posedge clk )
 	if ( remain > 0 )
-		data_o	<= quotient + 1'h1;
+		data_o	<= quotient[8:1] + 1'h1;
 	else
-		data_o	<= quotient;
-		
+		data_o	<= quotient[8:1];
+
 endmodule

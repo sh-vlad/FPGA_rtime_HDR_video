@@ -44,12 +44,12 @@ for i=1:1:H
         fprintf(fileY1,'%x\n',Y1(i,2*j-1));
         fprintf(fileY1,'%x\n',Y1(i,2*j));
         fprintf(fileCb1,'%x\n',Cb1_dec(i,j));
-        fprintf(fileCr1,'%x\n',Cb1_dec(i,j));
+        fprintf(fileCr1,'%x\n',Cr1_dec(i,j));
         
         fprintf(fileY2,'%x\n',Y2(i,2*j-1));
         fprintf(fileY2,'%x\n',Y2(i,2*j));
         fprintf(fileCb2,'%x\n',Cb2_dec(i,j));
-        fprintf(fileCr2,'%x\n',Cb2_dec(i,j));
+        fprintf(fileCr2,'%x\n',Cr2_dec(i,j));
     end
 end
 

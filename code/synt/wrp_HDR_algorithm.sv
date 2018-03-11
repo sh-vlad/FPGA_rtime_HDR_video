@@ -2,7 +2,7 @@
 //
 
 `timescale 1 ns / 1 ns
-module HDR_algorithm
+module wrp_HDR_algorithm
 #(
 	parameter DATA_WIDTH = 32
 )
@@ -47,7 +47,7 @@ HDR_algorithm_Y
 (
 	.clk			( clk					),
 	.data_i0        ( asi_snk_0_data_i[7:0] ),
-	.data_i1        ( asi_snk_1_data_i[7:0]	),
+	.data_i1        ( asi_snk_0_data_i[15:8]	),
 	.data_o         ( aso_src_data_o[7:0]	)
 );
 
@@ -58,22 +58,22 @@ HDR_algorithm
 HDR_algorithm_CrCb
 (
 	.clk			( clk	),
-	.data_i0        ( asi_snk_0_data_i[15:8] ),
+	.data_i0        ( asi_snk_1_data_i[7:0] ),
 	.data_i1        ( asi_snk_1_data_i[15:8] ),
 	.data_o         ( aso_src_data_o[15:8]	)
 );
 
 delay_rg
 #(
-	.W				( 1				),
-	.D				( 20			)
+	.W				( 3				),
+	.D				( 21			)
 )
 delay_weight
 (
 	.clk			( clk				),
-	.data_in		( asi_snk_0_valid_i	),
-	.data_out       ( aso_src_valid_o	)
-);
+	.data_in		( {asi_snk_0_endofpacket_i, asi_snk_0_startofpacket_i, asi_snk_0_valid_i }	),
+	.data_out       ( {aso_src_endofpacket_o, aso_src_startofpacket_o, aso_src_valid_o }	)
+); 
 
 
 endmodule
