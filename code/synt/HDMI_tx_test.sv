@@ -31,13 +31,6 @@ localparam HTOTAL	= HBLANK + HACTIVE;
 localparam VBLANK	= VFRONT + VSYNC + VBACK;
 localparam VTOTAL	= VBLANK + VACTIVE;
 
-localparam RYCb	= 16'h1;
-localparam RYCr	= 16'h2;
-localparam GYCb	= 16'h3;
-localparam GYCr	= 16'h4;
-localparam BYCb	= 16'h5;
-localparam BYCr	= 16'h6;
-
 reg		[12: 0]		h_count;
 reg		[12: 0]		v_count;	
 reg		[12: 0]		string_num;
@@ -92,20 +85,57 @@ always @( posedge pixel_clk )
 		Cb_Cr_label <= 1'h0;
 	else
 		Cb_Cr_label = ~Cb_Cr_label;
-			
+
+
+localparam GYCb	= {8'd81,8'd90};
+localparam GYCr	= {8'd81,8'd240};
+localparam RYCb	= {8'd145,8'd54};
+localparam RYCr	= {8'd145,8'd34};
+localparam BYCb	= {8'd41,8'd240};
+localparam BYCr	= {8'd41,8'd110};
+localparam WYCb	= {8'd235,8'd128};
+localparam WYCr	= {8'd235,8'd128};	
+/*			
 always @( posedge pixel_clk ) 
-	if ( (h_count > HBLANK) && (h_count < (HBLANK + HACTIVE/3)) && Cb_Cr_label)
+	if ( (h_count > HBLANK) && (h_count <= (HBLANK + HACTIVE/4)) && Cb_Cr_label)
 		{data_Y,data_Cb_Cr}	<= RYCb;
-	else if ( h_count > HBLANK && h_count < (HBLANK + HACTIVE/3) && !Cb_Cr_label)
+	else if ( h_count > HBLANK && h_count <= (HBLANK + HACTIVE/4) && !Cb_Cr_label)
 		{data_Y,data_Cb_Cr}	<= RYCr;		
-	else if ( (h_count > (HBLANK + HACTIVE/3)) && (h_count < ( HBLANK + HACTIVE/3 + HACTIVE/3 )) && Cb_Cr_label)
+	else if ( (h_count > ( HBLANK + HACTIVE/4)) && (h_count <= ( HBLANK + (HACTIVE/4)*2 )) && Cb_Cr_label)
 		{data_Y,data_Cb_Cr}	<= GYCb;
-	else if ( (h_count > (HBLANK + HACTIVE/3))  && (h_count < ( HBLANK + HACTIVE/3 + HACTIVE/3 )) && !Cb_Cr_label)
+	else if ( (h_count > ( HBLANK + HACTIVE/4)) && (h_count <= ( HBLANK + (HACTIVE/4)*2 )) && !Cb_Cr_label)
 		{data_Y,data_Cb_Cr}	<= GYCr;			
-	else if ( (h_count > (  HBLANK + HACTIVE/3 + HACTIVE/3)) && (h_count < ( HBLANK + HACTIVE/3 + HACTIVE/3 + HACTIVE/3 )) && Cb_Cr_label)
+	else if ( (h_count > ( HBLANK + (HACTIVE/4)*2 )) && (h_count <= ( HBLANK + (HACTIVE/4)*3 )) && Cb_Cr_label)
 		{data_Y,data_Cb_Cr}	<= BYCb;
-	else if ( (h_count > ( HBLANK + HACTIVE/3 + HACTIVE/3 )) && (h_count < (HBLANK + HACTIVE/3 + HACTIVE/3 + HACTIVE/3 )) && !Cb_Cr_label)
+	else if ( (h_count > ( HBLANK + (HACTIVE/4)*2 )) && (h_count <= ( HBLANK + (HACTIVE/4)*3 )) && !Cb_Cr_label)
 		{data_Y,data_Cb_Cr}	<= BYCr;		
+	else if ( (h_count > ( HBLANK + (HACTIVE/4)*3 )) && (h_count <= ( HBLANK + (HACTIVE/4)*4 )) && Cb_Cr_label)
+		{data_Y,data_Cb_Cr}	<= WYCb;
+	else if ( (h_count > ( HBLANK + (HACTIVE/4)*3 )) && (h_count <= ( HBLANK + (HACTIVE/4)*4 )) && !Cb_Cr_label)
+		{data_Y,data_Cb_Cr}	<= WYCr;	
+*/	
+
+localparam VLOGO = 35;
+localparam HLOGO = 102;
+reg [11:0]  addr;
+reg [15:0]  q;
+always @( posedge pixel_clk or negedge reset_n )
+	if ( !reset_n )
+		addr	<= 12'h0;
+	else	
+		if ( (v_count >= (VBLANK + VACTIVE/2) && v_count < (VBLANK + VACTIVE/2 + VLOGO))/*( v_count >= 300 && v_count < 335 )*/ && ( h_count >= (HBLANK + HACTIVE/2) && h_count < (HBLANK + HACTIVE/2+HLOGO) )/*( h_count >= 600 && h_count <702 )*/ )
+			addr <= addr + 1;
+		else if ( v_count == (VBLANK + VACTIVE/2 + (VLOGO+1) ) )
+			addr <= 0;
+			
+logo_mem logo_mem_inst
+(
+	.address	( addr				),
+	.clock      ( pixel_clk			),
+	.q          ( q	)
+);	
+assign {data_Cb_Cr, data_Y} = ( (v_count >= (VBLANK + VACTIVE/2) && v_count < (VBLANK + VACTIVE/2 + VLOGO)) && ( h_count >= (HBLANK + HACTIVE/2) && h_count < (HBLANK + HACTIVE/2+HLOGO) ) ) ? q : 24'h0;
+
 endmodule
 
 
