@@ -29,15 +29,17 @@ reg		[ 2: 0]				sh_raw_valid;
 logic 	[ 2: 0]				fifo_wr;
 logic 	[ 2: 0]				fifo_rd;
 reg 	[11: 0]				line_cnt;
-reg		[DATA_WIDTH-1:0]	reg_line_0[2:0];
-reg		[DATA_WIDTH-1:0]	reg_line_1[2:0];
-reg		[DATA_WIDTH-1:0]	reg_line_2[2:0];
 wire						sh_fifo_rd;
 reg							odd_even_column;
 reg		[DATA_WIDTH-1+3:0]	r_tmp;
 reg		[DATA_WIDTH-1+3:0]	g_tmp;
 reg		[DATA_WIDTH-1+3:0]	b_tmp;
 reg		[DATA_WIDTH-1:0]	reg_line[3][3];
+wire	[10: 0]				usedw;
+reg		[ 6: 0]				wait_cnt;
+wire						sh_valid;
+wire						sh_sop;
+wire						sh_eop;
 always @( posedge clk or negedge reset_n )
 	if ( ~reset_n )
 		line_cnt	<= 12'h0;
@@ -49,12 +51,14 @@ always @( posedge clk or negedge reset_n )
 //FSM
 enum reg [2:0]
 {
-	s0_idle				= 0,
-	s0_wait_first_line 	= 1,
-	s0_wait_second_line = 2,	
-	s0_wait_third_line 	= 3,	
-	s0_line_even		= 4,
-	s0_line_odd			= 5	
+	s0_idle				= 3'd0,
+	s0_wait_first_line 	= 3'd1,
+	s0_wait_second_line = 3'd2,	
+	s0_wait_third_line 	= 3'd3,	
+	s0_line_even		= 3'd4,
+	s0_line_odd			= 3'd5,
+	s0_wait_line_last	= 3'd6,
+	s0_line_last		= 3'd7	
 }ns,cs;
 
 always @( posedge clk or negedge reset_n )
@@ -65,15 +69,18 @@ always @( posedge clk or negedge reset_n )
 
 always_comb
 	begin
+		ns = cs;
 		case ( cs )
-			s0_idle:			if ( reset_n )							ns = s0_wait_first_line;
-			s0_wait_first_line:	if ( line_cnt == 12'd1 && raw_sop )		ns = s0_wait_second_line;
-			s0_wait_second_line:if ( line_cnt == 12'd2 && raw_sop )		ns = s0_wait_third_line;
-			s0_wait_third_line:	if ( line_cnt == 12'd3 && raw_sop )		ns = s0_line_even;
-			s0_line_odd:		if ( raw_sop )							ns = s0_line_even;
-			s0_line_even:		if ( line_cnt == 12'd0 )				ns = s0_wait_first_line;
-								else if ( raw_sop )						ns = s0_line_odd;
-			default:													ns = s0_idle;
+			s0_idle:			if ( reset_n )								ns = s0_wait_first_line;
+			s0_wait_first_line:	if ( line_cnt == 12'd1 && raw_sop )			ns = s0_line_even;//s0_wait_second_line;
+			s0_wait_second_line:if ( line_cnt == 12'd2 && raw_sop )			ns = s0_wait_third_line;
+			s0_wait_third_line:	if ( line_cnt == 12'd3 && raw_sop )			ns = s0_line_even;
+			s0_line_odd:		if ( raw_sop )								ns = s0_line_even;
+			s0_line_even:		if ( line_cnt == 12'd720 && raw_eop )		ns = s0_wait_line_last;
+								else if ( raw_sop )							ns = s0_line_odd;
+			s0_wait_line_last:	if ( wait_cnt == 7'd100 )					ns = s0_line_last;
+			s0_line_last:		if ( usedw == 11'h0 )						ns = s0_wait_first_line;
+			default:														ns = s0_idle;
 		endcase
 		
 	end
@@ -82,10 +89,22 @@ assign sh_raw_valid[0] = raw_valid;
 always @( posedge clk )
 	{sh_raw_valid[2],sh_raw_valid[1]} <= {sh_raw_valid[1],sh_raw_valid[0]};
 
+always @( posedge clk or negedge reset_n )
+	if ( !reset_n )
+		wait_cnt	<= 7'h0;
+	else
+		if ( cs == s0_wait_line_last )
+			wait_cnt <= wait_cnt + 1'h1;
+		else
+			wait_cnt <= 1'h0;
+	
 always_comb
 	begin
 		case ( ns )
-			s0_wait_first_line:		fifo_wr = {1'h0,1'h0,sh_raw_valid[0]};
+			s0_wait_first_line:		begin 
+										fifo_wr = {sh_raw_valid[0],sh_raw_valid[0],sh_raw_valid[0]};
+										fifo_rd = 3'h0;
+									end
 			s0_wait_second_line:	begin 
 										fifo_wr = {1'h0,sh_raw_valid[1],sh_raw_valid[0]};
 										fifo_rd = {1'h0,1'h0,raw_valid};										
@@ -102,7 +121,15 @@ always_comb
 			s0_line_even:			begin
 										fifo_wr = {sh_raw_valid[1],sh_raw_valid[1],sh_raw_valid[0]};
 										fifo_rd = {raw_valid,raw_valid,raw_valid};
-									end									
+									end	
+			s0_wait_line_last:		begin
+										fifo_wr = {sh_raw_valid[1],sh_raw_valid[1],sh_raw_valid[0]};
+										fifo_rd = {raw_valid,raw_valid,raw_valid};
+									end	
+			s0_line_last:			begin
+										fifo_wr = 3'b000;
+										fifo_rd = 3'b111;			
+									end
 			default: 				begin	
 										fifo_wr = 3'h0;
 										fifo_rd = 3'h0;
@@ -120,7 +147,7 @@ fifo_raw2rgb fifo_raw2rgb_0
 	.empty      (				),
 	.full       (				),
 	.q          ( fifo_0_q		),
-	.usedw      (				)
+	.usedw      ( 				)
 );
 
 fifo_raw2rgb fifo_raw2rgb_1
@@ -144,7 +171,7 @@ fifo_raw2rgb fifo_raw2rgb_2
 	.empty      (				),
 	.full       (				),
 	.q          ( fifo_2_q		),
-	.usedw      (				)
+	.usedw      ( usedw			)
 );
 
 always @( posedge clk )
@@ -160,32 +187,30 @@ always @( posedge clk )
 				end
 	end
 
-/*
-always @( posedge clk )
-	begin
-		reg_line[2] <= {fifo_2_q,reg_line[2][2],reg_line[2][1]};//{reg_line_0[1],reg_line_0[0],fifo_2_q};
-		reg_line[1] <= {fifo_1_q,reg_line[1][2],reg_line[1][1]};//{reg_line_1[1],reg_line_1[0],fifo_1_q};
-		reg_line[0] <= {fifo_0_q,reg_line[0][2],reg_line[0][2]};//{reg_line_2[1],reg_line_2[0],fifo_0_q};
-	end
-*/
-always @( posedge clk )
-	begin
-		reg_line_0 <= {fifo_2_q,reg_line_0[2],reg_line_0[1]};//{reg_line_0[1],reg_line_0[0],fifo_2_q};
-		reg_line_1 <= {fifo_1_q,reg_line_1[2],reg_line_1[1]};//{reg_line_1[1],reg_line_1[0],fifo_1_q};
-		reg_line_2 <= {fifo_0_q,reg_line_2[2],reg_line_2[1]};//{reg_line_2[1],reg_line_2[0],fifo_0_q};
-	end
-
 delay_rg 
 #(
-	.W	( 1		),         // разрядность входного и выходного сигнала
-	.D	( 4		)		// задержка
+	.W	( 1		),         
+	.D	( 4		)		
 )    
-delay_rg_0     
+delay_rg_fifo_rd     
 (
 	.clk		( clk			),
 	.data_in    ( fifo_rd[0]	), 
 	.data_out   ( sh_fifo_rd	)
 );  
+
+delay_rg 
+#(
+	.W	( 3		),         
+	.D	( 5		)		
+)    
+delay_rg_strobes     
+(
+	.clk		( clk								),
+	.data_in    ( { raw_valid, raw_sop, raw_eop }	), 
+	.data_out   ( { sh_valid, sh_sop, sh_eop } 		)
+	
+); 
 
 always @( posedge clk or negedge reset_n )
 	if ( !reset_n )
@@ -221,6 +246,12 @@ always @( posedge clk )
 			g_tmp <= ( reg_line[1][2]+reg_line[2][1]+reg_line[1][0]+reg_line[0][1] ) >> 2; 
 			b_tmp <= reg_line[1][1];
 		end	
+	else if ( cs == s0_line_last )
+		begin
+			r_tmp <= fifo_2_q;	 
+			g_tmp <= fifo_2_q; 
+			b_tmp <= fifo_2_q;
+		end
 
 
 
@@ -229,5 +260,5 @@ assign g_data = g_tmp;
 assign b_data = b_tmp;
 
 always @( posedge clk )
-	data_o_valid <= ((cs==s0_line_odd)||(cs==s0_line_even)) ? sh_fifo_rd:1'h0;
+	data_o_valid <= /*((cs==s0_line_odd)||(cs==s0_line_even)||( cs == s0_line_last )) ?*/ sh_fifo_rd/*:1'h0*/;
 endmodule
