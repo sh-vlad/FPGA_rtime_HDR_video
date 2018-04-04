@@ -16,10 +16,10 @@ module raw2rgb_bilinear_interp
 	input wire							raw_sop,	
 	input wire							raw_eop,
 	
-	output reg		[DATA_WIDTH-1:0]	r_data,
-	output reg		[DATA_WIDTH-1:0]	g_data,
-	output reg		[DATA_WIDTH-1:0]	b_data,
-	output wire							data_o_valid
+	output wire		[DATA_WIDTH-1:0]	r_data,
+	output wire		[DATA_WIDTH-1:0]	g_data,
+	output wire		[DATA_WIDTH-1:0]	b_data,
+	output reg							data_o_valid
 );
 
 wire	[DATA_WIDTH-1:0] 	fifo_0_q;
@@ -37,7 +37,7 @@ reg							odd_even_column;
 reg		[DATA_WIDTH-1+3:0]	r_tmp;
 reg		[DATA_WIDTH-1+3:0]	g_tmp;
 reg		[DATA_WIDTH-1+3:0]	b_tmp;
-
+reg		[DATA_WIDTH-1:0]	reg_line[3][3];
 always @( posedge clk or negedge reset_n )
 	if ( ~reset_n )
 		line_cnt	<= 12'h0;
@@ -69,7 +69,7 @@ always_comb
 			s0_idle:			if ( reset_n )							ns = s0_wait_first_line;
 			s0_wait_first_line:	if ( line_cnt == 12'd1 && raw_sop )		ns = s0_wait_second_line;
 			s0_wait_second_line:if ( line_cnt == 12'd2 && raw_sop )		ns = s0_wait_third_line;
-			s0_wait_third_line:	if ( line_cnt == 12'd3 && raw_sop )		ns = s0_line_odd;
+			s0_wait_third_line:	if ( line_cnt == 12'd3 && raw_sop )		ns = s0_line_even;
 			s0_line_odd:		if ( raw_sop )							ns = s0_line_even;
 			s0_line_even:		if ( line_cnt == 12'd0 )				ns = s0_wait_first_line;
 								else if ( raw_sop )						ns = s0_line_odd;
@@ -149,9 +149,30 @@ fifo_raw2rgb fifo_raw2rgb_2
 
 always @( posedge clk )
 	begin
-		reg_line_0 <= {reg_line_0[1],reg_line_0[0],fifo_0_q};
-		reg_line_1 <= {reg_line_1[1],reg_line_1[0],fifo_1_q};
-		reg_line_2 <= {reg_line_2[1],reg_line_2[0],fifo_2_q};
+		reg_line[0][2] <= fifo_2_q;
+		reg_line[1][2] <= fifo_1_q;
+		reg_line[2][2] <= fifo_0_q;	
+		
+		for ( int i = 0; i < 3; i++ )
+			for ( int j = 0; j < 2; j++ )
+				begin
+					reg_line[i][j] <= reg_line[i][j+1];
+				end
+	end
+
+/*
+always @( posedge clk )
+	begin
+		reg_line[2] <= {fifo_2_q,reg_line[2][2],reg_line[2][1]};//{reg_line_0[1],reg_line_0[0],fifo_2_q};
+		reg_line[1] <= {fifo_1_q,reg_line[1][2],reg_line[1][1]};//{reg_line_1[1],reg_line_1[0],fifo_1_q};
+		reg_line[0] <= {fifo_0_q,reg_line[0][2],reg_line[0][2]};//{reg_line_2[1],reg_line_2[0],fifo_0_q};
+	end
+*/
+always @( posedge clk )
+	begin
+		reg_line_0 <= {fifo_2_q,reg_line_0[2],reg_line_0[1]};//{reg_line_0[1],reg_line_0[0],fifo_2_q};
+		reg_line_1 <= {fifo_1_q,reg_line_1[2],reg_line_1[1]};//{reg_line_1[1],reg_line_1[0],fifo_1_q};
+		reg_line_2 <= {fifo_0_q,reg_line_2[2],reg_line_2[1]};//{reg_line_2[1],reg_line_2[0],fifo_0_q};
 	end
 
 delay_rg 
@@ -174,36 +195,39 @@ always @( posedge clk or negedge reset_n )
 			odd_even_column <= ~odd_even_column;
 		else
 			odd_even_column	<= 1'h0;
-	
+
 always @( posedge clk )	
 	if ( ( cs == s0_line_even ) && ( !odd_even_column ) ) //even line even column
 		begin
-			r_data <= reg_line_1[1];	
-			g_data <= (reg_line_0[1]+reg_line_2[1])>>2;	
-			b_data <= (reg_line_0[0]	+ reg_line_0[2]	+ reg_line_2[0]	+ reg_line_2[2] )>>4;
+			r_tmp <= reg_line[1][1];	
+			g_tmp <= (reg_line[1][0]+reg_line[0][1]+reg_line[1][2]+reg_line[2][1])>>2;	
+			b_tmp <= (reg_line[0][0]+reg_line[2][0]+reg_line[0][2]+reg_line[2][2])>>2;
 		end
-	else if ( ( cs == s0_line_even ) && ( !odd_even_column ) ) //even line odd column
+	else if ( ( cs == s0_line_even ) && ( odd_even_column ) ) //even line odd column
 		begin			
-			r_data <= (reg_line_1[0]+reg_line_1[2])>>2;
-			g_data <= reg_line_1[1];	
-			b_data <= (reg_line_0[1]+reg_line_2[1])>>2;
+			r_tmp <= (reg_line[1][2]+reg_line[1][0])>>1;
+			g_tmp <= reg_line[1][1];	
+			b_tmp <= (reg_line[0][1]+reg_line[2][1])>>1;
 		end
-	else if ( ( cs == s0_line_odd ) && ( odd_even_column ) ) //odd line even column
+	else if ( ( cs == s0_line_odd ) && ( !odd_even_column ) ) //odd line even column
 		begin
-			r_data <= (reg_line_0[1]+reg_line_2[1])>>2;
-			g_data <= reg_line_1[1]; 
-			b_data <= (reg_line_1[0]+reg_line_1[2])>>2;
+			r_tmp <= (reg_line[2][1]+reg_line[0][1])>>1;
+			g_tmp <= reg_line[1][1]; 
+			b_tmp <= (reg_line[1][0]+reg_line[1][2])>>1;
 		end		
-	else if ( ( cs == s0_line_odd ) && ( !odd_even_column ) )	 //odd line odd column
+	else if ( ( cs == s0_line_odd ) && ( odd_even_column ) )	 //odd line odd column
 		begin
-			r_data <= ( reg_line_0[0]+reg_line_0[2]+reg_line_2[0]+reg_line_2[2] ) >> 4;	 
-			g_data <= ( reg_line_0[0]+reg_line_2[2]+reg_line_2[0]+reg_line_2[2] ) >> 4; 
-			b_data <= (reg_line_1[0]+reg_line_1[2])>>2;
+			r_tmp <= ( reg_line[2][2]+reg_line[0][0]+reg_line[0][2]+reg_line[2][0] ) >> 2;	 
+			g_tmp <= ( reg_line[1][2]+reg_line[2][1]+reg_line[1][0]+reg_line[0][1] ) >> 2; 
+			b_tmp <= reg_line[1][1];
 		end	
-/*
-	output wire		[DATA_WIDTH-1:0]	r_data,
-	output wire		[DATA_WIDTH-1:0]	g_data,
-	output wire		[DATA_WIDTH-1:0]	b_data	
-	*/
-assign data_o_valid	= ((cs==s0_line_odd)||(cs==s0_line_even)) ? sh_fifo_rd:1'h0;
+
+
+
+assign r_data = r_tmp;
+assign g_data = g_tmp;
+assign b_data = b_tmp;
+
+always @( posedge clk )
+	data_o_valid <= ((cs==s0_line_odd)||(cs==s0_line_even)) ? sh_fifo_rd:1'h0;
 endmodule
