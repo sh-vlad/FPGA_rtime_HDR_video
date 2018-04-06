@@ -1,6 +1,8 @@
 //Author: ShVlad / e-mail: shvladspb@gmail.com
 //
 
+`define PIPELINE
+
 `timescale 1 ns / 1 ns
 module raw2rgb_bilinear_interp
 #(
@@ -29,11 +31,22 @@ reg		[ 2: 0]				sh_raw_valid;
 logic 	[ 2: 0]				fifo_wr;
 logic 	[ 2: 0]				fifo_rd;
 reg 	[11: 0]				line_cnt;
-wire						sh_fifo_rd;
+reg		[ 7: 0]				sh_fifo_rd;
 reg							odd_even_column;
+reg							sh_odd_even_column;
+`ifdef PIPELINE
+reg		[DATA_WIDTH-1+1:0]	r_stp0[2];
+reg		[DATA_WIDTH-1+1:0]	g_stp0[2];
+reg		[DATA_WIDTH-1+1:0]	b_stp0[2];
+reg		[DATA_WIDTH-1+1+2:0]r_stp1;
+reg		[DATA_WIDTH-1+1+2:0]g_stp1;
+reg		[DATA_WIDTH-1+1+2:0]b_stp1;
+`else
 reg		[DATA_WIDTH-1+3:0]	r_tmp;
 reg		[DATA_WIDTH-1+3:0]	g_tmp;
 reg		[DATA_WIDTH-1+3:0]	b_tmp;
+`endif
+
 reg		[DATA_WIDTH-1:0]	reg_line[3][3];
 wire	[10: 0]				usedw[3];
 reg		[ 6: 0]				wait_cnt;
@@ -213,7 +226,7 @@ always @( posedge clk )
 					reg_line[i][j] <= reg_line[i][j+1];
 				end
 	end
-
+/*
 delay_rg 
 #(
 	.W	( 1		),         
@@ -225,6 +238,9 @@ delay_rg_fifo_rd
 	.data_in    ( fifo_rd[0]	), 
 	.data_out   ( sh_fifo_rd	)
 );  
+*/
+always @( posedge clk )
+	sh_fifo_rd	<= {sh_fifo_rd[6:0],fifo_rd[0]};
 
 delay_rg 
 #(
@@ -243,10 +259,136 @@ always @( posedge clk or negedge reset_n )
 	if ( !reset_n )
 		odd_even_column	<= 1'h0;
 	else
-		if ( sh_fifo_rd )
+		if ( sh_fifo_rd[3] )
 			odd_even_column <= ~odd_even_column;
 		else
 			odd_even_column	<= 1'h0;
+			
+always @( posedge clk )
+	sh_odd_even_column	<= odd_even_column;				
+		
+
+
+		
+	
+`ifdef PIPELINE
+always @( posedge clk )	
+	if ( cs == s0_wait_third_line )
+		begin
+			r_stp0[0] <= reg_line[2][1];			
+			g_stp0[0] <= reg_line[2][0] + reg_line[1][1];		
+			b_stp0[0] <= reg_line[1][0];		
+		end
+	else if ( ( cs == s0_line_even ) && ( !odd_even_column ) ) //even line even column
+		begin
+			r_stp0[0] <= reg_line[1][1];
+			g_stp0[0] <= reg_line[1][0]+reg_line[0][1];
+			g_stp0[1] <= reg_line[1][2]+reg_line[2][1];				
+			b_stp0[0] <= reg_line[0][0]+reg_line[2][0];
+			b_stp0[1] <= reg_line[0][2]+reg_line[2][2];
+		end
+	else if ( ( cs == s0_line_even ) && ( odd_even_column ) ) //even line odd column
+		begin		
+			r_stp0[0] <= reg_line[1][2] + reg_line[1][0];
+			g_stp0[0] <= reg_line[1][1];			
+			b_stp0[0] <= reg_line[0][1] + reg_line[2][1];
+		end
+	else if ( ( cs == s0_line_odd ) && ( !odd_even_column ) ) //odd line even column
+		begin		
+			r_stp0[0] <= reg_line[2][1] + reg_line[0][1];			
+			g_stp0[0] <= reg_line[1][1];					
+			b_stp0[0] <= reg_line[1][0] + reg_line[1][2];
+		end		
+	else if ( ( cs == s0_line_odd ) && ( odd_even_column ) )	 //odd line odd column
+		begin		
+			r_stp0[0] <= reg_line[2][2]+reg_line[0][0];
+			r_stp0[1] <= reg_line[0][2]+reg_line[2][0];			
+			g_stp0[0] <= reg_line[1][2]+reg_line[2][1];	
+			g_stp0[1] <= reg_line[1][0]+reg_line[0][1];				
+			b_stp0[0] <= reg_line[1][1];
+		end	
+	else if ( ( cs == s0_line_last0 ) && ( !odd_even_column ) ) //odd line even column
+		begin		
+			r_stp0[0] <= reg_line[2][1] + reg_line[0][1];
+			g_stp0[0] <= reg_line[1][1];	
+			b_stp0[0] <= reg_line[1][0] + reg_line[1][2];
+		end		
+	else if ( ( cs == s0_line_last0 ) && ( odd_even_column ) )	 //odd line odd column
+		begin		
+			r_stp0[0] <= reg_line[2][2]+reg_line[0][0];
+			r_stp0[1] <= reg_line[0][2]+reg_line[2][0];			
+			g_stp0[0] <= reg_line[1][2]+reg_line[2][1];	
+			g_stp0[1] <= reg_line[1][0]+reg_line[0][1];				
+			b_stp0[0] <= reg_line[1][1];
+		end	
+	else if ( ( cs == s0_line_last1 ) && ( odd_even_column ) )
+		begin		
+			r_stp0[0] <= reg_line[1][1];
+			g_stp0[0] <= reg_line[1][0]+reg_line[0][1];	
+			b_stp0[0] <= reg_line[0][0];
+
+		end
+
+always @( posedge clk )	
+	if ( sh_cs == s0_wait_third_line )
+		begin
+			r_stp1 <= r_stp0[0];
+			g_stp1 <= g_stp0[0]>>1;
+			b_stp1 <= b_stp0[0];	
+		end
+	else if ( ( sh_cs == s0_line_even ) && ( !sh_odd_even_column ) ) //even line even column
+		begin
+			r_stp1 <= r_stp0[0];
+			g_stp1 <= (g_stp0[0]+g_stp0[1])>>2;
+			b_stp1 <= (b_stp0[0]+b_stp0[1])>>2;		
+		end
+	else if ( ( sh_cs == s0_line_even ) && ( sh_odd_even_column ) ) //even line odd column
+		begin		
+			r_stp1 <= r_stp0[0]>>1;
+			g_stp1 <= g_stp0[0];
+			b_stp1 <= b_stp0[0]>>1;		
+		end
+	else if ( ( sh_cs == s0_line_odd ) && ( !sh_odd_even_column ) ) //odd line even column
+		begin				
+			r_stp1 <= r_stp0[0]>>1;
+			g_stp1 <= g_stp0[0];
+			b_stp1 <= b_stp0[0]>>1;			
+		end		
+	else if ( ( sh_cs == s0_line_odd ) && ( sh_odd_even_column ) )	 //odd line odd column
+		begin				
+			r_stp1 <= (r_stp0[0]+r_stp0[1])>>2;
+			g_stp1 <= (g_stp0[0]+g_stp0[1])>>2;
+			b_stp1 <= b_stp0[0];			
+		end	
+	else if ( ( sh_cs == s0_line_last0 ) && ( !sh_odd_even_column ) ) //odd line even column
+		begin				
+			r_stp1 <= r_stp0[0]>>1;
+			g_stp1 <= g_stp0[0];
+			b_stp1 <= b_stp0[0]>>1;					
+		end		
+	else if ( ( sh_cs == s0_line_last0 ) && ( sh_odd_even_column ) )	 //odd line odd column
+		begin		
+			r_stp1 <= r_stp0[0]+r_stp0[1]>>2;
+			g_stp1 <= g_stp0[0]+g_stp0[1]>>2;
+			b_stp1 <= b_stp0[0];			
+		end		
+	else if ( ( sh_cs == s0_line_last1 ) && ( sh_odd_even_column ) )
+		begin	
+			r_stp1 <= r_stp0[0];
+			g_stp1 <= g_stp0[0]>>1;
+			b_stp1 <= b_stp0[0];	
+		end
+	
+///////////////////////////////
+
+assign r_data = r_stp1;
+assign g_data = g_stp1;
+assign b_data = b_stp1;
+
+always @( posedge clk )
+	data_o_valid <= ((sh_cs!=s0_wait_second_line)&&(sh_cs!=s0_line_last2)&&(sh_cs!=s0_wait_first_line)) ? sh_fifo_rd[4]:1'h0;
+	
+`else	
 
 always @( posedge clk )	
 	if ( cs == s0_wait_third_line )
@@ -290,19 +432,8 @@ always @( posedge clk )
 			r_tmp <= ( reg_line[2][2]+reg_line[0][0]+reg_line[0][2]+reg_line[2][0] ) >> 2;	 
 			g_tmp <= ( reg_line[1][2]+reg_line[2][1]+reg_line[1][0]+reg_line[0][1] ) >> 2; 
 			b_tmp <= reg_line[1][1];
-		end	
-else if ( ( cs == s0_line_even ) && ( !odd_even_column ) ) //even line even column
-		begin
-			r_tmp <= reg_line[0][1];	
-			g_tmp <= (reg_line[0][0]+reg_line[1][1])>>1;	
-			b_tmp <= reg_line[1][0];
-		end
-	else if ( ( cs == s0_line_even ) && ( odd_even_column ) ) //even line odd column
-		begin			
-			r_tmp <= (reg_line[0][0])>>1;
-			g_tmp <= reg_line[0][1];	
-			b_tmp <= (reg_line[1][1])>>1;
 		end			
+	
 	else if ( ( cs == s0_line_last1 ) && ( odd_even_column ) )
 		begin
 			r_tmp <= reg_line[1][1];		 
@@ -310,15 +441,12 @@ else if ( ( cs == s0_line_even ) && ( !odd_even_column ) ) //even line even colu
 			b_tmp <= reg_line[0][0];			
 		end
 
-////////////////////////////////		
-		
-		
-///////////////////////////////
-
 assign r_data = r_tmp;
 assign g_data = g_tmp;
-assign b_data = b_tmp;
-
+assign b_data = b_tmp;		
+		
 always @( posedge clk )
-	data_o_valid <= /*((cs==s0_line_odd)||(cs==s0_line_even)||( cs == s0_line_last )) ?*/((cs!=s0_wait_second_line)&&(cs!=s0_line_last2)&&(cs!=s0_wait_first_line)) ? sh_fifo_rd:1'h0/**/;
+	data_o_valid <= ((cs!=s0_wait_second_line)&&(cs!=s0_line_last2)&&(cs!=s0_wait_first_line)) ? sh_fifo_rd[3]:1'h0;			
+`endif	
+	
 endmodule
