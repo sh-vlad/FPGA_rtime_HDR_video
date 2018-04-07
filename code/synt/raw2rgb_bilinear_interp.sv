@@ -18,9 +18,9 @@ module raw2rgb_bilinear_interp
 	input wire							raw_sop,	
 	input wire							raw_eop,
 	
-	output wire		[DATA_WIDTH-1:0]	r_data,
-	output wire		[DATA_WIDTH-1:0]	g_data,
-	output wire		[DATA_WIDTH-1:0]	b_data,
+	output wire		[DATA_WIDTH-1:0]	r_data_o,
+	output wire		[DATA_WIDTH-1:0]	g_data_o,
+	output wire		[DATA_WIDTH-1:0]	b_data_o,
 	output reg							data_o_valid,
 	output reg							sop_o,	
 	output reg							eop_o	
@@ -383,9 +383,9 @@ always @( posedge clk )
 	
 ///////////////////////////////
 
-assign r_data = r_stp1;
-assign g_data = g_stp1;
-assign b_data = b_stp1;
+assign r_data_o = r_stp1;
+assign g_data_o = g_stp1;
+assign b_data_o = b_stp1;
 
 always @( posedge clk )
 	begin
@@ -447,9 +447,9 @@ always @( posedge clk )
 			b_tmp <= reg_line[0][0];			
 		end
 
-assign r_data = r_tmp;
-assign g_data = g_tmp;
-assign b_data = b_tmp;		
+assign r_data_o = r_tmp;
+assign g_data_o = g_tmp;
+assign b_data_o = b_tmp;		
 		
 always @( posedge clk )
 	begin

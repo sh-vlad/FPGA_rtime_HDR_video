@@ -15,11 +15,8 @@ module HDMI_tx
 	input wire							asi_snk_valid_i,
 	output reg							asi_snk_ready_o,
 	input wire		[DATA_WIDTH-1: 0] 	asi_snk_data_i,
-	input wire		[ 0: 0] 			asi_snk_empty_i,
 	input wire							asi_snk_startofpacket_i,
 	input wire							asi_snk_endofpacket_i,
-	input wire							asi_snk_error_i,
-	input wire		[ 0: 0] 			asi_snk_channel_i,	
 //vga interface to ADV7513
 	output reg							data_enable,
 	output reg							hsync,

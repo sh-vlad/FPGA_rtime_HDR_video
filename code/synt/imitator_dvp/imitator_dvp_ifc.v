@@ -30,7 +30,7 @@ reg        wait_next_vsync;
 /* start pass next frame */ 
 wire next_start_frame = (cnt_pclk =='d4115952); // 
 wire t_start_vsync   = next_start_frame | start_first_frame;
-wire t_stop_vsync    = (cnt_pclk == 'd11376);
+wire t_stop_vsync    = (cnt_pclk == 'd176);
 wire last_line_in_frame = (cnt_line_in_frame == 'd720);
 //============================================================//
 wire initial_reg = start_first_frame | next_start_frame;
@@ -60,7 +60,7 @@ always @(posedge pclk or negedge reset_n)
 	if (~reset_n)
 		next_href_t2 <= '1;
 	else if(initial_reg)
-		next_href_t2 <= 'd14912;//'d7075224;
+		next_href_t2 <= 'd13632;//'d7075224;
 	else if(t_stop_href)
 		next_href_t2 <= next_href_t2 +'d5688 ;	
 //===========================================================//
@@ -124,42 +124,65 @@ always_ff @(posedge pclk or negedge reset_n)
 		running_trans_frame <= 1'b0;
 		
 		
-//`include "../task_read_file.v"		
+`include "../../tb/task_read_file.v"		
 //`include "task_read_file.v"
-`include "D:/Vlad/FPGA_rtime_HDR_video/code/tb/task_read_file.v"
+//`include "D:/Vlad/FPGA_rtime_HDR_video/code/tb/task_read_file.v"
 // read files components of image_1		
+//initial begin
+//	/* input files */
+//	
+//	integer file_Y1  = $fopen("../../tb/test_images/generate_component_YCbCR/Y1_comp.txt" ,"r");
+//	integer file_Cb1 = $fopen("../../tb/test_images/generate_component_YCbCR/Cb1_comp.txt","r");
+//	integer file_Cr1 = $fopen("../../tb/test_images/generate_component_YCbCR/Cr1_comp.txt","r");
+//
+////	integer file_Y1  = $fopen("test_images/generate_component_YCbCR/Y1_comp.txt" ,"r");
+////	integer file_Cb1 = $fopen("test_images/generate_component_YCbCR/Cb1_comp.txt","r");
+////	integer file_Cr1 = $fopen("test_images/generate_component_YCbCR/Cr1_comp.txt","r");		
+//	@(posedge reset_n);
+//	@(posedge pclk);
+//	@(posedge run_test);
+//	read_file_comp_image_1(file_Y1, file_Cb1, file_Cr1, 2 );
+//end
+//
+//
+//// read files components of image_2
+//initial begin
+//	
+//	integer file_Y2  = $fopen("../../tb/test_images/generate_component_YCbCR/Y2_comp.txt" ,"r");
+//    integer file_Cb2 = $fopen("../../tb/test_images/generate_component_YCbCR/Cb2_comp.txt","r");
+//    integer file_Cr2 = $fopen("../../tb/test_images/generate_component_YCbCR/Cr2_comp.txt","r");
+//
+//	//integer file_Y2  = $fopen("test_images/generate_component_YCbCR/Y2_comp.txt" ,"r");
+//   // integer file_Cb2 = $fopen("test_images/generate_component_YCbCR/Cb2_comp.txt","r");
+//   // integer file_Cr2 = $fopen("test_images/generate_component_YCbCR/Cr2_comp.txt","r");
+//	@(posedge reset_n);
+//	@(posedge pclk);
+//	@(posedge run_test);
+//	read_file_comp_image_2(file_Y2, file_Cb2, file_Cr2, 2 );
+//end
+	
+	
 initial begin
 	/* input files */
-/*	
-	integer file_Y1  = $fopen("../../tb/test_images/generate_component_YCbCR/Y1_comp.txt" ,"r");
-	integer file_Cb1 = $fopen("../../tb/test_images/generate_component_YCbCR/Cb1_comp.txt","r");
-	integer file_Cr1 = $fopen("../../tb/test_images/generate_component_YCbCR/Cr1_comp.txt","r");
-*/
-	integer file_Y1  = $fopen("test_images/generate_component_YCbCR/Y1_comp.txt" ,"r");
-	integer file_Cb1 = $fopen("test_images/generate_component_YCbCR/Cb1_comp.txt","r");
-	integer file_Cr1 = $fopen("test_images/generate_component_YCbCR/Cr1_comp.txt","r");		
+	
+	integer file_RAW_1  = $fopen("../../tb/test_images/generate_component_YCbCR/RAW_1.txt" ,"r");
+	integer file_RAW_2 = $fopen("../../tb/test_images/generate_component_YCbCR/RAW_2.txt","r");
+	
 	@(posedge reset_n);
 	@(posedge pclk);
 	@(posedge run_test);
-	read_file_comp_image_1(file_Y1, file_Cb1, file_Cr1, 2 );
+	read_file_raw_images(file_RAW_1, file_RAW_2, 2 );
 end
 
 
-// read files components of image_2
-initial begin
-/*	
-	integer file_Y2  = $fopen("../../tb/test_images/generate_component_YCbCR/Y2_comp.txt" ,"r");
-    integer file_Cb2 = $fopen("../../tb/test_images/generate_component_YCbCR/Cb2_comp.txt","r");
-    integer file_Cr2 = $fopen("../../tb/test_images/generate_component_YCbCR/Cr2_comp.txt","r");
-*/
-	integer file_Y2  = $fopen("test_images/generate_component_YCbCR/Y2_comp.txt" ,"r");
-    integer file_Cb2 = $fopen("test_images/generate_component_YCbCR/Cb2_comp.txt","r");
-    integer file_Cr2 = $fopen("test_images/generate_component_YCbCR/Cr2_comp.txt","r");
-	@(posedge reset_n);
-	@(posedge pclk);
-	@(posedge run_test);
-	read_file_comp_image_2(file_Y2, file_Cb2, file_Cr2, 2 );
-end
+
+
+
+
+
+
+
+
 endmodule
 
 	            

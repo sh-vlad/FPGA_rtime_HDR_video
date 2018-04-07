@@ -98,3 +98,36 @@ $fclose(file_Y);
 $fclose(file_Cb);
 $fclose(file_Cr);
 endtask
+
+
+
+task read_file_raw_images;
+	input integer      file_RAW_1  ;
+	input integer      file_RAW_2  ;
+    input [5:0]        cnt_frame;
+
+integer i;
+for(i = 0; i<cnt_frame; i=i+1)
+begin
+	while(!t_start_href) @(posedge pclk);
+	
+	$fscanf(file_RAW_1,"%x\n", D1);
+	$fscanf(file_RAW_2,"%x\n", D2);
+	@(posedge pclk);
+
+	while(!$feof(file_RAW_1) )
+	begin
+		while(!HREF)  @(posedge pclk);
+		$fscanf(file_RAW_1,"%x\n", D1);
+		$fscanf(file_RAW_2,"%x\n", D2);
+		@(posedge pclk);
+	end
+	$fseek(file_RAW_1, 0, `SEEK_SET);
+	$fseek(file_RAW_2, 0, `SEEK_SET);
+end
+
+@(posedge pclk);
+$fclose(file_RAW_1);
+$fclose(file_RAW_2);
+
+endtask
