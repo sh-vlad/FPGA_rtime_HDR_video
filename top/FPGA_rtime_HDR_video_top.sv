@@ -36,6 +36,7 @@ wire				pixel_clk;
 wire				reset_n_b;
 //
 reg 	[ 3: 0]		switches_resync[2:0];
+reg		[ 1: 0]		sh_VSYNC;
 //
 wire	[ 7: 0]		raw_data_0;
 wire	[ 7: 0]		raw_data_1;
@@ -99,13 +100,15 @@ assign clk_cam_1_o = clk_cam_0_o;
 
 //
 always @( posedge sys_clk_b )
-	begin
-//		switches_resync[1:0] <= {switches_resync[0],switches};
-		switches_resync[0] <= switches;
-		switches_resync[1] <= switches_resync[0];
-		if ( raw_data_eop )
-			switches_resync[2] <= switches_resync[1];
-	end
+	sh_VSYNC <= {sh_VSYNC[0], VSYNC};	
+always @( posedge sys_clk_b )
+		begin
+	//		switches_resync[1:0] <= {switches_resync[0],switches};
+			switches_resync[0] <= switches;
+			switches_resync[1] <= switches_resync[0];
+			if ( sh_VSYNC[1] )
+				switches_resync[2] <= switches_resync[1];
+		end
 	
 //resync cam clk to sys clk
 convert2avl_stream_raw convert2avl_stream_raw_inst
@@ -152,7 +155,7 @@ wrp_HDR_algorithm_inst
 
 //mode mux
 always @( posedge sys_clk_b )
-	case ( switches_resync[2] )
+	case ( switches_resync[2]/*switches*/ )
 		4'd1:	begin					// cam №0
 					raw2rgb_data	<= raw_data_0;
 					raw2rgb_valid   <= raw_data_valid;
@@ -203,19 +206,7 @@ raw2rgb_bilinear_interp_inst
 
 //instans frame buffer here ->
 
-// 
-
-//HDMI test
-//HDMI_tx_test HDMI_tx_test_inst
-//(
-//	.pixel_clk      ( pixel_clk		),
-//	.reset_n        ( pll_lock_0	),
-//	.data_enable    ( data_enable	),
-//	.hsync          ( hsync			),
-//	.vsync          ( vsync			),
-//	.data_Y         ( data_Y		),
-//	.data_Cb_Cr     ( data_Cb_Cr	)	
-//);		
+// 	
 
 HDMI_tx
 #(
@@ -252,8 +243,9 @@ I2C_HDMI_Config u_I2C_HDMI_Config
 );
 
 //assign data_HDMI = { data_Cb_Cr, data_Y, 8'h0 };
-`ifdef DEBUG`endif
 
+`ifdef DEBUG_OFF
+`else
 int sensor;
 initial
 	begin
@@ -273,9 +265,9 @@ initial
 		raw  = $fopen("raw.txt","w");
 		forever @( posedge sys_clk_b )
 			begin
-				if (raw_data_valid)
+				if (raw2rgb_valid)
 					begin
-						$fwrite (raw,raw_data_0,"\n");
+						$fwrite (raw,raw2rgb_data,"\n");
 					end				
 			end   	
 	end
@@ -296,5 +288,5 @@ initial
 					end				
 			end   	
 	end
-	
+`endif	
 endmodule
