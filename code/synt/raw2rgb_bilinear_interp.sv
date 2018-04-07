@@ -21,7 +21,9 @@ module raw2rgb_bilinear_interp
 	output wire		[DATA_WIDTH-1:0]	r_data,
 	output wire		[DATA_WIDTH-1:0]	g_data,
 	output wire		[DATA_WIDTH-1:0]	b_data,
-	output reg							data_o_valid
+	output reg							data_o_valid,
+	output reg							sop_o,	
+	output reg							eop_o	
 );
 
 wire	[DATA_WIDTH-1:0] 	fifo_0_q;
@@ -386,8 +388,12 @@ assign g_data = g_stp1;
 assign b_data = b_stp1;
 
 always @( posedge clk )
-	data_o_valid <= ((sh_cs!=s0_wait_second_line)&&(sh_cs!=s0_line_last2)&&(sh_cs!=s0_wait_first_line)) ? sh_fifo_rd[4]:1'h0;
-	
+	begin
+		data_o_valid <= ((sh_cs!=s0_wait_second_line)&&(sh_cs!=s0_line_last2)&&(sh_cs!=s0_wait_first_line)) ? sh_fifo_rd[4]:1'h0;
+		sop_o	<= ((sh_cs!=s0_wait_second_line)&&(sh_cs!=s0_line_last2)&&(sh_cs!=s0_wait_first_line)) ? sh_fifo_rd[4]&(~sh_fifo_rd[5]):1'h0;
+		eop_o	<= ((sh_cs!=s0_wait_second_line)&&(sh_cs!=s0_line_last2)&&(sh_cs!=s0_wait_first_line)) ? sh_fifo_rd[4]&(~sh_fifo_rd[3]):1'h0;
+	end
+							
 `else	
 
 always @( posedge clk )	
@@ -446,7 +452,11 @@ assign g_data = g_tmp;
 assign b_data = b_tmp;		
 		
 always @( posedge clk )
-	data_o_valid <= ((cs!=s0_wait_second_line)&&(cs!=s0_line_last2)&&(cs!=s0_wait_first_line)) ? sh_fifo_rd[3]:1'h0;			
+	begin
+		data_o_valid <= ((cs!=s0_wait_second_line)&&(cs!=s0_line_last2)&&(cs!=s0_wait_first_line)) ? sh_fifo_rd[3]:1'h0;	
+		sop_o	<= ((cs!=s0_wait_second_line)&&(cs!=s0_line_last2)&&(cs!=s0_wait_first_line)) ? sh_fifo_rd[3]&(~sh_fifo_rd[4]):1'h0;
+		eop_o	<= ((cs!=s0_wait_second_line)&&(cs!=s0_line_last2)&&(cs!=s0_wait_first_line)) ? sh_fifo_rd[3]&(~sh_fifo_rd[2]):1'h0;
+	end
 `endif	
 	
 endmodule
