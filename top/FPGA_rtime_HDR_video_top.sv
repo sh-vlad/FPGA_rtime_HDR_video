@@ -218,16 +218,16 @@ HDMI_tx_inst
 	.pixel_clk                  ( pixel_clk					),
 	.reset_n	                ( reset_n_b					),
 	.asi_snk_valid_i            ( data_rgb_valid			),
-	.asi_snk_ready_o            (							),
+	.line_request_o             (							),
 	.asi_snk_data_i             ( {b_data, g_data, r_data} 	),
 	.asi_snk_startofpacket_i    ( sop_rgb					),
 	.asi_snk_endofpacket_i	    ( eop_rgb					),
 	.data_enable                ( data_enable				),
 	.hsync                      ( hsync						),
 	.vsync                      ( vsync						),
-	.data_r                     ( data_HDMI[ 7: 0]			),
+	.data_r                     ( data_HDMI[23:16]			),
 	.data_g                     ( data_HDMI[15: 8]			),
-	.data_b                     ( data_HDMI[23:16]			)
+	.data_b                     ( data_HDMI[ 7: 0]			)
 	
 );
 

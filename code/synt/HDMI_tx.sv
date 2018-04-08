@@ -13,7 +13,7 @@ module HDMI_tx
 	input wire							reset_n,
 // sink interface
 	input wire							asi_snk_valid_i,
-	output reg							asi_snk_ready_o,
+	output reg							line_request_o,
 	input wire		[DATA_WIDTH-1: 0] 	asi_snk_data_i,
 	input wire							asi_snk_startofpacket_i,
 	input wire							asi_snk_endofpacket_i,
@@ -46,7 +46,8 @@ reg		[12: 0]		v_count;
 reg		[12: 0]		string_num;
 wire	[10: 0]  	wrusedw;
 reg					rdreq;
-
+reg					line_request_pclk;
+reg		[ 2: 0]		line_request_sys_clk;
 //making strobes 
 always @( posedge pixel_clk or negedge reset_n )
 	if ( !reset_n )
@@ -90,7 +91,20 @@ always @( posedge pixel_clk )
 	else
 		rdreq	<= 1'h1;		
 //
-
+always @( posedge pixel_clk )
+	if ( ( h_count >= HBLANK-10 && h_count <= HBLANK ) && ( v_count >= VBLANK && v_count < VTOTAL-1 ) )
+		line_request_pclk <= 1'h1;
+	else
+		line_request_pclk <= 1'h0;
+		
+always @( posedge clk )
+	begin
+		line_request_sys_clk <= {line_request_sys_clk[1:0], line_request_pclk };	
+		line_request_o <= line_request_sys_clk[1] & !line_request_sys_clk[2];
+	end	
+		
+//
+/*
 always @( posedge clk or negedge reset_n )
 	if ( !reset_n )	
 		string_num	<= 	13'h0;
@@ -106,7 +120,8 @@ always @( posedge clk )
 		asi_snk_ready_o <= 1'h0;
 	else if ( wrusedw < 11'd600 )
 		asi_snk_ready_o <= 1'h1;
-	
+*/
+		
 resync_fifo_HDMI_tx resync_fifo_HDMI_tx_inst_0
 (
 	.data		( asi_snk_data_i			),
