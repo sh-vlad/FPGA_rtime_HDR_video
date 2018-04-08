@@ -21,9 +21,9 @@ module HDMI_tx
 	output reg							data_enable,
 	output reg							hsync,
 	output reg							vsync,
-	output wire		[ 7: 0]				data_r,
-	output wire		[ 7: 0]				data_g,
-	output wire		[ 7: 0]				data_b
+	output logic		[ 7: 0]			data_r,
+	output logic		[ 7: 0]			data_g,
+	output logic		[ 7: 0]			data_b
 	
 );
 //
@@ -121,7 +121,8 @@ always @( posedge clk )
 	else if ( wrusedw < 11'd600 )
 		asi_snk_ready_o <= 1'h1;
 */
-		
+
+`ifdef HDMI_TEST_OFF		
 resync_fifo_HDMI_tx resync_fifo_HDMI_tx_inst_0
 (
 	.data		( asi_snk_data_i			),
@@ -137,6 +138,22 @@ resync_fifo_HDMI_tx resync_fifo_HDMI_tx_inst_0
 	.wrfull     (							),
 	.wrusedw	( wrusedw					)
 );			
+`else
+localparam R_test = 8'd255;
+localparam G_test = 8'd255;
+localparam B_test = 8'd255;
+
+always @( posedge pixel_clk ) 
+	if ( (h_count > HBLANK) && (h_count <= (HBLANK + HACTIVE/4)))
+		{ data_b, data_g, data_r }	<= {8'h0, 8'h0, R_test};
+	else if ( (h_count > ( HBLANK + HACTIVE/4)) && (h_count <= ( HBLANK + (HACTIVE/4)*2 )))
+		{ data_b, data_g, data_r }	<= {8'h0, G_test, 8'h0};
+	else if ( (h_count > ( HBLANK + (HACTIVE/4)*2 )) && (h_count <= ( HBLANK + (HACTIVE/4)*3 )))
+		{ data_b, data_g, data_r }	<= {B_test, 8'h0, 8'h0};
+	else if ( (h_count > ( HBLANK + (HACTIVE/4)*3 )) && (h_count <= ( HBLANK + (HACTIVE/4)*4 )))
+		{ data_b, data_g, data_r }	<= {B_test, G_test, R_test};
+`endif
+
 
 endmodule
 
