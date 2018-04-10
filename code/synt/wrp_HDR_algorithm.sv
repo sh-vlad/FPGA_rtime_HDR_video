@@ -17,7 +17,7 @@ module wrp_HDR_algorithm
 	input wire		[DATA_WIDTH-1: 0] 	asi_snk_1_data_i,	
 	
 	output logic						aso_src_valid_o,
-	output logic	[DATA_WIDTH-1: 0]	aso_src_data_o,
+	output logic	[DATA_WIDTH+1: 0]	aso_src_data_o,
 	output logic						aso_src_startofpacket_o,
 	output logic						aso_src_endofpacket_o
 );
@@ -38,7 +38,7 @@ HDR_algorithm_Y
 delay_rg
 #(
 	.W				( 3				),
-	.D				( 21			)
+	.D				( 21+2			)
 )
 delay_weight
 (

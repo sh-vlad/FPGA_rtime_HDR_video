@@ -8,29 +8,29 @@ module HDR_algorithm
 )
 (
 //clocks & reset
-	input wire							clk,
+	input wire						clk,
 //
-	input wire	[DATA_WIDTH-1: 0]		data_i0,
-	input wire	[DATA_WIDTH-1: 0]		data_i1,
+	input wire	[DATA_WIDTH-1: 0]	data_i0,
+	input wire	[DATA_WIDTH-1: 0]	data_i1,
 	
-	output reg 	[DATA_WIDTH-1: 0]		data_o
+	output reg 	[DATA_WIDTH+1: 0]	data_o
 );
 //
 	wire 	[DATA_WIDTH-1: 0] 		weight_coef_0;
 	wire 	[DATA_WIDTH-1: 0] 		weight_coef_1;
 	
-	reg		[DATA_WIDTH-1: 0] 		weight_coef_sum;
-	wire 	[DATA_WIDTH-1: 0] 		weight_coef_sum_delay;	
+	reg		[DATA_WIDTH: 0] 		weight_coef_sum;
+	wire 	[DATA_WIDTH: 0] 		weight_coef_sum_delay;	
 	
 	wire 	[DATA_WIDTH-1: 0] 		bright_delay_0;			
 	wire 	[DATA_WIDTH-1: 0] 		bright_delay_1;	
 
-	reg 	[(DATA_WIDTH*2)-1: 0]	mult_0;
-	reg 	[(DATA_WIDTH*2)-1: 0] 	mult_1;	
-	reg	 	[(DATA_WIDTH*2): 0]   	E;	
+	reg 	[(DATA_WIDTH*2): 0]		mult_0;
+	reg 	[(DATA_WIDTH*2): 0] 	mult_1;	
+	reg	 	[(DATA_WIDTH*2)+1: 0]   E;	
 	
-	wire	[15: 0]  				quotient;
-	wire	[ 7: 0]  				remain;	
+	wire	[17: 0]  				quotient;
+	wire	[ 8: 0]  				remain;	
 	
 delay_rg
 #(
@@ -80,12 +80,12 @@ calc_weight_coef_1
 
 delay_rg
 #(
-	.W				( DATA_WIDTH	),
+	.W				( DATA_WIDTH+1	),
 	.D				( 2				)
 )
 delay_weight
 (
-	.clk			( clk			),
+	.clk			( clk					),
 	.data_in		( weight_coef_sum		),
 	.data_out       ( weight_coef_sum_delay	)
 );
@@ -114,8 +114,8 @@ HDR_divider HDR_divider_inst
 
 always @( posedge clk )
 	if ( remain > 0 )
-		data_o	<= quotient[8:1] + 1'h1;
+		data_o	<= quotient[9:0] + 1'h1;
 	else
-		data_o	<= quotient[8:1];
+		data_o	<= quotient[9:0];
 
 endmodule

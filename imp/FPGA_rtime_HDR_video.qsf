@@ -124,6 +124,13 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HDMI_TX_INT
 set_global_assignment -name VERILOG_INPUT_VERSION SYSTEMVERILOG_2005
 set_global_assignment -name VERILOG_SHOW_LMF_MAPPING_MESSAGES OFF
 #>>>>>>> vsh_t4
+set_global_assignment -name VERILOG_MACRO "GLOBAL_BUFFERS=1"
+set_global_assignment -name VERILOG_MACRO "DEBUG_OFF=1"
+set_global_assignment -name VERILOG_MACRO "HDMI_TEST_OFF=1"
+set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/min_max_detector.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/wrp_tone_mapping.sv
+set_global_assignment -name VERILOG_FILE ../code/synt/tone_mapping_divider.v
+set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/tone_mapping.sv
 set_global_assignment -name VERILOG_FILE ../code/synt/resync_fifo_HDMI_tx.v
 set_global_assignment -name VERILOG_FILE ../code/synt/dvp2avl_stream/convert2avl_stream_raw.v
 set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/raw2rgb_bilinear_interp.sv
@@ -149,7 +156,4 @@ set_global_assignment -name SYSTEMVERILOG_FILE ../top/FPGA_rtime_HDR_video_top.s
 set_global_assignment -name SIGNALTAP_FILE output_files/stp1.stp
 set_global_assignment -name QIP_FILE ../code/synt/logo_mem.qip
 set_global_assignment -name HEX_FILE ../code/synt/logo.hex
-set_global_assignment -name VERILOG_MACRO "GLOBAL_BUFFERS=1"
-set_global_assignment -name VERILOG_MACRO "DEBUG_OFF=1"
-set_global_assignment -name VERILOG_MACRO "HDMI_TEST_OFF=1"
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

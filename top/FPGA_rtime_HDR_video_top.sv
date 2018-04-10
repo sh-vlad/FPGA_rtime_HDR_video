@@ -45,22 +45,37 @@ wire				raw_data_sop;
 wire				raw_data_eop;
 //
 wire				HDR_valid;			
-wire	[ 7: 0]		HDR_data;			
+wire	[ 9: 0]		HDR_data;			
 wire				HDR_sop;			
 wire				HDR_eop;	
 //
-logic	[ 7: 0]		raw2rgb_data;
+logic	[ 9: 0]		raw2rgb_data;
 logic				raw2rgb_valid;
 logic				raw2rgb_sop;
 logic				raw2rgb_eop;
 //
-wire 	[ 7: 0]		r_data;
-wire 	[ 7: 0]		g_data;
-wire 	[ 7: 0]		b_data;
+wire 	[ 9: 0]		r_data;
+wire 	[ 9: 0]		g_data;
+wire 	[ 9: 0]		b_data;
 wire 				data_rgb_valid;
 wire 				sop_rgb		  ;
 wire 				eop_rgb	      ;
-
+//
+/*wire 	[ 7: 0]		r_tm;
+wire 	[ 7: 0]		g_tm;
+wire 	[ 7: 0]		b_tm;*/
+wire 	[ 7: 0]		rgb_tm[3];
+wire 				data_tm_valid;
+wire 				sop_tm		  ;
+wire 				eop_tm	      ;
+//
+reg 	[ 7: 0]		r_fb;
+reg 	[ 7: 0]		g_fb;
+reg 	[ 7: 0]		b_fb;
+reg 				data_fb_valid;
+reg 				sop_fb		  ;
+reg 				eop_fb	      ;
+//
 pll_0 pll_0_inst
 (
 	.refclk   		( clk50			),
@@ -155,20 +170,20 @@ wrp_HDR_algorithm_inst
 
 //mode mux
 always @( posedge sys_clk_b )
-	case ( switches_resync[2]/*switches*/ )
-		4'd1:	begin					// cam №0
+	casex ( switches_resync[2]/*switches*/ )
+		4'b??01:begin					// cam №0
 					raw2rgb_data	<= raw_data_0;
 					raw2rgb_valid   <= raw_data_valid;
 					raw2rgb_sop     <= raw_data_sop;
 					raw2rgb_eop     <= raw_data_eop;
 				end
-		4'd2:	begin					// cam №1
+		4'b??10:begin					// cam №1
 					raw2rgb_data	<= raw_data_1;
 					raw2rgb_valid   <= raw_data_valid;
 					raw2rgb_sop     <= raw_data_sop;
 					raw2rgb_eop		<= raw_data_eop;
 				end
-		4'd3:	begin					// HDR
+		4'b??11:begin					// HDR
 					raw2rgb_data	<= HDR_data;
 					raw2rgb_valid   <= HDR_valid;
 					raw2rgb_sop     <= HDR_sop;
@@ -186,7 +201,7 @@ always @( posedge sys_clk_b )
 //convert raw to rgb
 raw2rgb_bilinear_interp 
 #(
-	.DATA_WIDTH		( 8	)
+	.DATA_WIDTH		( 10	)
 )
 raw2rgb_bilinear_interp_inst
 (
@@ -204,6 +219,74 @@ raw2rgb_bilinear_interp_inst
 	.eop_o	        ( eop_rgb	      	)
 );
 
+//tone mapping
+wire [9:0] rgb_arr[3]; 
+assign rgb_arr[2] = r_data;
+assign rgb_arr[1] = g_data;
+assign rgb_arr[0] = b_data;
+wrp_tone_mapping
+#(
+    .W		( 10		)
+)
+wrp_tone_mapping_inst
+(
+	.clk		( sys_clk_b					),
+	.reset_n    ( reset_n_b					),
+    .sop        ( sop_rgb					),
+	.eop        ( eop_rgb					),
+	.valid      ( data_rgb_valid			),
+	.data       ( rgb_arr/*{r_data, g_data, b_data }*/	),
+	.data_o		( rgb_tm					),
+    .sop_o		( sop_tm					),
+	.eop_o      ( eop_tm					),
+	.valid_o	( data_tm_valid				)	
+);
+
+always @( posedge sys_clk_b )
+	begin
+		casex ( switches_resync[2]/**/ )
+			4'b?001:begin
+						r_fb			<= r_data[7:0]	;			
+						g_fb			<= g_data[7:0]	;
+						b_fb			<= b_data[7:0]	;
+						data_fb_valid	<= data_rgb_valid;
+						sop_fb		  	<= sop_rgb		;
+						eop_fb	      	<= eop_rgb	    ;				
+					end	
+			4'b?010:begin
+						r_fb			<= r_data[7:0]	;			
+						g_fb			<= g_data[7:0]	;
+						b_fb			<= b_data[7:0]	;
+						data_fb_valid	<= data_rgb_valid;
+						sop_fb		  	<= sop_rgb		;
+						eop_fb	      	<= eop_rgb	    ;			
+					end	
+			4'b?011:begin
+						r_fb			<= r_data[8:1]	;			
+						g_fb			<= g_data[8:1]	;
+						b_fb			<= b_data[8:1]	;
+						data_fb_valid	<= data_rgb_valid;
+						sop_fb		  	<= sop_rgb		 ;
+						eop_fb	      	<= eop_rgb	     ;			
+					end
+			4'b?111:begin
+						r_fb			<= rgb_tm[2];			
+						g_fb			<= rgb_tm[1];
+						b_fb			<= rgb_tm[0];
+						data_fb_valid	<= data_tm_valid;
+						sop_fb		  	<= eop_tm		;
+						eop_fb	      	<= sop_tm		;			
+					end
+			default:begin
+						r_fb			<= r_data[7:0]	;			
+						g_fb			<= g_data[7:0]	;
+						b_fb			<= b_data[7:0]	;
+						data_fb_valid	<= data_rgb_valid;
+						sop_fb		  	<= sop_rgb		;
+						eop_fb	      	<= eop_rgb	    ;				
+					end
+		endcase
+	end
 //instans frame buffer here ->
 
 // 	
@@ -217,11 +300,11 @@ HDMI_tx_inst
 	.clk						( sys_clk_b					),						
 	.pixel_clk                  ( pixel_clk					),
 	.reset_n	                ( reset_n_b					),
-	.asi_snk_valid_i            ( data_rgb_valid			),
+	.asi_snk_valid_i            ( data_fb_valid				),
 	.line_request_o             (							),
-	.asi_snk_data_i             ( {b_data, g_data, r_data} 	),
-	.asi_snk_startofpacket_i    ( sop_rgb					),
-	.asi_snk_endofpacket_i	    ( eop_rgb					),
+	.asi_snk_data_i             ( {b_fb, g_fb, r_fb} 		),
+	.asi_snk_startofpacket_i    ( sop_fb					),
+	.asi_snk_endofpacket_i	    ( eop_fb					),
 	.data_enable                ( data_enable				),
 	.hsync                      ( hsync						),
 	.vsync                      ( vsync						),
@@ -288,5 +371,39 @@ initial
 					end				
 			end   	
 	end
+	
+int r__tm,g__tm,b__tm;
+initial
+	begin
+		r__tm  = $fopen("r__tm.txt","w");
+		g__tm  = $fopen("g__tm.txt","w");
+		b__tm  = $fopen("b__tm.txt","w");
+		forever @( posedge sys_clk_b )
+			begin
+				if (data_tm_valid)
+					begin
+						$fwrite (r__tm,rgb_tm[2],"\n");
+						$fwrite (g__tm,rgb_tm[1],"\n");
+						$fwrite (b__tm,rgb_tm[0],"\n");
+					end				
+			end   	
+	end	
+	
+int rb_fb,gb_fb,bb_fb;
+initial
+	begin
+		rb_fb  = $fopen("rb_fb.txt","w");
+		gb_fb  = $fopen("gb_fb.txt","w");
+		bb_fb  = $fopen("bb_fb.txt","w");
+		forever @( posedge sys_clk_b )
+			begin
+				if (data_fb_valid)
+					begin
+						$fwrite (rb_fb,r_fb,"\n");
+						$fwrite (gb_fb,g_fb,"\n");
+						$fwrite (bb_fb,b_fb,"\n");
+					end				
+			end   	
+	end	
 `endif	
 endmodule

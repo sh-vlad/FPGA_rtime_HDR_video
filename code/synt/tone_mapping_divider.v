@@ -4,7 +4,7 @@
 // MODULE: LPM_DIVIDE 
 
 // ============================================================
-// File Name: HDR_divider.v
+// File Name: tone_mapping_divider.v
 // Megafunction Name(s):
 // 			LPM_DIVIDE
 //
@@ -36,7 +36,7 @@
 // synopsys translate_off
 `timescale 1 ps / 1 ps
 // synopsys translate_on
-module HDR_divider (
+module tone_mapping_divider (
 	clock,
 	denom,
 	numer,
@@ -44,15 +44,15 @@ module HDR_divider (
 	remain);
 
 	input	  clock;
-	input	[8:0]  denom;
+	input	[9:0]  denom;
 	input	[17:0]  numer;
 	output	[17:0]  quotient;
-	output	[8:0]  remain;
+	output	[9:0]  remain;
 
 	wire [17:0] sub_wire0;
-	wire [8:0] sub_wire1;
+	wire [9:0] sub_wire1;
 	wire [17:0] quotient = sub_wire0[17:0];
-	wire [8:0] remain = sub_wire1[8:0];
+	wire [9:0] remain = sub_wire1[9:0];
 
 	lpm_divide	LPM_DIVIDE_component (
 				.clock (clock),
@@ -64,11 +64,11 @@ module HDR_divider (
 				.clken (1'b1));
 	defparam
 		LPM_DIVIDE_component.lpm_drepresentation = "UNSIGNED",
-		LPM_DIVIDE_component.lpm_hint = "MAXIMIZE_SPEED=6,LPM_REMAINDERPOSITIVE=TRUE",
+		LPM_DIVIDE_component.lpm_hint = "LPM_REMAINDERPOSITIVE=TRUE",
 		LPM_DIVIDE_component.lpm_nrepresentation = "UNSIGNED",
 		LPM_DIVIDE_component.lpm_pipeline = 18,
 		LPM_DIVIDE_component.lpm_type = "LPM_DIVIDE",
-		LPM_DIVIDE_component.lpm_widthd = 9,
+		LPM_DIVIDE_component.lpm_widthd = 10,
 		LPM_DIVIDE_component.lpm_widthn = 18;
 
 
@@ -79,33 +79,33 @@ endmodule
 // ============================================================
 // Retrieval info: PRIVATE: INTENDED_DEVICE_FAMILY STRING "Cyclone V"
 // Retrieval info: PRIVATE: PRIVATE_LPM_REMAINDERPOSITIVE STRING "TRUE"
-// Retrieval info: PRIVATE: PRIVATE_MAXIMIZE_SPEED NUMERIC "6"
+// Retrieval info: PRIVATE: PRIVATE_MAXIMIZE_SPEED NUMERIC "-1"
 // Retrieval info: PRIVATE: SYNTH_WRAPPER_GEN_POSTFIX STRING "0"
 // Retrieval info: PRIVATE: USING_PIPELINE NUMERIC "1"
 // Retrieval info: PRIVATE: VERSION_NUMBER NUMERIC "2"
 // Retrieval info: PRIVATE: new_diagram STRING "1"
 // Retrieval info: LIBRARY: lpm lpm.lpm_components.all
 // Retrieval info: CONSTANT: LPM_DREPRESENTATION STRING "UNSIGNED"
-// Retrieval info: CONSTANT: LPM_HINT STRING "MAXIMIZE_SPEED=6,LPM_REMAINDERPOSITIVE=TRUE"
+// Retrieval info: CONSTANT: LPM_HINT STRING "LPM_REMAINDERPOSITIVE=TRUE"
 // Retrieval info: CONSTANT: LPM_NREPRESENTATION STRING "UNSIGNED"
 // Retrieval info: CONSTANT: LPM_PIPELINE NUMERIC "18"
 // Retrieval info: CONSTANT: LPM_TYPE STRING "LPM_DIVIDE"
-// Retrieval info: CONSTANT: LPM_WIDTHD NUMERIC "9"
+// Retrieval info: CONSTANT: LPM_WIDTHD NUMERIC "10"
 // Retrieval info: CONSTANT: LPM_WIDTHN NUMERIC "18"
 // Retrieval info: USED_PORT: clock 0 0 0 0 INPUT NODEFVAL "clock"
-// Retrieval info: USED_PORT: denom 0 0 9 0 INPUT NODEFVAL "denom[8..0]"
+// Retrieval info: USED_PORT: denom 0 0 10 0 INPUT NODEFVAL "denom[9..0]"
 // Retrieval info: USED_PORT: numer 0 0 18 0 INPUT NODEFVAL "numer[17..0]"
 // Retrieval info: USED_PORT: quotient 0 0 18 0 OUTPUT NODEFVAL "quotient[17..0]"
-// Retrieval info: USED_PORT: remain 0 0 9 0 OUTPUT NODEFVAL "remain[8..0]"
+// Retrieval info: USED_PORT: remain 0 0 10 0 OUTPUT NODEFVAL "remain[9..0]"
 // Retrieval info: CONNECT: @clock 0 0 0 0 clock 0 0 0 0
-// Retrieval info: CONNECT: @denom 0 0 9 0 denom 0 0 9 0
+// Retrieval info: CONNECT: @denom 0 0 10 0 denom 0 0 10 0
 // Retrieval info: CONNECT: @numer 0 0 18 0 numer 0 0 18 0
 // Retrieval info: CONNECT: quotient 0 0 18 0 @quotient 0 0 18 0
-// Retrieval info: CONNECT: remain 0 0 9 0 @remain 0 0 9 0
-// Retrieval info: GEN_FILE: TYPE_NORMAL HDR_divider.v TRUE
-// Retrieval info: GEN_FILE: TYPE_NORMAL HDR_divider.inc FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL HDR_divider.cmp FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL HDR_divider.bsf FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL HDR_divider_inst.v FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL HDR_divider_bb.v FALSE
+// Retrieval info: CONNECT: remain 0 0 10 0 @remain 0 0 10 0
+// Retrieval info: GEN_FILE: TYPE_NORMAL tone_mapping_divider.v TRUE
+// Retrieval info: GEN_FILE: TYPE_NORMAL tone_mapping_divider.inc FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL tone_mapping_divider.cmp FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL tone_mapping_divider.bsf FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL tone_mapping_divider_inst.v FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL tone_mapping_divider_bb.v FALSE
 // Retrieval info: LIB_FILE: lpm
