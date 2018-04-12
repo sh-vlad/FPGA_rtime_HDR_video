@@ -11,6 +11,7 @@ module HDMI_tx
 	input wire							clk,
 	input wire  						pixel_clk,  
 	input wire							reset_n,
+	input wire							frame_buffer_ready,
 // sink interface
 	input wire							asi_snk_valid_i,
 	output reg							line_request_o,
@@ -48,6 +49,15 @@ wire	[10: 0]  	wrusedw;
 reg					rdreq;
 reg					line_request_pclk;
 reg		[ 2: 0]		line_request_sys_clk;
+reg					frame_buffer_ready_lock;
+
+logic	[ 7: 0]		data_r_tmp;
+logic	[ 7: 0]		data_g_tmp;
+logic	[ 7: 0]		data_b_tmp;
+
+logic	[ 7: 0]		test_r;
+logic	[ 7: 0]		test_g;
+logic	[ 7: 0]		test_b;
 //making strobes 
 always @( posedge pixel_clk or negedge reset_n )
 	if ( !reset_n )
@@ -100,9 +110,19 @@ always @( posedge pixel_clk )
 always @( posedge clk )
 	begin
 		line_request_sys_clk <= {line_request_sys_clk[1:0], line_request_pclk };	
-		line_request_o <= line_request_sys_clk[1] & !line_request_sys_clk[2];
+		line_request_o <= ( line_request_sys_clk[1] & !line_request_sys_clk[2] ) & frame_buffer_ready_lock  ;
 	end	
-		
+
+always @( posedge clk or negedge reset_n )
+	if ( !reset_n )
+		frame_buffer_ready_lock <= 1'b0;
+	else	
+		if ( frame_buffer_ready && ( ( v_count >= VFRONT ) && ( v_count <= VFRONT + VSYNC ) ) )
+			frame_buffer_ready_lock <= 1'b1;
+		else if ( !frame_buffer_ready )
+			frame_buffer_ready_lock <= 1'b0;	
+	
+	
 //
 /*
 always @( posedge clk or negedge reset_n )
@@ -122,7 +142,7 @@ always @( posedge clk )
 		asi_snk_ready_o <= 1'h1;
 */
 
-`ifdef HDMI_TEST_OFF		
+//`ifdef HDMI_TEST_OFF		
 resync_fifo_HDMI_tx resync_fifo_HDMI_tx_inst_0
 (
 	.data		( asi_snk_data_i			),
@@ -130,7 +150,7 @@ resync_fifo_HDMI_tx resync_fifo_HDMI_tx_inst_0
 	.rdreq      ( rdreq						),
 	.wrclk      ( clk						),
 	.wrreq      ( asi_snk_valid_i			),
-	.q          ({ data_b, data_g, data_r }	),
+	.q          ({ data_b_tmp, data_g_tmp, data_r_tmp }	),
 	.rdempty    (							),
 	.rdfull     (							),
 	.rdusedw	(							),
@@ -138,22 +158,23 @@ resync_fifo_HDMI_tx resync_fifo_HDMI_tx_inst_0
 	.wrfull     (							),
 	.wrusedw	( wrusedw					)
 );			
-`else
+//`else
 localparam R_test = 8'd255;
 localparam G_test = 8'd255;
 localparam B_test = 8'd255;
 
 always @( posedge pixel_clk ) 
 	if ( (h_count > HBLANK) && (h_count <= (HBLANK + HACTIVE/4)))
-		{ data_b, data_g, data_r }	<= {8'h0, 8'h0, R_test};
+		{ test_b, test_g, test_r }	<= {8'h0, 8'h0, R_test};
 	else if ( (h_count > ( HBLANK + HACTIVE/4)) && (h_count <= ( HBLANK + (HACTIVE/4)*2 )))
-		{ data_b, data_g, data_r }	<= {8'h0, G_test, 8'h0};
+		{ test_b, test_g, test_r }	<= {8'h0, G_test, 8'h0};
 	else if ( (h_count > ( HBLANK + (HACTIVE/4)*2 )) && (h_count <= ( HBLANK + (HACTIVE/4)*3 )))
-		{ data_b, data_g, data_r }	<= {B_test, 8'h0, 8'h0};
+		{ test_b, test_g, test_r }	<= {B_test, 8'h0, 8'h0};
 	else if ( (h_count > ( HBLANK + (HACTIVE/4)*3 )) && (h_count <= ( HBLANK + (HACTIVE/4)*4 )))
-		{ data_b, data_g, data_r }	<= {B_test, G_test, R_test};
-`endif
+		{ test_b, test_g, test_r }	<= {B_test, G_test, R_test};
+//`endif
 
+assign { data_b, data_g, data_r } = ( frame_buffer_ready_lock ) ? { data_b_tmp, data_g_tmp, data_r_tmp } : { test_b, test_g, test_r };
 
 endmodule
 
