@@ -9,6 +9,7 @@ module hps_register_ov5640
 	output logic [15:0]                  address_ov5640 ,
 	output logic [7:0]                  data_ov5640    ,
 	output logic [31:0]                 reg_addr_buf_1  ,
+	output logic [31:0]                 reg_addr_buf_2  ,
 	output logic                       start_write_image2ddr  ,
 	 //шина avalon от моста hps2-to-fpga                          
 	avl_ifc.avl_write_slave_port        avl_h2f_write    
@@ -19,7 +20,12 @@ always_ff @( posedge clk_sys or negedge reset_n )
 		reg_addr_buf_1 <='0;
 	else if( write_hps & (avl_h2f_write.address[15:0] ==16'd0) )
 		reg_addr_buf_1 <=  avl_h2f_write.writedata;
-
+		
+always_ff @( posedge clk_sys or negedge reset_n )
+	if(~reset_n)
+		reg_addr_buf_2 <='0;
+	else if( write_hps & (avl_h2f_write.address[15:0] ==16'd1) )
+		reg_addr_buf_2 <=  avl_h2f_write.writedata;
 always_ff @( posedge clk_sys or negedge reset_n )
 	if(~reset_n)
 		start_write_image2ddr <='0;

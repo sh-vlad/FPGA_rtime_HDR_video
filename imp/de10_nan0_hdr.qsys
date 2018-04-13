@@ -17,6 +17,14 @@
          type = "int";
       }
    }
+   element clk_1
+   {
+      datum _sortIndex
+      {
+         value = "3";
+         type = "int";
+      }
+   }
    element h2f_bridge_dsp_0
    {
       datum _sortIndex
@@ -60,6 +68,7 @@
    type="avalon"
    dir="start" />
  <interface name="clk" internal="clk_0.clk_in" type="clock" dir="end" />
+ <interface name="clk_0" internal="clk_1.clk_in" type="clock" dir="end" />
  <interface
    name="f2h_sdram0"
    internal="hps_0.f2h_sdram0_data"
@@ -70,10 +79,21 @@
    internal="hps_0.f2h_sdram1_data"
    type="avalon"
    dir="end" />
+ <interface
+   name="h2f_reset_out"
+   internal="hps_0.h2f_reset"
+   type="reset"
+   dir="start" />
  <interface name="hps_io" internal="hps_0.hps_io" type="conduit" dir="end" />
  <interface name="memory" internal="hps_0.memory" type="conduit" dir="end" />
- <interface name="reset_n" internal="clk_0.clk_reset" type="reset" dir="start" />
+ <interface name="reset_in" internal="clk_0.clk_in_reset" type="reset" dir="end" />
  <module name="clk_0" kind="clock_source" version="17.1" enabled="1">
+  <parameter name="clockFrequency" value="50000000" />
+  <parameter name="clockFrequencyKnown" value="true" />
+  <parameter name="inputClockFrequency" value="0" />
+  <parameter name="resetSynchronousEdges" value="NONE" />
+ </module>
+ <module name="clk_1" kind="clock_source" version="17.1" enabled="1">
   <parameter name="clockFrequency" value="100000000" />
   <parameter name="clockFrequencyKnown" value="true" />
   <parameter name="inputClockFrequency" value="0" />
@@ -199,7 +219,7 @@
   <parameter name="F2SCLK_SDRAMCLK_FREQ" value="0" />
   <parameter name="F2SCLK_WARMRST_Enable" value="false" />
   <parameter name="F2SDRAM_Type">Avalon-MM Write-Only,Avalon-MM Read-Only</parameter>
-  <parameter name="F2SDRAM_Width" value="64,64" />
+  <parameter name="F2SDRAM_Width" value="64,32" />
   <parameter name="F2SINTERRUPT_Enable" value="false" />
   <parameter name="F2S_Width" value="0" />
   <parameter name="FIX_READ_LATENCY" value="8" />
@@ -252,9 +272,9 @@
   <parameter name="HLGPI_Enable" value="false" />
   <parameter name="HPS_PROTOCOL" value="DDR3" />
   <parameter name="I2C0_Mode" value="I2C" />
-  <parameter name="I2C0_PinMuxing" value="HPS I/O Set 1" />
-  <parameter name="I2C1_Mode" value="N/A" />
-  <parameter name="I2C1_PinMuxing" value="Unused" />
+  <parameter name="I2C0_PinMuxing" value="HPS I/O Set 0" />
+  <parameter name="I2C1_Mode" value="I2C" />
+  <parameter name="I2C1_PinMuxing" value="HPS I/O Set 0" />
   <parameter name="I2C2_Mode" value="N/A" />
   <parameter name="I2C2_PinMuxing" value="Unused" />
   <parameter name="I2C3_Mode" value="N/A" />
@@ -307,19 +327,19 @@
   <parameter name="MEM_SRT" value="Normal" />
   <parameter name="MEM_TCL" value="7" />
   <parameter name="MEM_TFAW_NS" value="37.5" />
-  <parameter name="MEM_TINIT_US" value="499" />
-  <parameter name="MEM_TMRD_CK" value="3" />
-  <parameter name="MEM_TRAS_NS" value="40.0" />
-  <parameter name="MEM_TRCD_NS" value="15.0" />
-  <parameter name="MEM_TREFI_US" value="7.0" />
-  <parameter name="MEM_TRFC_NS" value="75.0" />
-  <parameter name="MEM_TRP_NS" value="15.0" />
+  <parameter name="MEM_TINIT_US" value="500" />
+  <parameter name="MEM_TMRD_CK" value="4" />
+  <parameter name="MEM_TRAS_NS" value="35.0" />
+  <parameter name="MEM_TRCD_NS" value="13.75" />
+  <parameter name="MEM_TREFI_US" value="7.8" />
+  <parameter name="MEM_TRFC_NS" value="300.0" />
+  <parameter name="MEM_TRP_NS" value="13.75" />
   <parameter name="MEM_TRRD_NS" value="7.5" />
   <parameter name="MEM_TRTP_NS" value="7.5" />
   <parameter name="MEM_TWR_NS" value="15.0" />
-  <parameter name="MEM_TWTR" value="2" />
+  <parameter name="MEM_TWTR" value="4" />
   <parameter name="MEM_USER_LEVELING_MODE" value="Leveling" />
-  <parameter name="MEM_VENDOR" value="Micron" />
+  <parameter name="MEM_VENDOR" value="Other" />
   <parameter name="MEM_VERBOSE" value="true" />
   <parameter name="MEM_VOLTAGE" value="1.5V DDR3" />
   <parameter name="MEM_WTCL" value="7" />
@@ -468,10 +488,10 @@
   <parameter name="SKIP_MEM_INIT" value="true" />
   <parameter name="SOPC_COMPAT_RESET" value="false" />
   <parameter name="SPEED_GRADE" value="7" />
-  <parameter name="SPIM0_Mode" value="Single Slave Select" />
-  <parameter name="SPIM0_PinMuxing" value="HPS I/O Set 0" />
-  <parameter name="SPIM1_Mode" value="N/A" />
-  <parameter name="SPIM1_PinMuxing" value="Unused" />
+  <parameter name="SPIM0_Mode" value="N/A" />
+  <parameter name="SPIM0_PinMuxing" value="Unused" />
+  <parameter name="SPIM1_Mode" value="Single Slave Select" />
+  <parameter name="SPIM1_PinMuxing" value="HPS I/O Set 0" />
   <parameter name="SPIS0_Mode" value="N/A" />
   <parameter name="SPIS0_PinMuxing" value="Unused" />
   <parameter name="SPIS1_Mode" value="N/A" />
@@ -531,7 +551,7 @@
   <parameter name="TREFI" value="35100" />
   <parameter name="TRFC" value="350" />
   <parameter name="UART0_Mode" value="No Flow Control" />
-  <parameter name="UART0_PinMuxing" value="HPS I/O Set 2" />
+  <parameter name="UART0_PinMuxing" value="HPS I/O Set 0" />
   <parameter name="UART1_Mode" value="N/A" />
   <parameter name="UART1_PinMuxing" value="Unused" />
   <parameter name="USB0_Mode" value="N/A" />
@@ -630,32 +650,32 @@
  <connection
    kind="clock"
    version="17.1"
-   start="clk_0.clk"
+   start="clk_1.clk"
    end="h2f_bridge_dsp_0.clock_dsp" />
  <connection
    kind="clock"
    version="17.1"
-   start="clk_0.clk"
+   start="clk_1.clk"
    end="hps_0.f2h_sdram0_clock" />
  <connection
    kind="clock"
    version="17.1"
-   start="clk_0.clk"
+   start="clk_1.clk"
    end="hps_0.f2h_sdram1_clock" />
  <connection
    kind="clock"
    version="17.1"
-   start="clk_0.clk"
+   start="clk_1.clk"
    end="hps_0.h2f_axi_clock" />
  <connection
    kind="reset"
    version="17.1"
-   start="hps_0.h2f_reset"
-   end="clk_0.clk_in_reset" />
+   start="clk_0.clk_reset"
+   end="clk_1.clk_in_reset" />
  <connection
    kind="reset"
    version="17.1"
-   start="hps_0.h2f_reset"
+   start="clk_0.clk_reset"
    end="h2f_bridge_dsp_0.reset" />
  <interconnectRequirement for="$system" name="qsys_mm.clockCrossingAdapter" value="HANDSHAKE" />
  <interconnectRequirement for="$system" name="qsys_mm.enableEccProtection" value="FALSE" />
