@@ -28,14 +28,14 @@ module HDMI_tx
 	
 );
 //
-localparam HFRONT	= 110		- 1;
-localparam HSYNC	= 40		- 1;
-localparam HBACK	= 220		- 1;
-localparam HACTIVE	= 1280		- 1;
-localparam VFRONT	= 5			- 1;
-localparam VSYNC	= 5			- 1;
-localparam VBACK	= 20		- 1;
-localparam VACTIVE 	= 720		- 1;
+localparam HFRONT	= 110	;
+localparam HSYNC	= 40	;
+localparam HBACK	= 220	;
+localparam HACTIVE	= 1280	;
+localparam VFRONT	= 5		;
+localparam VSYNC	= 5		;
+localparam VBACK	= 20	;
+localparam VACTIVE 	= 720	;
 //
 localparam HBLANK 	= HFRONT + HSYNC + HBACK;
 localparam HTOTAL	= HBLANK + HACTIVE;
@@ -72,7 +72,7 @@ always @( posedge pixel_clk or negedge reset_n )
 	if ( !reset_n )
 		v_count	<= 13'h0;
 	else
-		if ( v_count == VTOTAL )
+		if ( v_count == VTOTAL+1 )
 			v_count <= 13'h0;
 		else if ( h_count == HFRONT )
 			v_count	<= v_count + 1'h1;
@@ -102,7 +102,7 @@ always @( posedge pixel_clk )
 		rdreq	<= 1'h1;		
 //
 always @( posedge pixel_clk )
-	if ( ( h_count >= HBLANK-10 && h_count <= HBLANK ) && ( v_count >= VBLANK && v_count < VTOTAL-1 ) )
+	if ( ( h_count >= HBLANK-10 && h_count <= HBLANK ) && ( v_count >= VBLANK && v_count < VTOTAL ) )
 		line_request_pclk <= 1'h1;
 	else
 		line_request_pclk <= 1'h0;
@@ -121,26 +121,7 @@ always @( posedge clk or negedge reset_n )
 			frame_buffer_ready_lock <= 1'b1;
 		else if ( !frame_buffer_ready )
 			frame_buffer_ready_lock <= 1'b0;	
-	
-	
-//
-/*
-always @( posedge clk or negedge reset_n )
-	if ( !reset_n )	
-		string_num	<= 	13'h0;
-	else
-	
-		if ( asi_snk_startofpacket_i )
-			string_num	<= string_num  + 1'h1;
-		else if ( ( string_num == VACTIVE ) && asi_snk_endofpacket_i )
-			string_num	<= 	13'h0;
 
-always @( posedge clk )
-	if ( asi_snk_endofpacket_i || ( string_num == 13'h0 && v_count > ( VBLANK - 1 ) ) )
-		asi_snk_ready_o <= 1'h0;
-	else if ( wrusedw < 11'd600 )
-		asi_snk_ready_o <= 1'h1;
-*/
 
 //`ifdef HDMI_TEST_OFF		
 resync_fifo_HDMI_tx resync_fifo_HDMI_tx_inst_0
