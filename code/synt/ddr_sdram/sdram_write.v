@@ -1,12 +1,4 @@
-//////////////////////////////////////////////////////
-//Name File     : sdram_write                       //
-//Author        : Andrey Papushin                   //
-//Email         : a.s.papushin@npk-pelengator.ru    //
-//Standart      : IEEE 1800—2009(SystemVerilog-2009)//
-//Company       : npk pelengator                    //
-//Start design  : 11.05.2017                        //
-//Last revision : 29.01.2018                        //
-//////////////////////////////////////////////////////
+
 module sdram_write
 (
 	input  wire  						    clk_100         	,   
@@ -17,13 +9,14 @@ module sdram_write
 	input  wire  [63:0]                     data_ddr            ,
     input  wire                             valid_data_ddr      ,
 	input  wire  [31:0]                     reg_addr_buf_1  	,  // адрес 1-го буфера в ddr памяти
+	input  wire  [31:0]                     reg_addr_buf_2  	,  // адрес 1-го буфера в ddr памяти
+	output wire                             end_frame           ,
 	sdram_ifc.sdram_write_master_port       f2h_sdram2             // avl интерфейс к sdram 
 );
 
 wire         [95:0]     data_fifo_frame  ;
 
 reg [1:0]running_write_ddr;
-wire end_frame;
 wire last_burst;
 // запись сырого сигнала во время работы синхронизатора
 write_to_buf_frame write_to_buf_frame_inst
@@ -67,7 +60,7 @@ wire ready_read            = data_fifo_frame[95] & !f2h_sdram2.waitrequest & !ru
 wire p_ready_read          = ready_read & !sh_ready_read; // передний фронт  ready_read
 wire start_read            = p_ready_read & !running_read; // импульс начала чтения из FiFo
 wire start_read_burst_fifo = p_ready_read & !run_read_fifo_64; // импульс начала чтения берста из FiFo
-
+reg ctrl_buff;
 /* сигнал разрешения чтения из FiFo */
 wire rdreq                 = run_read_fifo_64 & !f2h_sdram2.waitrequest & !empty;
 /* импульс начала чтения из FiFo (один раз выставляется)*/
@@ -94,6 +87,11 @@ always_ff @(posedge clk_200  or negedge reset_n)
 	else if(start_read  )
 		running_read <= 1'd1;
 		
+always_ff @(posedge clk_200  or negedge reset_n)
+	if (~reset_n)
+		ctrl_buff <= 1'd0;
+	else if(start_frame)
+		ctrl_buff <= ~ctrl_buff;	
 // интервал чтения из fifo 64 элементов
 always_ff @(posedge clk_200  or negedge reset_n)
 	if (~reset_n)
@@ -109,8 +107,6 @@ always_ff @(posedge clk_100  or negedge reset_n)
 		running_write_ddr <=2'b01;
 		else if(running_write_ddr ==2'b01 & start_frame)
 		running_write_ddr <=2'b11;
-	else if(end_frame)
-		running_write_ddr <='0;
 // сдвиговый регистр на f=200 MHz
 always_ff @(posedge clk_200  or negedge reset_n)
 	if (~reset_n)
@@ -180,8 +176,10 @@ always_ff @(posedge clk_200  or negedge reset_n)
 always_ff @(posedge clk_200  or negedge reset_n)
 	if (~reset_n)
 		data_address <= 29'd0;
-	else if(start_frame)
+	else if(start_frame & !ctrl_buff)
 		data_address <= reg_addr_buf_1[28:0];
+	else if(start_frame & ctrl_buff)
+		data_address <= reg_addr_buf_2[28:0];
 	else if(n_write_sdram)
 		data_address <= data_address + 29'd32;
 

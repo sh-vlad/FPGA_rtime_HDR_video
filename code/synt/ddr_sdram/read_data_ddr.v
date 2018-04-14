@@ -5,14 +5,17 @@ module read_data_ddr
 	input  wire 						    reset_b         ,
 	input  wire                             line_request	,
 	input  wire                             start_read_image_from_ddr	,
+	input  wire                             done_write_frame	,
 	output  reg                             frame_buffer_ready	,
 	output reg  [7:0]                       r_data          ,
 	output reg  [7:0]                       g_data          ,
 	output reg  [7:0]                       b_data          ,
 	output reg                              valid_rgb       ,
-	input  wire [29:0]                      addr_read_ddr   ,
+	input  wire [29:0]                      addr_read_ddr1   ,
+	input  wire [29:0]                      addr_read_ddr2   ,
 	sdram_ifc.sdram_read_master_port        f2h_sdram         // avl интерфейс к sdram 
 );
+reg ctrl_buff;
 reg last_burst;
 reg ready_start;
 reg [13:0] count_burst;
@@ -45,7 +48,7 @@ always @( posedge clk_100 or negedge reset_b )
 always @( posedge clk_100 or negedge reset_b )
 	if ( !reset_b ) 
 		frame_buffer_ready <= 1'd0;	
-	else if(start_read_image_from_ddr)
+	else if(done_write_frame)
 		frame_buffer_ready <= 1;
 always @( posedge clk_100 or negedge reset_b )
 	if ( !reset_b ) 
@@ -54,6 +57,11 @@ always @( posedge clk_100 or negedge reset_b )
 		ready_start <= 0;
 	else if(frame_buffer_ready & line_request)
 		ready_start <= 1;
+always_ff @(posedge clk_100  or negedge reset_b)
+	if (~reset_b)
+		ctrl_buff <= 1'd0;
+	else if(done_write_frame)
+		ctrl_buff <= ~ctrl_buff;	
 // флаг валидности данных на f=100MHz
 always_ff @(posedge clk_100  or negedge reset_b)
 	if (~reset_b)
@@ -114,10 +122,15 @@ always_ff @(posedge clk_100  or negedge reset_b)
 		address     <= 'd0; 
 		burstcount  <= 8'd80; 
 	end
-	else if(sh_start_read & !read_frame)
+	else if(sh_start_read & !read_frame & ctrl_buff)
 	begin
 		read        <= 1'd1;
-		address     <= addr_read_ddr;
+		address     <= addr_read_ddr1;
+	end
+	else if(sh_start_read & !read_frame & !ctrl_buff)
+	begin
+		read        <= 1'd1;
+		address     <= addr_read_ddr2;
 	end
 	else if((last_unit_burst & !end_frame & !end_line) || (read_frame & sh_start_read))
 	begin

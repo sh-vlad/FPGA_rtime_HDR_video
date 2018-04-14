@@ -161,6 +161,7 @@ wire                start_write_image2ddr;
 wire                SIOD_o;
 wire                SIOC_o;
 wire [31:0]         reg_addr_buf_1;
+wire [31:0]         reg_addr_buf_2;
 
 
 
@@ -180,7 +181,7 @@ de10_nan0_hdr de10_nan0_hdr_inst
 	.f2h_sdram0_waitrequest             ( f2h_sdram0.waitrequest     ),
 	.f2h_sdram0_writedata               ( f2h_sdram0.writedata       ),
 	.f2h_sdram0_byteenable              ( f2h_sdram0.byteenable      ),
-	.f2h_sdram0_write                   ( 1'b0                       ),
+	.f2h_sdram0_write                   ( f2h_sdram0.write       ),            
 	.f2h_sdram1_address                 ( f2h_sdram1.address         ),
 	.f2h_sdram1_burstcount              ( f2h_sdram1.burstcount      ),
 	.f2h_sdram1_waitrequest             ( f2h_sdram1.waitrequest     ),
@@ -301,7 +302,7 @@ always @( posedge sys_clk_b )
 				switches_resync[2] <= switches_resync[1];
 		end
 wire start_frame;	
-wire valid_data_ddr;	
+reg [1:0] valid_data_ddr;	
 wire [63:0] data_ddr;
 //resync cam clk to sys clk
 convert2avl_stream_raw convert2avl_stream_raw_inst
@@ -323,8 +324,8 @@ convert2avl_stream_raw convert2avl_stream_raw_inst
 	.SOF    	       	( raw_data_sop	),
 	.EOF    	       	( raw_data_eop	),
 	.start_frame     	(start_frame),
-	.data_ddr        	(data_ddr),
-    .valid_data_ddr	    (valid_data_ddr)
+	.data_ddr        	(/*data_ddr      */),
+    .valid_data_ddr	    (/*valid_data_ddr*/)
 	
 );
 reg [14:0] cnt_clk24;
@@ -369,7 +370,7 @@ SCCB_interface SCCB_interface_inst
 	.SIOC_oe           (SIOC_o                     ), // ->
 	.SIOD_oe           (SIOD_o                     ) // ->
 );
-
+wire end_frame;
 hps_register_ov5640 hps_register_ov5640_inst
 (
 	.clk_sys               (sys_clk_b                   ),
@@ -392,8 +393,10 @@ sdram_write sdram_write_inst
     .start_frame        (start_frame   ),
     .start_write_image2ddr(start_write_image2ddr   ),
     .data_ddr           (data_ddr      ),
-    .valid_data_ddr     (valid_data_ddr),
+    .valid_data_ddr     (valid_data_ddr[1]),
     .reg_addr_buf_1     (reg_addr_buf_1),
+    .reg_addr_buf_2     (reg_addr_buf_2),
+    .end_frame     (end_frame),
     .f2h_sdram2         (f2h_sdram0.sdram_write_master_port)
 
 );
@@ -484,6 +487,19 @@ raw2rgb_bilinear_interp_inst
 	.eop_o	        ( eop_rgb	      	)
 );
 
+always_ff @(posedge sys_clk_b  or negedge reset_n_b)
+	if (~reset_n_b)
+		valid_data_ddr <= 2'd0;
+	else if(valid_data_ddr == 2'd2)
+		valid_data_ddr <= 2'd0;
+	else if(data_rgb_valid)
+		valid_data_ddr <= valid_data_ddr + 2'd1;
+	
+always_ff @(posedge sys_clk_b  or negedge reset_n_b)
+	if (~reset_n_b)
+		data_ddr <= 64'd0;
+	else if(data_rgb_valid)
+		data_ddr <= {data_ddr[31:0],8'd0,b_data, g_data, r_data};
 //tone mapping
 wire [9:0] rgb_arr[3]; 
 assign rgb_arr[2] = r_data;
@@ -563,19 +579,22 @@ wire [7:0] b_data_ddr;
 wire data_rgb_valid_ddr;
 wire read_data_ddr;
 wire frame_buffer_ready;
+wire done_write_frame;
 // 	
 read_data_ddr read_data_ddr_inst
 (
 	.clk_100        (sys_clk_b                        ),    
 	.reset_b        (reset_n_b                        ),
 	.line_request   (line_request                     ),
+	.done_write_frame   (end_frame                     ),
 	.start_read_image_from_ddr   (start_write_image2ddr                     ),
 	.frame_buffer_ready (frame_buffer_ready),
 	.r_data         (r_data_ddr                       ),
 	.g_data         (g_data_ddr                       ),
 	.b_data         (b_data_ddr                       ),
 	.valid_rgb      (data_rgb_valid_ddr                   ),
-	.addr_read_ddr  ('hFC40000                   ),
+	.addr_read_ddr1  ({reg_addr_buf_1,1'b0}                    ),
+	.addr_read_ddr2  ({reg_addr_buf_2,1'b0}                     ),
 	.f2h_sdram      (f2h_sdram1.sdram_read_master_port)
 );
 HDMI_tx
