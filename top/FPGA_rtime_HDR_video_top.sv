@@ -142,12 +142,21 @@ wire 				data_tm_valid;
 wire 				sop_tm		  ;
 wire 				eop_tm	      ;
 //
-reg 	[ 7: 0]		r_fb;
-reg 	[ 7: 0]		g_fb;
-reg 	[ 7: 0]		b_fb;
-reg 				data_fb_valid;
-reg 				sop_fb		  ;
-reg 				eop_fb	      ;
+wire 	[ 7: 0]		r_fb;
+wire 	[ 7: 0]		g_fb;
+wire 	[ 7: 0]		b_fb;
+wire 				data_fb_valid;
+wire 				sop_fb		  ;
+wire 				eop_fb	      ;
+
+reg 	[ 7: 0]		r_fb_test			;
+reg 	[ 7: 0]		g_fb_test			;
+reg 	[ 7: 0]		b_fb_test			;
+reg 				data_fb_valid_test	;
+reg 				sop_fb_test		  	;
+reg 				eop_fb_test	      	;
+
+
 //
 
 wire                start_ov5640;
@@ -497,47 +506,70 @@ always @( posedge sys_clk_b )
 	begin
 		casex ( switches_resync[2]/**/ )
 			4'b?001:begin
-						r_fb			<= r_data[7:0]	;			
-						g_fb			<= g_data[7:0]	;
-						b_fb			<= b_data[7:0]	;
-						data_fb_valid	<= data_rgb_valid;
-						sop_fb		  	<= sop_rgb		;
-						eop_fb	      	<= eop_rgb	    ;				
+						r_fb_test			<= r_data[7:0]	;			
+						g_fb_test			<= g_data[7:0]	;
+						b_fb_test			<= b_data[7:0]	;
+						data_fb_valid_test	<= data_rgb_valid;
+						sop_fb_test		  	<= sop_rgb		;
+						eop_fb_test	      	<= eop_rgb	    ;				
 					end	
 			4'b?010:begin
-						r_fb			<= r_data[7:0]	;			
-						g_fb			<= g_data[7:0]	;
-						b_fb			<= b_data[7:0]	;
-						data_fb_valid	<= data_rgb_valid;
-						sop_fb		  	<= sop_rgb		;
-						eop_fb	      	<= eop_rgb	    ;			
+						r_fb_test			<= r_data[7:0]	;			
+						g_fb_test			<= g_data[7:0]	;
+						b_fb_test			<= b_data[7:0]	;
+						data_fb_valid_test	<= data_rgb_valid;
+						sop_fb_test		  	<= sop_rgb		;
+						eop_fb_test	      	<= eop_rgb	    ;			
 					end	
 			4'b?011:begin
-						r_fb			<= r_data[8:1]	;			
-						g_fb			<= g_data[8:1]	;
-						b_fb			<= b_data[8:1]	;
-						data_fb_valid	<= data_rgb_valid;
-						sop_fb		  	<= sop_rgb		 ;
-						eop_fb	      	<= eop_rgb	     ;			
+						r_fb_test			<= r_data[8:1]	;			
+						g_fb_test			<= g_data[8:1]	;
+						b_fb_test			<= b_data[8:1]	;
+						data_fb_valid_test	<= data_rgb_valid;
+						sop_fb_test		  	<= sop_rgb		 ;
+						eop_fb_test	      	<= eop_rgb	     ;			
 					end
 			4'b?111:begin
-						r_fb			<= rgb_tm[2];			
-						g_fb			<= rgb_tm[1];
-						b_fb			<= rgb_tm[0];
-						data_fb_valid	<= data_tm_valid;
-						sop_fb		  	<= eop_tm		;
-						eop_fb	      	<= sop_tm		;			
+						r_fb_test			<= rgb_tm[2];			
+						g_fb_test			<= rgb_tm[1];
+						b_fb_test			<= rgb_tm[0];
+						data_fb_valid_test	<= data_tm_valid;
+						sop_fb_test		  	<= eop_tm		;
+						eop_fb_test	      	<= sop_tm		;			
 					end
 			default:begin
-						r_fb			<= r_data[7:0]	;			
-						g_fb			<= g_data[7:0]	;
-						b_fb			<= b_data[7:0]	;
-						data_fb_valid	<= data_rgb_valid;
-						sop_fb		  	<= sop_rgb		;
-						eop_fb	      	<= eop_rgb	    ;				
+						r_fb_test			<= r_data[7:0]	;			
+						g_fb_test			<= g_data[7:0]	;
+						b_fb_test			<= b_data[7:0]	;
+						data_fb_valid_test	<= data_rgb_valid;
+						sop_fb_test		  	<= sop_rgb		;
+						eop_fb_test	      	<= eop_rgb	    ;				
 					end
 		endcase
 	end
+	
+test_pattern
+#(
+    .W	( 8	)
+)
+test_pattern_inst
+(
+	.clk		(sys_clk_b			),
+	.reset_n    (reset_n_b			),
+    .sop_i      (sop_fb_test		),
+	.eop_i      (eop_fb_test		),
+	.valid_i	(data_fb_valid_test	),
+	.r_i        (r_fb_test			),
+	.g_i	    (g_fb_test			),
+	.b_i		(b_fb_test			),
+    .sop_o      (sop_fb				),
+	.eop_o      (eop_fb				),
+	.valid_o	(data_fb_valid		),
+	.r_o        (r_fb				),
+	.g_o        (g_fb				),
+	.b_o		(b_fb				)
+	
+);	
 //instans frame buffer here ->
 
 // 	

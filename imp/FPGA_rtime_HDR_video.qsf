@@ -122,49 +122,11 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HDMI_TX_INT
 set_global_assignment -name VERILOG_INPUT_VERSION SYSTEMVERILOG_2005
 set_global_assignment -name VERILOG_SHOW_LMF_MAPPING_MESSAGES OFF
 
-set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/min_max_detector.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/wrp_tone_mapping.sv
-set_global_assignment -name VERILOG_FILE ../code/synt/tone_mapping_divider.v
-set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/tone_mapping.sv
 
 set_global_assignment -name VERILOG_MACRO "GLOBAL_BUFFERS=1"
 set_global_assignment -name VERILOG_MACRO "DEBUG_OFF=1"
 set_global_assignment -name VERILOG_MACRO "HDMI_TEST_OFF=1"
-set_global_assignment -name VERILOG_FILE ../code/synt/SCCB_interface.v
-set_global_assignment -name VERILOG_FILE ../code/synt/ddr_sdram/write_to_buf_frame.v
-set_global_assignment -name VERILOG_FILE ../code/synt/ddr_sdram/sdram_write.v
-set_global_assignment -name VERILOG_FILE ../code/synt/ddr_sdram/sdram_fifo.v
-set_global_assignment -name QIP_FILE ../code/synt/ddr_sdram/sdram_fifo.qip
-set_global_assignment -name VERILOG_FILE ../code/synt/h2f_bridge/hps_register_ov5640.v
-set_global_assignment -name VERILOG_FILE ../code/synt/h2f_bridge/fifo_avl_mm.v
-set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/interface_files/interface_hps.sv
-set_global_assignment -name QSYS_FILE de10_nan0_hdr.qsys
 
-set_global_assignment -name VERILOG_FILE ../code/synt/resync_fifo_HDMI_tx.v
-set_global_assignment -name VERILOG_FILE ../code/synt/dvp2avl_stream/convert2avl_stream_raw.v
-set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/raw2rgb_bilinear_interp.sv
-set_global_assignment -name VERILOG_FILE ../code/synt/fifo_raw2rgb.v
-set_global_assignment -name VERILOG_FILE ../code/synt/delay_rg.v
-set_global_assignment -name VERILOG_FILE ../code/synt/HDR_divider.v
-set_global_assignment -name VERILOG_FILE ../code/synt/dvp2avl_stream/fifo_dvp.v
-set_global_assignment -name VERILOG_FILE ../code/synt/dvp2avl_stream/convert2avl_stream.v
-set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/wrp_HDR_algorithm.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/HDR_algorithm.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/calc_weight_coef.sv
-set_global_assignment -name VERILOG_FILE ../code/synt/pll_1/pll_1_0002.v
-set_global_assignment -name VERILOG_FILE ../code/synt/pll_1.v
-set_global_assignment -name VERILOG_FILE ../code/synt/I2C_WRITE_WDATA.v
-set_global_assignment -name VERILOG_FILE ../code/synt/I2C_HDMI_Config.v
-set_global_assignment -name VERILOG_FILE ../code/synt/I2C_Controller.v
-set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/HDMI_tx_test.sv
-set_global_assignment -name VERILOG_FILE ../code/synt/pll_0/pll_0_0002.v
-set_global_assignment -name VERILOG_FILE ../code/synt/pll_0.v
-set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/HDMI_tx.sv
-set_global_assignment -name SDC_FILE FPGA_rtime_HDR_video.out.sdc
-set_global_assignment -name SYSTEMVERILOG_FILE ../top/FPGA_rtime_HDR_video_top.sv
-set_global_assignment -name SIGNALTAP_FILE output_files/stp1.stp
-set_global_assignment -name QIP_FILE ../code/synt/logo_mem.qip
-set_global_assignment -name HEX_FILE ../code/synt/logo.hex
 
 
 set_location_assignment PIN_W14 -to cam_0_data[7]
@@ -509,7 +471,6 @@ set_global_assignment -name USE_DLL_FREQUENCY_FOR_DQS_DELAY_CHAIN ON
 set_global_assignment -name UNIPHY_SEQUENCER_DQS_CONFIG_ENABLE ON
 set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING ON
 set_global_assignment -name ECO_REGENERATE_REPORT ON
-set_global_assignment -name SIGNALTAP_FILE stp1.stp
 set_global_assignment -name SLD_NODE_CREATOR_ID 110 -section_id auto_signaltap_0
 set_global_assignment -name SLD_NODE_ENTITY_NAME sld_signaltap -section_id auto_signaltap_0
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_RAM_BLOCK_TYPE=AUTO" -section_id auto_signaltap_0
@@ -574,5 +535,45 @@ set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[27] -
 set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[28] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
 set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[31] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_SAMPLE_DEPTH=512" -section_id auto_signaltap_0
+set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/test_pattern.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/min_max_detector.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/wrp_tone_mapping.sv
+set_global_assignment -name VERILOG_FILE ../code/synt/tone_mapping_divider.v
+set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/tone_mapping.sv
+set_global_assignment -name VERILOG_FILE ../code/synt/SCCB_interface.v
+set_global_assignment -name VERILOG_FILE ../code/synt/ddr_sdram/write_to_buf_frame.v
+set_global_assignment -name VERILOG_FILE ../code/synt/ddr_sdram/sdram_write.v
+set_global_assignment -name VERILOG_FILE ../code/synt/ddr_sdram/sdram_fifo.v
+set_global_assignment -name QIP_FILE ../code/synt/ddr_sdram/sdram_fifo.qip
+set_global_assignment -name VERILOG_FILE ../code/synt/h2f_bridge/hps_register_ov5640.v
+set_global_assignment -name VERILOG_FILE ../code/synt/h2f_bridge/fifo_avl_mm.v
+set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/interface_files/interface_hps.sv
+set_global_assignment -name QSYS_FILE de10_nan0_hdr.qsys
+set_global_assignment -name VERILOG_FILE ../code/synt/resync_fifo_HDMI_tx.v
+set_global_assignment -name VERILOG_FILE ../code/synt/dvp2avl_stream/convert2avl_stream_raw.v
+set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/raw2rgb_bilinear_interp.sv
+set_global_assignment -name VERILOG_FILE ../code/synt/fifo_raw2rgb.v
+set_global_assignment -name VERILOG_FILE ../code/synt/delay_rg.v
+set_global_assignment -name VERILOG_FILE ../code/synt/HDR_divider.v
+set_global_assignment -name VERILOG_FILE ../code/synt/dvp2avl_stream/fifo_dvp.v
+set_global_assignment -name VERILOG_FILE ../code/synt/dvp2avl_stream/convert2avl_stream.v
+set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/wrp_HDR_algorithm.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/HDR_algorithm.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/calc_weight_coef.sv
+set_global_assignment -name VERILOG_FILE ../code/synt/pll_1/pll_1_0002.v
+set_global_assignment -name VERILOG_FILE ../code/synt/pll_1.v
+set_global_assignment -name VERILOG_FILE ../code/synt/I2C_WRITE_WDATA.v
+set_global_assignment -name VERILOG_FILE ../code/synt/I2C_HDMI_Config.v
+set_global_assignment -name VERILOG_FILE ../code/synt/I2C_Controller.v
+set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/HDMI_tx_test.sv
+set_global_assignment -name VERILOG_FILE ../code/synt/pll_0/pll_0_0002.v
+set_global_assignment -name VERILOG_FILE ../code/synt/pll_0.v
+set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/HDMI_tx.sv
+set_global_assignment -name SDC_FILE FPGA_rtime_HDR_video.out.sdc
+set_global_assignment -name SYSTEMVERILOG_FILE ../top/FPGA_rtime_HDR_video_top.sv
+set_global_assignment -name SIGNALTAP_FILE output_files/stp1.stp
+set_global_assignment -name QIP_FILE ../code/synt/logo_mem.qip
+set_global_assignment -name HEX_FILE ../code/synt/logo.hex
+set_global_assignment -name SIGNALTAP_FILE stp1.stp
 set_global_assignment -name SLD_FILE db/stp1_auto_stripped.stp
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
