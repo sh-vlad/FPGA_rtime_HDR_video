@@ -96,7 +96,7 @@ always @( posedge pixel_clk )
 		vsync <= 1'h1;
 		
 always @( posedge pixel_clk )
-	if ( ( h_count >= 13'h0 && h_count <= HBLANK - 1) || ( v_count <= VBLANK ) )
+	if ( ( h_count >= 13'h0 && h_count <= HBLANK - 1) ||( h_count == HTOTAL ) || ( v_count <= VBLANK ) )
 		rdreq	<= 1'h0;
 	else
 		rdreq	<= 1'h1;		
