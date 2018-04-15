@@ -26,7 +26,7 @@ reg [ 6:0] count_unit_burst ; // счетчик передач внутри бе
 reg [13:0] count_burst      ; // счетчик берстов 
 /* упаковываем в шины strbs стробы синхронизатора */
 	reg  last_burst_href;
-	reg [2:0] cnt;
+	reg [4:0] cnt;
 wire last_unit_burst = (count_unit_burst == 'd31) & valid_data_ddr; // последнее переданное слово в берсте
 wire  end_write_buf   = last_unit_burst & last_burst_href; // импульс на последний пиксель фрейма
 
@@ -44,16 +44,16 @@ assign end_frame = last_unit_burst  & last_burst_href & last_burst;
 always_ff @(posedge clk_100  or negedge reset_n)
 	if (~reset_n)
 		last_burst <= 1'b0;
-	else if(start_frame)
+	else if( end_frame)
 		last_burst <= 1'b0;	
-	else if(count_burst == 'd3599)
+	else if(count_burst == 'd14399)
 		last_burst <= 1'b1;	
 always_ff @(posedge clk_100  or negedge reset_n)
 	if (~reset_n)
 		last_burst_href <= 1'b0;
 	else if(end_write_buf)
 		last_burst_href <= 1'b0;	
-	else if(cnt== 'd4)
+	else if(cnt== 'd19)
 		last_burst_href <= 1'b1;	
 // счетчик загружаемых элементов берста в fifo 
 always_ff @(posedge clk_100  or negedge reset_n)
@@ -74,9 +74,9 @@ always_ff @(posedge clk_100  or negedge reset_n)
 		
 always_ff @(posedge clk_100  or negedge reset_n)
 	if (~reset_n)
-		cnt <= 3'd0;
+		cnt <= 5'd0;
 	else if(end_write_buf)
-		cnt <= 3'd0;
+		cnt <= 5'd0;
 	else if(last_unit_burst )
 		cnt <= cnt + 'd1;
 		

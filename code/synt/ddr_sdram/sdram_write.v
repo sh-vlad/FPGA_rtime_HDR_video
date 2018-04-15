@@ -11,12 +11,15 @@ module sdram_write
 	input  wire  [31:0]                     reg_addr_buf_1  	,  // адрес 1-го буфера в ddr памяти
 	input  wire  [31:0]                     reg_addr_buf_2  	,  // адрес 1-го буфера в ddr памяти
 	output wire                             end_frame           ,
+	output wire                             _ready_read           ,
+	output wire                             ready_write           ,
 	sdram_ifc.sdram_write_master_port       f2h_sdram2             // avl интерфейс к sdram 
 );
 
 wire         [95:0]     data_fifo_frame  ;
 
 reg [1:0]running_write_ddr;
+assign _ready_read = running_write_ddr[1];
 wire last_burst;
 // запись сырого сигнала во время работы синхронизатора
 write_to_buf_frame write_to_buf_frame_inst
@@ -90,7 +93,7 @@ always_ff @(posedge clk_200  or negedge reset_n)
 always_ff @(posedge clk_200  or negedge reset_n)
 	if (~reset_n)
 		ctrl_buff <= 1'd0;
-	else if(start_frame)
+	else if(start_frame & running_write_ddr[1])
 		ctrl_buff <= ~ctrl_buff;	
 // интервал чтения из fifo 64 элементов
 always_ff @(posedge clk_200  or negedge reset_n)
@@ -176,10 +179,12 @@ always_ff @(posedge clk_200  or negedge reset_n)
 always_ff @(posedge clk_200  or negedge reset_n)
 	if (~reset_n)
 		data_address <= 29'd0;
-	else if(start_frame & !ctrl_buff)
+	else if(start_frame & !ctrl_buff & !running_write_ddr[1])
 		data_address <= reg_addr_buf_1[28:0];
-	else if(start_frame & ctrl_buff)
+	else if(start_frame & !ctrl_buff & running_write_ddr[1])
 		data_address <= reg_addr_buf_2[28:0];
+	else if(start_frame & ctrl_buff & running_write_ddr[1])
+		data_address <= reg_addr_buf_1[28:0];
 	else if(n_write_sdram)
 		data_address <= data_address + 29'd32;
 

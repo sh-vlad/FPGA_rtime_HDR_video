@@ -14,6 +14,8 @@ module hps_register_ov5640
 	 //шина avalon от моста hps2-to-fpga                          
 	avl_ifc.avl_write_slave_port        avl_h2f_write    
 );
+wire valid_addr1 = write_hps & (avl_h2f_write.address[15:0] ==16'd0);
+wire valid_addr2 = write_hps & (avl_h2f_write.address[15:0] ==16'd1);
 wire write_hps = avl_h2f_write.chipselect &  avl_h2f_write.write;
 always_ff @( posedge clk_sys or negedge reset_n )
 	if(~reset_n)
@@ -34,7 +36,7 @@ always_ff @( posedge clk_sys or negedge reset_n )
 	else 
 		start_write_image2ddr <= '0;
 
-wire [23:0] fifo_in  = { avl_h2f_write.writedata[7:0], avl_h2f_write.address[15:0] };
+wire [23:0] fifo_in  = !(valid_addr1 | valid_addr2) ? { avl_h2f_write.writedata[7:0], avl_h2f_write.address[15:0]  } : 24'd0;
 wire [23:0] fifo_out;
 wire empty;
 wire rdreq =  !empty & ready_ov5640;		

@@ -209,8 +209,16 @@ assign RAW_2  = data_fifo_out2[7:0];
 
 assign SOF	       = data_fifo_out1[8] & sh_reg[0];	
 assign EOF	       = data_fifo_out1[9] & sh_reg[0];	
-assign start_frame = p_VSYNC_1 ;//reg_start_frame & !sh_reg_start_frame;
+//reg_start_frame & !sh_reg_start_frame;
 reg [63:0] reg_ddr;
+reg [1:0] reg_vsync1_100;
+always @(posedge clk_sys, negedge reset_n)
+	if(!reset_n)
+		reg_vsync1_100 <='0;
+	else 
+		reg_vsync1_100 <= {reg_vsync1_100[0], VSYNC_1};
+		
+assign start_frame = reg_vsync1_100[0] & !reg_vsync1_100[1];
 always @(posedge clk_sys, negedge reset_n)
 	if(!reset_n)
 		reg_ddr <='0;
