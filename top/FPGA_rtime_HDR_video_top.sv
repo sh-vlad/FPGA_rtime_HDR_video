@@ -99,7 +99,7 @@ module FPGA_rtime_HDR_video_top
 	input  wire        memory_oct_rzqin  
 );
 `ifdef DEBUG_OFF
-avl_ifc        #(    16,    32,      4)      avl_h2f_dsp()  ; 
+avl_ifc        #(    16,    32,      4)     avl_h2f_dsp()  ; 
 sdram_ifc      #(   29,    64,      8)      f2h_sdram0()   ; 
 sdram_ifc      #(   30,    32,      4)      f2h_sdram1()   ; 
 `else
@@ -165,36 +165,36 @@ wire                SIOD_o;
 wire                SIOC_o;
 wire [31:0]         reg_addr_buf_1;
 wire [31:0]         reg_addr_buf_2;
-
-
-wire clk_240;
-
+wire clk_cam;
+wire [3:0] hps_switch;
+wire clk_23;
+reg [3:0] reg_hps_switch;
 
 `ifdef DEBUG_OFF
 de10_nan0_hdr de10_nan0_hdr_inst
 (
-	.avl_h2f_dsp_write                  (avl_h2f_dsp.write           ),
-	.avl_h2f_dsp_chipselect             (avl_h2f_dsp.chipselect      ),
-	.avl_h2f_dsp_address                (avl_h2f_dsp.address         ),
-	.avl_h2f_dsp_byteenable             (avl_h2f_dsp.byteenable      ),
-	.avl_h2f_dsp_readdata               (avl_h2f_dsp.readdata        ),
-	.avl_h2f_dsp_writedata              (avl_h2f_dsp.writedata       ),
-	.f2h_sdram0_address                 ( f2h_sdram0.address         ),
-	.f2h_sdram0_burstcount              ( f2h_sdram0.burstcount      ),
-	.f2h_sdram0_waitrequest             ( f2h_sdram0.waitrequest     ),
-	.f2h_sdram0_writedata               ( f2h_sdram0.writedata       ),
-	.f2h_sdram0_byteenable              ( f2h_sdram0.byteenable      ),
-	.f2h_sdram0_write                   ( f2h_sdram0.write           ),            
-	.f2h_sdram1_address                 ( f2h_sdram1.address         ),
-	.f2h_sdram1_burstcount              ( f2h_sdram1.burstcount      ),
-	.f2h_sdram1_waitrequest             ( f2h_sdram1.waitrequest     ),
-	.f2h_sdram1_readdata                ( f2h_sdram1.readdata        ),
-	.f2h_sdram1_readdatavalid           ( f2h_sdram1.readdatavalid   ),
-	.f2h_sdram1_read                    ( f2h_sdram1.read            ),
-	.clk_clk                            (clk50                          ),
-	.clk_0_clk                          (sys_clk_b                          ),
-	.reset_in_reset_n                   (reset_n                          ),
-	.h2f_reset_out_reset_n              (reset_n                            ),
+	.avl_h2f_dsp_write                ( avl_h2f_dsp.write              ),
+	.avl_h2f_dsp_chipselect           ( avl_h2f_dsp.chipselect         ),
+	.avl_h2f_dsp_address              ( avl_h2f_dsp.address            ),
+	.avl_h2f_dsp_byteenable           ( avl_h2f_dsp.byteenable         ),
+	.avl_h2f_dsp_readdata             ( avl_h2f_dsp.readdata           ),
+	.avl_h2f_dsp_writedata            ( avl_h2f_dsp.writedata          ),
+	.f2h_sdram0_address               ( f2h_sdram0.address             ),
+	.f2h_sdram0_burstcount            ( f2h_sdram0.burstcount          ),
+	.f2h_sdram0_waitrequest           ( f2h_sdram0.waitrequest         ),
+	.f2h_sdram0_writedata             ( f2h_sdram0.writedata           ),
+	.f2h_sdram0_byteenable            ( f2h_sdram0.byteenable          ),
+	.f2h_sdram0_write                 ( f2h_sdram0.write               ),            
+	.f2h_sdram1_address               ( f2h_sdram1.address             ),
+	.f2h_sdram1_burstcount            ( f2h_sdram1.burstcount          ),
+	.f2h_sdram1_waitrequest           ( f2h_sdram1.waitrequest         ),
+	.f2h_sdram1_readdata              ( f2h_sdram1.readdata            ),
+	.f2h_sdram1_readdatavalid         ( f2h_sdram1.readdatavalid       ),
+	.f2h_sdram1_read                  ( f2h_sdram1.read                ),
+	.clk_clk                          ( clk50                          ),
+	.clk_0_clk                        ( sys_clk_b                          ),
+	.reset_in_reset_n                 ( reset_n                          ),
+	.h2f_reset_out_reset_n            ( reset_n                            ),
 	.hps_io_hps_io_emac1_inst_TX_CLK  (  hps_io_hps_io_emac1_inst_TX_CLK  ),
 	.hps_io_hps_io_emac1_inst_TXD0    (  hps_io_hps_io_emac1_inst_TXD0    ),
 	.hps_io_hps_io_emac1_inst_TXD1    (  hps_io_hps_io_emac1_inst_TXD1    ),
@@ -237,22 +237,22 @@ de10_nan0_hdr de10_nan0_hdr_inst
 	.hps_io_hps_io_i2c0_inst_SCL      (  hps_io_hps_io_i2c0_inst_SCL      ),
 	.hps_io_hps_io_i2c1_inst_SDA      (  hps_io_hps_io_i2c1_inst_SDA      ),
 	.hps_io_hps_io_i2c1_inst_SCL      (  hps_io_hps_io_i2c1_inst_SCL      ),
-	.memory_mem_a                       (memory_mem_a                     ),
-	.memory_mem_ba                      (memory_mem_ba                    ),
-	.memory_mem_ck                      (memory_mem_ck                    ),
-	.memory_mem_ck_n                    (memory_mem_ck_n                  ),
-	.memory_mem_cke                     (memory_mem_cke                   ),
-	.memory_mem_cs_n                    (memory_mem_cs_n                  ),
-	.memory_mem_ras_n                   (memory_mem_ras_n                 ),
-	.memory_mem_cas_n                   (memory_mem_cas_n                 ),
-	.memory_mem_we_n                    (memory_mem_we_n                  ),
-	.memory_mem_reset_n                 (memory_mem_reset_n               ),
-	.memory_mem_dq                      (memory_mem_dq                    ),
-	.memory_mem_dqs                     (memory_mem_dqs                   ),
-	.memory_mem_dqs_n                   (memory_mem_dqs_n                 ),
-	.memory_mem_odt                     (memory_mem_odt                   ),
-	.memory_mem_dm                      (memory_mem_dm                    ),
-	.memory_oct_rzqin                   (memory_oct_rzqin                 )
+	.memory_mem_a                     (  memory_mem_a                     ),
+	.memory_mem_ba                    (  memory_mem_ba                    ),
+	.memory_mem_ck                    (  memory_mem_ck                    ),
+	.memory_mem_ck_n                  (  memory_mem_ck_n                  ),
+	.memory_mem_cke                   (  memory_mem_cke                   ),
+	.memory_mem_cs_n                  (  memory_mem_cs_n                  ),
+	.memory_mem_ras_n                 (  memory_mem_ras_n                 ),
+	.memory_mem_cas_n                 (  memory_mem_cas_n                 ),
+	.memory_mem_we_n                  (  memory_mem_we_n                  ),
+	.memory_mem_reset_n               (  memory_mem_reset_n               ),
+	.memory_mem_dq                    (  memory_mem_dq                    ),
+	.memory_mem_dqs                   (  memory_mem_dqs                   ),
+	.memory_mem_dqs_n                 (  memory_mem_dqs_n                 ),
+	.memory_mem_odt                   (  memory_mem_odt                   ),
+	.memory_mem_dm                    (  memory_mem_dm                    ),
+	.memory_oct_rzqin                 (  memory_oct_rzqin                 )
 );
 `else
 `endif	
@@ -263,14 +263,13 @@ pll_0 pll_0_inst
 	.outclk_0 		( pixel_clk		),		//74.25MHz
 	.locked   		( pll_lock[0]	)
 );
-wire clk_cam;
 pll_1 pll_1_inst
 (
-	.refclk   		( clk50			),		//50MHz
+	.refclk   		( clk50			),	//50MHz
 	.rst      		( 1'h0			),
-	.outclk_0 		( sys_clk		),		//100MHz
-	.outclk_1 		( /*clk_cam_0_o*/	),		//24MHz
-	.outclk_2 		( /*clk_cam_1_o	*/),		//24MHz
+	.outclk_0 		( sys_clk		),	//100MHz
+	.outclk_1 		( pll_clk_cam_0_o),	//24MHz
+	.outclk_2 		( /*clk_cam_1_o	*/),//24MHz
 	.outclk_3 		( clk_cam	),		//24MHz
 	.locked   		( pll_lock[1]	)
 );
@@ -278,12 +277,12 @@ pll_2 pll_2_inst
 (
 	.refclk   		( clk50			),		//50MHz
 	.rst      		( 1'h0			),
-	.outclk_0 		( clk_240	),		//100MHz
-	
+	.outclk_0 		( clk_23	    ),		//100MHz
 	.locked   		( 	)
 );
 assign pixel_clk_out = pixel_clk;
-//assign clk_cam_1_o = clk_cam_0_o;
+assign clk_cam_0_o = err_ch0 ? clk_23 : pll_clk_cam_0_o ;
+assign clk_cam_1_o = err_ch1 ? clk_23 : pll_clk_cam_0_o ;
 
 `ifdef GLOBAL_BUFFERS
 	GLOBAL global_sys_clk_inst
@@ -311,16 +310,6 @@ wire frame_buffer_ready;
 wire done_write_frame;
 // 	
 //
-always @( posedge sys_clk_b )
-	sh_VSYNC <= {sh_VSYNC[0], VSYNC_0};	
-always @( posedge sys_clk_b )
-		begin
-	//		switches_resync[1:0] <= {switches_resync[0],switches};
-			switches_resync[0] <= switches;
-			switches_resync[1] <= switches_resync[0];
-			if ( sh_VSYNC[1] )
-				switches_resync[2] <= switches_resync[1];
-		end
 wire start_frame;	
 wire start_frame2;	
 reg [1:0] valid_data_ddr;	
@@ -329,53 +318,7 @@ wire ready_read;
 wire ready_read2;
 wire err_ch0;
 wire err_ch1;
-//resync cam clk to sys clk
-convert2avl_stream_raw convert2avl_stream_raw_inst
-(
-	.pclk_1   	       	( clk_cam_0_i	),
-	.pclk_2   	       	( clk_cam_1_i	),
-	._ready_read         ( ready_read ) ,
-	._ready_read2         ( ready_read2 ) ,
-	.clk_sys	       	( sys_clk_b		),
-	.reset_n	       	( reset_n_b		),
-	.VSYNC_1  	       	( VSYNC_0		),
-	.VSYNC_2  	       	( VSYNC_1		),
-	.HREF_1   	       	( HREF_0  & ready_read  	),
-	.HREF_2   	       	( HREF_1  & ready_read2   	),
-	.D1     	       	( cam_0_data	),
-	.D2     	       	( cam_1_data	),	                               
-	.RAW_1           	( raw_data_0	),
-	.RAW_2           	( raw_data_1	),
-	.valid_RAW_1     	( raw_data_valid),                                       
-	.valid_RAW_2     	( raw_data_valid2),   
-	.err_ch0            (err_ch0),
-	.err_ch1             (err_ch1),
-	.SOF    	       	( raw_data_sop	),
-	.SOF_2    	       	( raw_data_2_sop	),
-	.EOF    	       	( raw_data_eop	),
-	.EOF_2    	       	( raw_data_2_eop	),
-	.start_frame     	(start_frame),
-	.start_frame2     	(start_frame2),
-	.data_ddr        	(/*data_ddr      */),
-    .valid_data_ddr	    (/*valid_data_ddr*/)
-	
-);
-freq_adjust
-#(
-	.FREQ 	( 240),
-	.DIV_COEF (5)
 
-)
-freq_adjust_inst
-
-(
-	.clk        (clk_240  ),
-    .reset_n    (reset_n_b  ),
-    .err_ch0    (err_ch0  ),
-    .err_ch1	(err_ch1  ),
-    .clk24_0    ( clk_cam_0_o ),
-    .clk24_1	(clk_cam_1_o  )
-);
 reg [14:0] cnt_clk24;
 wire stop = cnt_clk24 == 'd2500;
 reg running;
@@ -410,13 +353,13 @@ assign PWDN_1      = !reset_n_b;
 `ifdef DEBUG_OFF
 SCCB_interface SCCB_interface_inst
 (
-	.clk               (sys_clk_b             ),
+	.clk               (sys_clk_b                   ),
 	.start             (start_ov5640                ), // <-
 	.address           (address_ov5640              ), // <-
 	.data              (data_ov5640                 ), // <-
 	.ready             (ready_ov5640                ), // ->
-	.SIOC_oe           (SIOC_o                     ), // ->
-	.SIOD_oe           (SIOD_o                     ) // ->
+	.SIOC_oe           (SIOC_o                      ), // ->
+	.SIOD_oe           (SIOD_o                      ) // ->
 );
 hps_register_ov5640 hps_register_ov5640_inst
 (
@@ -428,54 +371,73 @@ hps_register_ov5640 hps_register_ov5640_inst
 	.data_ov5640           (data_ov5640                 ), // ->
 	.reg_addr_buf_1        (reg_addr_buf_1              ), // ->
 	.reg_addr_buf_2        (reg_addr_buf_2              ), // ->
+	.hps_switch            (hps_switch                  ), // ->
 	.start_write_image2ddr (start_write_image2ddr       ), // ->
 	.avl_h2f_write     (avl_h2f_dsp.avl_write_slave_port) // <-
 
 );
-//gen_vsync gen_vsync_inst
-//(
-//	.clk_100                 ( sys_clk_b         	   	    ),
-//	.reset_n         	     ( reset_n_b         	        ),
-//	.start_write_image2ddr   ( start_write_image2ddr    ),
-//	.end_frame               ( end_frame                ),
-//	.master_vsync1           ( VSYNC_0            ),
-//	.master_vsync2           ( VSYNC_1            )
-//);
+
+convert2avl_stream_raw convert2avl_stream_raw_inst
+(
+	.pclk_1   	       	      ( clk_cam_0_i	                  ),
+	.pclk_2   	       	      ( clk_cam_1_i	                  ),
+	._ready_read              ( ready_read                    ),
+	._ready_read2             ( ready_read2                   ),
+	.clk_sys	       	      ( sys_clk_b		              ),
+	.reset_n	       	      ( reset_n_b		              ),
+	.VSYNC_1  	       	      ( VSYNC_0 		              ),
+	.VSYNC_2  	       	      ( VSYNC_1		                  ),
+	.HREF_1   	       	      ( HREF_0  & ready_read  	      ),
+	.HREF_2   	       	      ( HREF_1  & ready_read2   	  ),
+	.D1     	       	      ( cam_0_data	                  ),
+	.D2     	       	      ( cam_1_data	                  ),	                 
+	.RAW_1           	      ( raw_data_0	                  ),
+	.RAW_2           	      ( raw_data_1	                  ),
+	.valid_RAW     	          ( raw_data_valid                ),                   
+	.err_ch0                  (err_ch0                        ),
+	.err_ch1                  (err_ch1                        ),
+	.SOF    	       	      ( raw_data_sop	              ),
+	.EOF    	       	      ( raw_data_eop	              ),
+	.start_frame     	      (start_frame                    ),
+	.start_frame2     	      (start_frame2                   )
+	
+);
+
+
 sdram_write sdram_write_inst
 (	
-	.clk_100            ( sys_clk_b),
-    .clk_200            (sys_clk_b),
-    .reset_n            (reset_n_b),
-    .start_frame1        (start_frame   ),
-    .start_frame2        (start_frame2   ),
-    .start_write_image2ddr(start_write_image2ddr   ),
-    .data_ddr           (data_ddr      ),
-    .valid_data_ddr     (valid_data_ddr[1]),
-    .reg_addr_buf_1     (reg_addr_buf_1),
-    .reg_addr_buf_2     (reg_addr_buf_2),
-    .end_frame     (end_frame),
-    ._ready_read     (ready_read),
-    ._ready_read2     (ready_read2),
-    .f2h_sdram2         (f2h_sdram0.sdram_write_master_port)
+	.clk_100                  (sys_clk_b                         ),
+    .clk_200                  (sys_clk_b                         ),
+    .reset_n                  (reset_n_b                         ),
+    .start_frame1             (start_frame                       ),
+    .start_frame2             (start_frame2                      ),
+    .start_write_image2ddr    (start_write_image2ddr             ),
+    .data_ddr                 (data_ddr                          ),
+    .valid_data_ddr           (valid_data_ddr[1]                 ),
+    .reg_addr_buf_1           (reg_addr_buf_1                    ),
+    .reg_addr_buf_2           (reg_addr_buf_2                    ),
+    .end_frame                (end_frame                         ),
+    ._ready_read              (ready_read                        ),
+    ._ready_read2             (ready_read2                       ),
+    .f2h_sdram2               (f2h_sdram0.sdram_write_master_port)
 
 );
-//instans frame buffer here ->
 
 read_data_ddr read_data_ddr_inst
 (
-	.clk_100        (sys_clk_b                        ),    
-	.reset_b        (reset_n_b                        ),
-	.line_request   (line_request                     ),
-	.done_write_frame   (end_frame                     ),
-	.start_read_image_from_ddr   (start_write_image2ddr                     ),
-	.frame_buffer_ready (frame_buffer_ready),
-	.r_data         (r_data_ddr                       ),
-	.g_data         (g_data_ddr                       ),
-	.b_data         (b_data_ddr                       ),
-	.valid_rgb      (data_rgb_valid_ddr                   ),
-	.addr_read_ddr1  ({reg_addr_buf_1,1'b0}                    ),
-	.addr_read_ddr2  ({reg_addr_buf_2,1'b0}                     ),
-	.f2h_sdram      (f2h_sdram1.sdram_read_master_port)
+	.clk_100                  (sys_clk_b                        ),    
+	.reset_b                  (reset_n_b                        ),
+	.line_request             (line_request                     ),
+	.done_write_frame         (end_frame                        ),
+	.start_read_image_from_ddr(start_write_image2ddr            ),
+	.frame_buffer_ready       (frame_buffer_ready               ),
+	.r_data                   (r_data_ddr                       ),
+	.g_data                   (g_data_ddr                       ),
+	.b_data                   (b_data_ddr                       ),
+	.valid_rgb                (data_rgb_valid_ddr               ),
+	.addr_read_ddr1           ({reg_addr_buf_1,1'b0}            ),
+	.addr_read_ddr2           ({reg_addr_buf_2,1'b0}            ),
+	.f2h_sdram                (f2h_sdram1.sdram_read_master_port)
 );
 `else
 `endif
@@ -512,22 +474,26 @@ wrp_HDR_algorithm_inst
 	.aso_src_endofpacket_o          ( HDR_eop			)
 );
 
+
+always @( posedge sys_clk_b )
+	if(start_frame)
+		reg_hps_switch <= hps_switch;
 //mode mux
 always @( posedge sys_clk_b )
-	casex ( switches_resync[2]/*switches*/ )
-		4'b??01:begin					// cam №0
+	case ( reg_hps_switch )
+		4'b0001:begin					// cam №0
 					raw2rgb_data	<= raw_data_0;
 					raw2rgb_valid   <= raw_data_valid;
 					raw2rgb_sop     <= raw_data_sop;
 					raw2rgb_eop     <= raw_data_eop;
 				end
-		4'b??10:begin					// cam №1
+		4'b0010:begin					// cam №1
 					raw2rgb_data	<= raw_data_1;
 					raw2rgb_valid   <= raw_data_valid;
 					raw2rgb_sop     <= raw_data_sop;
 					raw2rgb_eop		<= raw_data_eop;
 				end
-		4'b??11:begin					// HDR
+		4'b0011:begin					// HDR
 					raw2rgb_data	<= HDR_data;
 					raw2rgb_valid   <= HDR_valid;
 					raw2rgb_sop     <= HDR_sop;
@@ -539,6 +505,52 @@ always @( posedge sys_clk_b )
 					raw2rgb_valid   <= raw_data_valid;
 					raw2rgb_sop     <= raw_data_sop;
 					raw2rgb_eop		<= raw_data_eop;
+			end
+	endcase
+
+
+	
+always @( posedge sys_clk_b )
+	case (reg_hps_switch )
+		4'b0001:begin
+					r_fb			<= r_data[7:0]	;			
+					g_fb			<= g_data[7:0]	;
+					b_fb			<= b_data[7:0]	;
+					data_fb_valid	<= data_rgb_valid;
+					sop_fb		  	<= sop_rgb		;
+					eop_fb	      	<= eop_rgb	    ;				
+				end	
+		4'b0010:begin
+					r_fb			<= r_data[7:0]	;			
+					g_fb			<= g_data[7:0]	;
+					b_fb			<= b_data[7:0]	;
+					data_fb_valid	<= data_rgb_valid;
+					sop_fb		  	<= sop_rgb		;
+					eop_fb	      	<= eop_rgb	    ;			
+				end	
+		4'b0011:begin
+					r_fb			<= r_data[8:1]	;			
+					g_fb			<= g_data[8:1]	;
+					b_fb			<= b_data[8:1]	;
+					data_fb_valid	<= data_rgb_valid;
+					sop_fb		  	<= sop_rgb		 ;
+					eop_fb	      	<= eop_rgb	     ;			
+				end
+		4'b0111:begin
+					r_fb			<= rgb_tm[2];			
+					g_fb			<= rgb_tm[1];
+					b_fb			<= rgb_tm[0];
+					data_fb_valid	<= data_tm_valid;
+					sop_fb		  	<= eop_tm		;
+					eop_fb	      	<= sop_tm		;			
+				end
+		default:begin
+					r_fb			<= r_data[7:0]	;			
+					g_fb			<= g_data[7:0]	;
+					b_fb			<= b_data[7:0]	;
+					data_fb_valid	<= data_rgb_valid;
+					sop_fb		  	<= sop_rgb		;
+					eop_fb	      	<= eop_rgb	    ;				
 				end
 	endcase
 
@@ -549,25 +561,6 @@ wire [7:0] r_o_test ;
 wire [7:0] g_o_test ;
 wire [7:0] b_o_test ;
 
-
-//imitator 
-//#(
-//	.WAIT_PULSES	( 1564 		),
-//	.WAIT_START		( 10_000 	),
-//	.WAIT_FRAME		( 20_000 	)
-//)
-//imitator_inst
-//(
-//	.clk       (  sys_clk_b      ),
-//	.reset_n	( ready_read & reset_n_b  ),
-//	.data_r_i  (  'd0 ),
-//	.data_g_i  (  'd0  ),
-//	.data_b_i  (  'd0  ),
-//	.valid     (  r_data		  ),
-//	.data_r    (  g_data		  ),
-//	.data_g    (  b_data		  ),
-//	.data_b    (  data_rgb_valid  )
-//);	
 
 
 	
@@ -581,12 +574,12 @@ raw2rgb_bilinear_interp
 )
 raw2rgb_bilinear_interp_inst
 (
-	.clk			( sys_clk_b			),
-	.reset_n        ( reset_n_b			),
-	.raw_data       (raw_data_1   /*raw2rgb_data	*/	),
-	.raw_valid      (raw_data_valid2 & ready_read2  /*raw2rgb_valid	*/	),
-	.raw_sop	    (raw_data_2_sop  & ready_read2 /*raw2rgb_sop		*/),
-	.raw_eop	    (raw_data_2_eop  & ready_read2 /*raw2rgb_eop		*/),
+	.clk			( sys_clk_b    ),
+	.reset_n        ( reset_n_b	   ),
+	.raw_data       (raw2rgb_data  ),
+	.raw_valid      (raw2rgb_valid ),
+	.raw_sop	    (raw2rgb_sop   ),
+	.raw_eop	    (raw2rgb_eop   ),
 	.r_data_o       ( r_data			),
 	.g_data_o       ( g_data			),
 	.b_data_o       ( b_data			),
@@ -594,28 +587,6 @@ raw2rgb_bilinear_interp_inst
 	.sop_o	        ( sop_rgb		  	),
 	.eop_o	        ( eop_rgb	      	)
 );
-//test_pattern 
-//#(
-//	.W		( 8	)
-//)
-//test_pattern_inst
-//(
-//	.clk       (sys_clk_b),     
-//	.reset_n   (reset_n_b),
-//	.sop_i     (sop_rgb),
-//	.eop_i     (eop_rgb),
-//	.valid_i   (data_rgb_valid),
-//	.r_i       (r_data),
-//	.g_i       (g_data),
-//	.b_i       (b_data),
-//	.sop_o     (sop_o_test ),
-//	.eop_o     (eop_o_test ),
-//	.valid_o   (valid_o_test),
-//	.r_o       (r_o_test   ),
-//	.g_o	   (g_o_test ),
-//	.b_o	   (b_o_test )
-//);
-//
 
 
 
@@ -623,18 +594,18 @@ raw2rgb_bilinear_interp_inst
 always_ff @(posedge sys_clk_b  or negedge reset_n_b)
 	if (~reset_n_b)
 		valid_data_ddr <= 2'd0;
-	else if(valid_data_ddr == 2'd2 & data_rgb_valid )
+	else if(valid_data_ddr == 2'd2 & data_fb_valid )
 		valid_data_ddr <= 2'd1;
-	else if(valid_data_ddr == 2'd2 & !data_rgb_valid )
+	else if(valid_data_ddr == 2'd2 & !data_fb_valid )
 		valid_data_ddr <= 2'd0;
-	else if(data_rgb_valid)
+	else if(data_fb_valid)
 		valid_data_ddr <= valid_data_ddr + 2'd1;
 	
 always_ff @(posedge sys_clk_b  or negedge reset_n_b)
 	if (~reset_n_b)
 		data_ddr <= 64'd0;
-	else if(data_rgb_valid)
-		data_ddr <= {data_ddr[31:0],8'd0,b_data[7:0], g_data[7:0], r_data[7:0]};
+	else if(data_fb_valid)
+		data_ddr <= {data_ddr[31:0],8'd0,b_fb[7:0], g_fb[7:0], r_fb[7:0]};
 //tone mapping
 wire [9:0] rgb_arr[3]; 
 assign rgb_arr[2] = r_data;
@@ -658,51 +629,7 @@ wrp_tone_mapping_inst
 	.valid_o	( data_tm_valid				)	
 );
 
-always @( posedge sys_clk_b )
-	begin
-		casex ( switches_resync[2]/**/ )
-			4'b?001:begin
-						r_fb			<= r_data[7:0]	;			
-						g_fb			<= g_data[7:0]	;
-						b_fb			<= b_data[7:0]	;
-						data_fb_valid	<= data_rgb_valid;
-						sop_fb		  	<= sop_rgb		;
-						eop_fb	      	<= eop_rgb	    ;				
-					end	
-			4'b?010:begin
-						r_fb			<= r_data[7:0]	;			
-						g_fb			<= g_data[7:0]	;
-						b_fb			<= b_data[7:0]	;
-						data_fb_valid	<= data_rgb_valid;
-						sop_fb		  	<= sop_rgb		;
-						eop_fb	      	<= eop_rgb	    ;			
-					end	
-			4'b?011:begin
-						r_fb			<= r_data[8:1]	;			
-						g_fb			<= g_data[8:1]	;
-						b_fb			<= b_data[8:1]	;
-						data_fb_valid	<= data_rgb_valid;
-						sop_fb		  	<= sop_rgb		 ;
-						eop_fb	      	<= eop_rgb	     ;			
-					end
-			4'b?111:begin
-						r_fb			<= rgb_tm[2];			
-						g_fb			<= rgb_tm[1];
-						b_fb			<= rgb_tm[0];
-						data_fb_valid	<= data_tm_valid;
-						sop_fb		  	<= eop_tm		;
-						eop_fb	      	<= sop_tm		;			
-					end
-			default:begin
-						r_fb			<= r_data[7:0]	;			
-						g_fb			<= g_data[7:0]	;
-						b_fb			<= b_data[7:0]	;
-						data_fb_valid	<= data_rgb_valid;
-						sop_fb		  	<= sop_rgb		;
-						eop_fb	      	<= eop_rgb	    ;				
-					end
-		endcase
-	end
+
 //instans frame buffer here ->
 
 // 	

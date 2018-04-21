@@ -10,24 +10,33 @@ module hps_register_ov5640
 	output logic [7:0]                  data_ov5640    ,
 	output logic [31:0]                 reg_addr_buf_1  ,
 	output logic [31:0]                 reg_addr_buf_2  ,
+	output logic [3:0]                  hps_switch     ,
 	output logic                       start_write_image2ddr  ,
 	 //шина avalon от моста hps2-to-fpga                          
 	avl_ifc.avl_write_slave_port        avl_h2f_write    
 );
 wire valid_addr1 = write_hps & (avl_h2f_write.address[15:0] ==16'd0);
 wire valid_addr2 = write_hps & (avl_h2f_write.address[15:0] ==16'd1);
+wire valid_switch = write_hps & (avl_h2f_write.address[15:0] ==16'd2);
 wire write_hps = avl_h2f_write.chipselect &  avl_h2f_write.write;
 always_ff @( posedge clk_sys or negedge reset_n )
 	if(~reset_n)
 		reg_addr_buf_1 <='0;
-	else if( write_hps & (avl_h2f_write.address[15:0] ==16'd0) )
+	else if( valid_addr1 )
 		reg_addr_buf_1 <=  avl_h2f_write.writedata;
 		
 always_ff @( posedge clk_sys or negedge reset_n )
 	if(~reset_n)
 		reg_addr_buf_2 <='0;
-	else if( write_hps & (avl_h2f_write.address[15:0] ==16'd1) )
+	else if( valid_addr2 )
 		reg_addr_buf_2 <=  avl_h2f_write.writedata;
+		
+always_ff @( posedge clk_sys or negedge reset_n )
+	if(~reset_n)
+		hps_switch <='0;
+	else if( valid_switch )
+		hps_switch <=  avl_h2f_write.writedata[3:0];
+		
 always_ff @( posedge clk_sys or negedge reset_n )
 	if(~reset_n)
 		start_write_image2ddr <='0;
@@ -36,7 +45,7 @@ always_ff @( posedge clk_sys or negedge reset_n )
 	else 
 		start_write_image2ddr <= '0;
 
-wire [23:0] fifo_in  = !(valid_addr1 | valid_addr2) ? { avl_h2f_write.writedata[7:0], avl_h2f_write.address[15:0]  } : 24'd0;
+wire [23:0] fifo_in  = !(valid_addr1 | valid_addr2 | valid_switch) ? { avl_h2f_write.writedata[7:0], avl_h2f_write.address[15:0]  } : 24'd0;
 wire [23:0] fifo_out;
 wire empty;
 wire rdreq =  !empty & ready_ov5640;		
