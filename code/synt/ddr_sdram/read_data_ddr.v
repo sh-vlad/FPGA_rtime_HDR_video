@@ -13,8 +13,10 @@ module read_data_ddr
 	output reg                              valid_rgb       ,
 	input  wire [29:0]                      addr_read_ddr1   ,
 	input  wire [29:0]                      addr_read_ddr2   ,
+	output reg  [7:0]                       count_read_frame ,
 	sdram_ifc.sdram_read_master_port        f2h_sdram         // avl интерфейс к sdram 
 );
+reg ready_new_frame;
 reg ctrl_buff;
 reg last_burst;
 reg ready_start;
@@ -38,6 +40,22 @@ always @( posedge clk_100 or negedge reset_b )
 		valid_rgb <= 1'd0;	
 	else
 		valid_rgb <= f2h_sdram.readdatavalid;
+reg sh_ready_new_frame;		
+	
+always @( posedge clk_100 or negedge reset_b )
+	if ( !reset_b ) 
+		ready_new_frame <= 1'd0;
+	else if(line_request & ready_new_frame & !read_frame )
+		ready_new_frame <= 0;
+	else if(done_write_frame)
+		ready_new_frame <= 1;
+		
+always @( posedge clk_100 or negedge reset_b )
+	if ( !reset_b ) 
+		sh_ready_new_frame <= 1'd0;
+	else 
+		sh_ready_new_frame <= ready_new_frame ;		
+wire n_frame_buffer_ready = !ready_new_frame & sh_ready_new_frame	;
 always @( posedge clk_100 or negedge reset_b )
 	if ( !reset_b ) 
 		read_frame <= 1'd0;	
@@ -60,7 +78,7 @@ always @( posedge clk_100 or negedge reset_b )
 always_ff @(posedge clk_100  or negedge reset_b)
 	if (~reset_b)
 		ctrl_buff <= 1'd0;
-	else if(done_write_frame)
+	else if(n_frame_buffer_ready)
 		ctrl_buff <= ~ctrl_buff;	
 // флаг валидности данных на f=100MHz
 always_ff @(posedge clk_100  or negedge reset_b)
@@ -77,6 +95,14 @@ always_ff @(posedge clk_100  or negedge reset_b)
 		count_unit_burst  <= 8'd0;
 	else if(f2h_sdram.readdatavalid & !f2h_sdram.waitrequest)
 		count_unit_burst  <= count_unit_burst + 8'd1;
+		
+always_ff @(posedge clk_100  or negedge reset_b)
+	if (~reset_b)
+		count_read_frame  <= 8'd0;
+	else if(n_frame_buffer_ready)
+		count_read_frame  <= count_read_frame + 8'd1;
+		
+		
 always_ff @(posedge clk_100  or negedge reset_b)
 	if (~reset_b)
 		count_burst <= 14'd0;
@@ -101,6 +127,17 @@ always_ff @(posedge clk_100  or negedge reset_b)
 		last_burst <= 1'b0;	
 	else if(count_burst == 'd11519)
 		last_burst <= 1'b1;			
+reg [1:0] reg_last_unit_burst;		
+always_ff @(posedge clk_100  or negedge reset_b)
+	if (~reset_b)
+		reg_last_unit_burst <= 2'b00;
+	else if(!f2h_sdram.waitrequest & reg_last_unit_burst[0])
+		reg_last_unit_burst <= 2'b10;	
+	else if((last_unit_burst & !end_frame & !end_line))
+		reg_last_unit_burst <= 2'b01;
+	else if(reg_last_unit_burst[1] )
+		reg_last_unit_burst <= 2'b00;
+		
 always_ff @(posedge clk_100  or negedge reset_b)
 	if (~reset_b)
 		sh_start_read  <= 1'd0;
@@ -132,7 +169,7 @@ always_ff @(posedge clk_100  or negedge reset_b)
 		read        <= 1'd1;
 		address     <= addr_read_ddr2;
 	end
-	else if((last_unit_burst & !end_frame & !end_line) || (read_frame & sh_start_read))
+	else if(reg_last_unit_burst[1] || (read_frame & sh_start_read))
 	begin
 		read        <= 1'd1;
 		address     <= address + 'd80; 

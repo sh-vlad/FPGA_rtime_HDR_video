@@ -102,7 +102,7 @@ always @( posedge pixel_clk )
 		rdreq	<= 1'h1;		
 //
 always @( posedge pixel_clk )
-	if ( ( h_count >= HBLANK-10 && h_count <= HBLANK ) && ( v_count >= VBLANK && v_count < VTOTAL ) )
+	if ( ( h_count >= HBLANK-50 && h_count <= HBLANK ) && ( v_count >= VBLANK-1 && v_count < VTOTAL-1 ) )
 		line_request_pclk <= 1'h1;
 	else
 		line_request_pclk <= 1'h0;

@@ -58,9 +58,9 @@ always_ff @(posedge clk_100  or negedge reset_n)
 // счетчик загружаемых элементов берста в fifo 
 always_ff @(posedge clk_100  or negedge reset_n)
 	if (~reset_n)
-		count_unit_burst <= 6'd0;
+		count_unit_burst <= 7'd0;
 	else if(end_write_buf | last_unit_burst)
-		count_unit_burst <= 6'd0;
+		count_unit_burst <= 7'd0;
 	else if(valid_data_ddr)
 		count_unit_burst <= count_unit_burst + 6'd1;
 // счетчик записи fifo 64 элементов 

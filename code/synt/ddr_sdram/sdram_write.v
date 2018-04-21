@@ -4,7 +4,8 @@ module sdram_write
 	input  wire  						    clk_100         	,   
 	input  wire  						    clk_200         	,   
 	input  wire 						    reset_n         	,
-	input  wire                             start_frame     	,  // импульс старта цикла синхронизатора
+	input  wire                             start_frame1     	,  // импульс старта цикла синхронизатора
+	input  wire                             start_frame2     	,  // импульс старта цикла синхронизатора
 	input  wire                             start_write_image2ddr     	,  //
 	input  wire  [63:0]                     data_ddr            ,
     input  wire                             valid_data_ddr      ,
@@ -12,14 +13,17 @@ module sdram_write
 	input  wire  [31:0]                     reg_addr_buf_2  	,  // адрес 1-го буфера в ddr памяти
 	output wire                             end_frame           ,
 	output wire                             _ready_read           ,
-	output wire                             ready_write           ,
+	output wire                             _ready_read2           ,
 	sdram_ifc.sdram_write_master_port       f2h_sdram2             // avl интерфейс к sdram 
 );
-
+reg [2:0]running_write_ddr;
 wire         [95:0]     data_fifo_frame  ;
+wire start_frame = start_frame2;
+wire ready_write_ddr  =   running_write_ddr[2];
 
-reg [1:0]running_write_ddr;
+
 assign _ready_read = running_write_ddr[1];
+assign _ready_read2 = running_write_ddr[2];
 wire last_burst;
 // запись сырого сигнала во время работы синхронизатора
 write_to_buf_frame write_to_buf_frame_inst
@@ -28,7 +32,7 @@ write_to_buf_frame write_to_buf_frame_inst
     .reset_n     		 (reset_n           ),
 	.reg_addr_buf_1      (reg_addr_buf_1    ),
 	.start_frame         (start_frame     ), 
-	.valid_data_ddr      (valid_data_ddr & running_write_ddr[1]   ),
+	.valid_data_ddr      (valid_data_ddr & ready_write_ddr   ),
 	.data_ddr            (data_ddr          ), 
 	.end_frame            (end_frame          ), 
 	.last_burst            (last_burst          ), 
@@ -58,8 +62,8 @@ wire        sh3_end_read_fifo  ; // задержанный на 3 такта f=2
 wire        end_read_fifo_burst; // завершено чтение берста из фифо
 wire        end_read_fifo      ; // конец чтения из фифо (сигнал записан в ddr)
 /* FiFo заполнена 64 элемантами, можно начинать чтение*/ 
-//wire ready_read            = (usedw >= 'd34) & !f2h_sdram2.waitrequest & !run_read_fifo_64;
-wire ready_read            = data_fifo_frame[95] & !f2h_sdram2.waitrequest & !run_read_fifo_64;
+wire ready_read            = (usedw >= 'd30) & !f2h_sdram2.waitrequest & !run_read_fifo_64;
+//wire ready_read            = data_fifo_frame[95] & !f2h_sdram2.waitrequest & !run_read_fifo_64;
 wire p_ready_read          = ready_read & !sh_ready_read; // передний фронт  ready_read
 wire start_read            = p_ready_read & !running_read; // импульс начала чтения из FiFo
 wire start_read_burst_fifo = p_ready_read & !run_read_fifo_64; // импульс начала чтения берста из FiFo
@@ -93,7 +97,7 @@ always_ff @(posedge clk_200  or negedge reset_n)
 always_ff @(posedge clk_200  or negedge reset_n)
 	if (~reset_n)
 		ctrl_buff <= 1'd0;
-	else if(start_frame & running_write_ddr[1])
+	else if(start_frame & ready_write_ddr)
 		ctrl_buff <= ~ctrl_buff;	
 // интервал чтения из fifo 64 элементов
 always_ff @(posedge clk_200  or negedge reset_n)
@@ -107,9 +111,11 @@ always_ff @(posedge clk_100  or negedge reset_n)
 	if (~reset_n)
 		running_write_ddr <='0;
 	else if(start_write_image2ddr)
-		running_write_ddr <=2'b01;
-		else if(running_write_ddr ==2'b01 & start_frame)
-		running_write_ddr <=2'b11;
+		running_write_ddr <=3'b001;
+	else if(running_write_ddr[0] & start_frame1)
+		running_write_ddr[1] <=1'b1;
+	else if(running_write_ddr[0] & start_frame2)
+		running_write_ddr[2] <=1'b1;
 // сдвиговый регистр на f=200 MHz
 always_ff @(posedge clk_200  or negedge reset_n)
 	if (~reset_n)
@@ -179,11 +185,11 @@ always_ff @(posedge clk_200  or negedge reset_n)
 always_ff @(posedge clk_200  or negedge reset_n)
 	if (~reset_n)
 		data_address <= 29'd0;
-	else if(start_frame & !ctrl_buff & !running_write_ddr[1])
+	else if(start_frame & !ctrl_buff & !ready_write_ddr)
 		data_address <= reg_addr_buf_1[28:0];
-	else if(start_frame & !ctrl_buff & running_write_ddr[1])
+	else if(start_frame & !ctrl_buff & ready_write_ddr)
 		data_address <= reg_addr_buf_2[28:0];
-	else if(start_frame & ctrl_buff & running_write_ddr[1])
+	else if(start_frame & ctrl_buff & ready_write_ddr)
 		data_address <= reg_addr_buf_1[28:0];
 	else if(n_write_sdram)
 		data_address <= data_address + 29'd32;

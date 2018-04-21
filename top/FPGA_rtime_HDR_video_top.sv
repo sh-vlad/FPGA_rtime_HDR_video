@@ -116,8 +116,11 @@ reg		[ 1: 0]		sh_VSYNC;
 wire	[ 7: 0]		raw_data_0;
 wire	[ 7: 0]		raw_data_1;
 wire				raw_data_valid;
+wire				raw_data_2_valid;
 wire				raw_data_sop;
+wire				raw_data_2_sop;
 wire				raw_data_eop;
+wire				raw_data_2_eop;
 //
 wire				HDR_valid;			
 wire	[ 9: 0]		HDR_data;			
@@ -164,7 +167,7 @@ wire [31:0]         reg_addr_buf_1;
 wire [31:0]         reg_addr_buf_2;
 
 
-
+wire clk_240;
 
 
 `ifdef DEBUG_OFF
@@ -260,18 +263,27 @@ pll_0 pll_0_inst
 	.outclk_0 		( pixel_clk		),		//74.25MHz
 	.locked   		( pll_lock[0]	)
 );
-
+wire clk_cam;
 pll_1 pll_1_inst
 (
 	.refclk   		( clk50			),		//50MHz
 	.rst      		( 1'h0			),
 	.outclk_0 		( sys_clk		),		//100MHz
-	.outclk_1 		( clk_cam_0_o	),		//24MHz
+	.outclk_1 		( /*clk_cam_0_o*/	),		//24MHz
+	.outclk_2 		( /*clk_cam_1_o	*/),		//24MHz
+	.outclk_3 		( clk_cam	),		//24MHz
 	.locked   		( pll_lock[1]	)
 );
-
+pll_2 pll_2_inst
+(
+	.refclk   		( clk50			),		//50MHz
+	.rst      		( 1'h0			),
+	.outclk_0 		( clk_240	),		//100MHz
+	
+	.locked   		( 	)
+);
 assign pixel_clk_out = pixel_clk;
-assign clk_cam_1_o = clk_cam_0_o;
+//assign clk_cam_1_o = clk_cam_0_o;
 
 `ifdef GLOBAL_BUFFERS
 	GLOBAL global_sys_clk_inst
@@ -290,6 +302,7 @@ assign clk_cam_1_o = clk_cam_0_o;
 	assign reset_n_b = pll_lock[1] & pll_lock[0];
 `endif
 wire [7:0] r_data_ddr;
+wire end_frame;
 wire [7:0] g_data_ddr;
 wire [7:0] b_data_ddr;
 wire data_rgb_valid_ddr;
@@ -309,57 +322,84 @@ always @( posedge sys_clk_b )
 				switches_resync[2] <= switches_resync[1];
 		end
 wire start_frame;	
+wire start_frame2;	
 reg [1:0] valid_data_ddr;	
 wire [63:0] data_ddr;
+wire ready_read;
+wire ready_read2;
+wire err_ch0;
+wire err_ch1;
 //resync cam clk to sys clk
 convert2avl_stream_raw convert2avl_stream_raw_inst
 (
 	.pclk_1   	       	( clk_cam_0_i	),
 	.pclk_2   	       	( clk_cam_1_i	),
+	._ready_read         ( ready_read ) ,
+	._ready_read2         ( ready_read2 ) ,
 	.clk_sys	       	( sys_clk_b		),
 	.reset_n	       	( reset_n_b		),
 	.VSYNC_1  	       	( VSYNC_0		),
 	.VSYNC_2  	       	( VSYNC_1		),
-	.HREF_1   	       	( HREF_0     	),
-	.HREF_2   	       	( HREF_1     	),
+	.HREF_1   	       	( HREF_0  & ready_read  	),
+	.HREF_2   	       	( HREF_1  & ready_read2   	),
 	.D1     	       	( cam_0_data	),
 	.D2     	       	( cam_1_data	),	                               
 	.RAW_1           	( raw_data_0	),
 	.RAW_2           	( raw_data_1	),
 	.valid_RAW_1     	( raw_data_valid),                                       
-	.valid_RAW_2     	(),                                       
+	.valid_RAW_2     	( raw_data_valid2),   
+	.err_ch0            (err_ch0),
+	.err_ch1             (err_ch1),
 	.SOF    	       	( raw_data_sop	),
+	.SOF_2    	       	( raw_data_2_sop	),
 	.EOF    	       	( raw_data_eop	),
+	.EOF_2    	       	( raw_data_2_eop	),
 	.start_frame     	(start_frame),
+	.start_frame2     	(start_frame2),
 	.data_ddr        	(/*data_ddr      */),
     .valid_data_ddr	    (/*valid_data_ddr*/)
 	
 );
-wire ready_read;
+freq_adjust
+#(
+	.FREQ 	( 240),
+	.DIV_COEF (5)
+
+)
+freq_adjust_inst
+
+(
+	.clk        (clk_240  ),
+    .reset_n    (reset_n_b  ),
+    .err_ch0    (err_ch0  ),
+    .err_ch1	(err_ch1  ),
+    .clk24_0    ( clk_cam_0_o ),
+    .clk24_1	(clk_cam_1_o  )
+);
 reg [14:0] cnt_clk24;
 wire stop = cnt_clk24 == 'd2500;
 reg running;
 reg sh_reset_n;
 wire p_reset_n = reset_n_b & !sh_reset_n;
-always @(posedge clk_cam_0_o, negedge reset_n_b)
+always @(posedge clk_cam, negedge reset_n_b)
 	if (~reset_n_b) 
 		sh_reset_n <='0;
 	else 
 		sh_reset_n <= 1;
-always @(posedge clk_cam_0_o, negedge reset_n_b)
+always @(posedge clk_cam, negedge reset_n_b)
 	if (~reset_n_b) 
 		running <='0;
 	else if(stop)
 		running <= '0;
 	else if(p_reset_n)
 		running <= 1;
-always @(posedge clk_cam_0_o, negedge reset_n_b)
+always @(posedge clk_cam, negedge reset_n_b)
 	if (~reset_n_b) 
 		cnt_clk24 <='0;
 	else if(running)
 		cnt_clk24 <= cnt_clk24+1;
 		
-always @(posedge clk_cam_0_o, negedge reset_n_b)
+always @(posedge clk_cam, negedge reset_n_b)
 	if (~reset_n_b) 
 		RESETB_0 <='0;
 	else if(stop)
@@ -378,7 +418,6 @@ SCCB_interface SCCB_interface_inst
 	.SIOC_oe           (SIOC_o                     ), // ->
 	.SIOD_oe           (SIOD_o                     ) // ->
 );
-wire end_frame;
 hps_register_ov5640 hps_register_ov5640_inst
 (
 	.clk_sys               (sys_clk_b                   ),
@@ -393,12 +432,22 @@ hps_register_ov5640 hps_register_ov5640_inst
 	.avl_h2f_write     (avl_h2f_dsp.avl_write_slave_port) // <-
 
 );
+//gen_vsync gen_vsync_inst
+//(
+//	.clk_100                 ( sys_clk_b         	   	    ),
+//	.reset_n         	     ( reset_n_b         	        ),
+//	.start_write_image2ddr   ( start_write_image2ddr    ),
+//	.end_frame               ( end_frame                ),
+//	.master_vsync1           ( VSYNC_0            ),
+//	.master_vsync2           ( VSYNC_1            )
+//);
 sdram_write sdram_write_inst
 (	
 	.clk_100            ( sys_clk_b),
     .clk_200            (sys_clk_b),
     .reset_n            (reset_n_b),
-    .start_frame        (start_frame   ),
+    .start_frame1        (start_frame   ),
+    .start_frame2        (start_frame2   ),
     .start_write_image2ddr(start_write_image2ddr   ),
     .data_ddr           (data_ddr      ),
     .valid_data_ddr     (valid_data_ddr[1]),
@@ -406,6 +455,7 @@ sdram_write sdram_write_inst
     .reg_addr_buf_2     (reg_addr_buf_2),
     .end_frame     (end_frame),
     ._ready_read     (ready_read),
+    ._ready_read2     (ready_read2),
     .f2h_sdram2         (f2h_sdram0.sdram_write_master_port)
 
 );
@@ -492,6 +542,38 @@ always @( posedge sys_clk_b )
 				end
 	endcase
 
+wire       sop_o_test ; 
+wire       eop_o_test ; 
+wire       valid_o_test;
+wire [7:0] r_o_test ;   
+wire [7:0] g_o_test ;
+wire [7:0] b_o_test ;
+
+
+//imitator 
+//#(
+//	.WAIT_PULSES	( 1564 		),
+//	.WAIT_START		( 10_000 	),
+//	.WAIT_FRAME		( 20_000 	)
+//)
+//imitator_inst
+//(
+//	.clk       (  sys_clk_b      ),
+//	.reset_n	( ready_read & reset_n_b  ),
+//	.data_r_i  (  'd0 ),
+//	.data_g_i  (  'd0  ),
+//	.data_b_i  (  'd0  ),
+//	.valid     (  r_data		  ),
+//	.data_r    (  g_data		  ),
+//	.data_g    (  b_data		  ),
+//	.data_b    (  data_rgb_valid  )
+//);	
+
+
+	
+	
+	
+	
 //convert raw to rgb
 raw2rgb_bilinear_interp 
 #(
@@ -501,10 +583,10 @@ raw2rgb_bilinear_interp_inst
 (
 	.clk			( sys_clk_b			),
 	.reset_n        ( reset_n_b			),
-	.raw_data       (raw_data_0   /*raw2rgb_data	*/	),
-	.raw_valid      (raw_data_valid & ready_read  /*raw2rgb_valid	*/	),
-	.raw_sop	    (raw_data_sop  & ready_read /*raw2rgb_sop		*/),
-	.raw_eop	    (raw_data_eop  & ready_read /*raw2rgb_eop		*/),
+	.raw_data       (raw_data_1   /*raw2rgb_data	*/	),
+	.raw_valid      (raw_data_valid2 & ready_read2  /*raw2rgb_valid	*/	),
+	.raw_sop	    (raw_data_2_sop  & ready_read2 /*raw2rgb_sop		*/),
+	.raw_eop	    (raw_data_2_eop  & ready_read2 /*raw2rgb_eop		*/),
 	.r_data_o       ( r_data			),
 	.g_data_o       ( g_data			),
 	.b_data_o       ( b_data			),
@@ -512,6 +594,31 @@ raw2rgb_bilinear_interp_inst
 	.sop_o	        ( sop_rgb		  	),
 	.eop_o	        ( eop_rgb	      	)
 );
+//test_pattern 
+//#(
+//	.W		( 8	)
+//)
+//test_pattern_inst
+//(
+//	.clk       (sys_clk_b),     
+//	.reset_n   (reset_n_b),
+//	.sop_i     (sop_rgb),
+//	.eop_i     (eop_rgb),
+//	.valid_i   (data_rgb_valid),
+//	.r_i       (r_data),
+//	.g_i       (g_data),
+//	.b_i       (b_data),
+//	.sop_o     (sop_o_test ),
+//	.eop_o     (eop_o_test ),
+//	.valid_o   (valid_o_test),
+//	.r_o       (r_o_test   ),
+//	.g_o	   (g_o_test ),
+//	.b_o	   (b_o_test )
+//);
+//
+
+
+
 
 always_ff @(posedge sys_clk_b  or negedge reset_n_b)
 	if (~reset_n_b)
