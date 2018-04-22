@@ -2,18 +2,19 @@
 
 module hps_register_ov5640
 (
-	input  logic                        clk_sys        ,             
-	input  logic                        reset_n        ,
-	input  logic                        ready_ov5640   ,
-	output logic                        start_ov5640   ,
-	output logic [15:0]                  address_ov5640 ,
-	output logic [7:0]                  data_ov5640    ,
-	output logic [31:0]                 reg_addr_buf_1  ,
-	output logic [31:0]                 reg_addr_buf_2  ,
-	output logic [3:0]                  hps_switch     ,
-	output logic [7:0]                  parallax_corr     ,
-	output logic                       start_write_image2ddr  ,
-	 //шина avalon от моста hps2-to-fpga                          
+	input  logic                        clk_sys             ,             
+	input  logic                        reset_n             ,
+	input  logic                        ready_ov5640        ,
+	output logic                        start_ov5640        ,
+	output logic [15:0]                 address_ov5640      ,
+	output logic [7:0]                  data_ov5640         ,
+	output logic [31:0]                 reg_addr_buf_1      ,
+	output logic [31:0]                 reg_addr_buf_2      ,
+	output logic [3:0]                  hps_switch          ,
+	output logic [7:0]                  parallax_corr       ,
+	output logic [1:0]                  select_cam_initial  ,
+	output logic                       start_write_image2ddr,
+	// bridge hps2-to-fpga                          
 	avl_ifc.avl_write_slave_port        avl_h2f_write    
 );
 wire write_hps = avl_h2f_write.chipselect &  avl_h2f_write.write;
@@ -21,6 +22,7 @@ wire valid_addr1 = write_hps & (avl_h2f_write.address[15:0] ==16'd0);
 wire valid_addr2 = write_hps & (avl_h2f_write.address[15:0] ==16'd1);
 wire valid_switch = write_hps & (avl_h2f_write.address[15:0] ==16'd2);
 wire valid_parallax_corr = write_hps & (avl_h2f_write.address[15:0] ==16'd3);
+wire valid_select_cam_initial = write_hps & (avl_h2f_write.address[15:0] ==16'd4);
 always_ff @( posedge clk_sys or negedge reset_n )
 	if(~reset_n)
 		reg_addr_buf_1 <='0;
@@ -35,15 +37,21 @@ always_ff @( posedge clk_sys or negedge reset_n )
 		
 always_ff @( posedge clk_sys or negedge reset_n )
 	if(~reset_n)
-		hps_switch <= 8'd10;
+		hps_switch <='0;
 	else if( valid_switch )
 		hps_switch <=  avl_h2f_write.writedata[3:0];
 		
 always_ff @( posedge clk_sys or negedge reset_n )
 	if(~reset_n)
-		parallax_corr <= 8'd10;
+		parallax_corr <='0;
 	else if(valid_parallax_corr)
 		parallax_corr <=  avl_h2f_write.writedata[7:0];
+		
+always_ff @( posedge clk_sys or negedge reset_n )
+	if(~reset_n)
+		select_cam_initial <='0;
+	else if(valid_select_cam_initial)
+		select_cam_initial <=  avl_h2f_write.writedata[1:0];	
 		
 always_ff @( posedge clk_sys or negedge reset_n )
 	if(~reset_n)
