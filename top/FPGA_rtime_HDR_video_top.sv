@@ -135,13 +135,27 @@ logic				raw2rgb_valid;
 logic				raw2rgb_sop;
 logic				raw2rgb_eop;
 //
+wire 	[ 9: 0]		r_data_0;
+wire 	[ 9: 0]		g_data_0;
+wire 	[ 9: 0]		b_data_0;
+wire 				data_rgb_valid_0;
+wire 				sop_rgb_0		  ;
+wire 				eop_rgb_0	      ;
+
+wire 	[ 9: 0]		r_data_1;
+wire 	[ 9: 0]		g_data_1;
+wire 	[ 9: 0]		b_data_1;
+wire 				data_rgb_valid_1;
+wire 				sop_rgb_1		  ;
+wire 				eop_rgb_1	      ;
+
+//
 wire 	[ 9: 0]		r_data;
 wire 	[ 9: 0]		g_data;
 wire 	[ 9: 0]		b_data;
 wire 				data_rgb_valid;
 wire 				sop_rgb		  ;
 wire 				eop_rgb	      ;
-
 //
 /*wire 	[ 7: 0]		r_tm;
 wire 	[ 7: 0]		g_tm;
@@ -445,7 +459,24 @@ convert2avl_stream_raw convert2avl_stream_raw_inst
 	.start_frame2     	      (start_frame2                   )
 	
 );
-//
+
+
+
+ assign SIOC_0  =SIOC_o ? 1'b0 : 1'bz;
+ assign SIOD_0  =SIOD_o ? 1'b0 : 1'bz;
+ 
+ assign SIOC_1  =SIOC_o ? 1'b0 : 1'bz;
+ assign SIOD_1  =SIOD_o ? 1'b0 : 1'bz;
+ 
+ //===========================================//
+ //===========================================//
+ //===========================================//
+ //===========================================//
+ //===========================================//
+ //===========================================//
+ //===========================================//
+ 
+ //
 		
 parallax_fix
 #(
@@ -469,21 +500,46 @@ parallax_fix_inst
 	.prlx_fxd_data_eop          (raw_data_eop  )
 );
 //
+ //convert raw to rgb
+raw2rgb_bilinear_interp 
+#(
+	.DATA_WIDTH		( 8	)
+)
+raw2rgb_bilinear_interp_inst_0
+(
+	.clk			( sys_clk_b    ),
+	.reset_n        ( reset_n_b	   ),
+	.raw_data       (raw_data_0  ),
+	.raw_valid      (raw_data_valid ),
+	.raw_sop	    (raw_data_sop   ),
+	.raw_eop	    (raw_data_eop   ),
+	.r_data_o       ( r_data_0			),
+	.g_data_o       ( g_data_0			),
+	.b_data_o       ( b_data_0			),
+	.data_o_valid   ( data_rgb_valid_0	),
+	.sop_o	        ( sop_rgb_0		  	),
+	.eop_o	        ( eop_rgb_0	      	)
+);
 
-
- assign SIOC_0  =SIOC_o ? 1'b0 : 1'bz;
- assign SIOD_0  =SIOD_o ? 1'b0 : 1'bz;
- 
- assign SIOC_1  =SIOC_o ? 1'b0 : 1'bz;
- assign SIOD_1  =SIOD_o ? 1'b0 : 1'bz;
- 
- //===========================================//
- //===========================================//
- //===========================================//
- //===========================================//
- //===========================================//
- //===========================================//
- //===========================================//
+raw2rgb_bilinear_interp 
+#(
+	.DATA_WIDTH		( 8	)
+)
+raw2rgb_bilinear_interp_inst_1
+(
+	.clk			( sys_clk_b    ),
+	.reset_n        ( reset_n_b	   ),
+	.raw_data       (raw_data_1  ),
+	.raw_valid      (raw_data_valid ),
+	.raw_sop	    (raw_data_sop   ),
+	.raw_eop	    (raw_data_eop   ),
+	.r_data_o       ( r_data_1			),
+	.g_data_o       ( g_data_1			),
+	.b_data_o       ( b_data_1			),
+	.data_o_valid   ( data_rgb_valid_1	),
+	.sop_o	        ( sop_rgb_1		  	),
+	.eop_o	        ( eop_rgb_1	      	)
+);
 //hdr for raw data
 wrp_HDR_algorithm
 #(
@@ -492,14 +548,25 @@ wrp_HDR_algorithm
 wrp_HDR_algorithm_inst					
 (
 	.clk							( sys_clk_b			), 	  
-	.asi_snk_0_valid_i	            ( raw_data_valid 	),
-	.asi_snk_0_data_i               ( raw_data_0		),
-	.asi_snk_0_startofpacket_i      ( raw_data_sop		),
-	.asi_snk_0_endofpacket_i        ( raw_data_eop 		),
-	.asi_snk_1_data_i               ( raw_data_1		),
+	.asi_snk_0_valid_i	            ( data_rgb_valid_1 	),
+//	.asi_snk_0_data_i               ( raw_data_0		),
+	.asi_snk_0_data_r_i				(r_data_0),
+	.asi_snk_0_data_g_i             (g_data_0),
+	.asi_snk_0_data_b_i             (b_data_0),
+	
+	.asi_snk_0_startofpacket_i      ( sop_rgb_1		),
+	.asi_snk_0_endofpacket_i        ( eop_rgb_1 		),
+//	.asi_snk_1_data_i               ( raw_data_1		),
+	.asi_snk_1_data_r_i				(r_data_1),	
+	.asi_snk_1_data_g_i	            (g_data_1),
+	.asi_snk_1_data_b_i	            (b_data_1),
 	                             
 	.aso_src_valid_o                ( HDR_valid			),
-	.aso_src_data_o                 ( HDR_data			),
+//	.aso_src_data_o                 ( HDR_data			),
+	.aso_src_data_r_o				( r_data	),
+	.aso_src_data_g_o               ( g_data	),
+	.aso_src_data_b_o				( b_data	),
+	
 	.aso_src_startofpacket_o        ( HDR_sop			),
 	.aso_src_endofpacket_o          ( HDR_eop			)
 );
@@ -508,6 +575,7 @@ wrp_HDR_algorithm_inst
 always @( posedge sys_clk_b )
 	if(start_frame)
 		reg_hps_switch <= hps_switch;
+		/*
 //mode mux
 always @( posedge sys_clk_b )
 	case ( reg_hps_switch )
@@ -537,34 +605,34 @@ always @( posedge sys_clk_b )
 					raw2rgb_eop		<= raw_data_eop;
 			end
 	endcase
-
+*/
 
 	
 always @( posedge sys_clk_b )
 	case (reg_hps_switch )
 		4'b0001:begin
-					r_fb			<= r_data[7:0]	;			
-					g_fb			<= g_data[7:0]	;
-					b_fb			<= b_data[7:0]	;
-					data_fb_valid	<= data_rgb_valid;
-					sop_fb		  	<= sop_rgb		;
-					eop_fb	      	<= eop_rgb	    ;				
+					r_fb			<= r_data_0;			//r_data[7:0]	;			
+					g_fb			<= g_data_0;			//g_data[7:0]	;
+					b_fb			<= b_data_0;			//b_data[7:0]	;
+					data_fb_valid	<= data_rgb_valid_0;
+					sop_fb		  	<= sop_rgb_0		;
+					eop_fb	      	<= eop_rgb_0	    ;				
 				end	
 		4'b0010:begin
-					r_fb			<= r_data[7:0]	;			
-					g_fb			<= g_data[7:0]	;
-					b_fb			<= b_data[7:0]	;
-					data_fb_valid	<= data_rgb_valid;
-					sop_fb		  	<= sop_rgb		;
-					eop_fb	      	<= eop_rgb	    ;			
+					r_fb			<= r_data_1;//r_data[7:0]	;			
+					g_fb			<= g_data_1;//g_data[7:0]	;
+					b_fb			<= b_data_1;//b_data[7:0]	;
+					data_fb_valid	<= data_rgb_valid_1;//data_rgb_valid;
+					sop_fb		  	<= sop_rgb_1;//sop_rgb		;
+					eop_fb	      	<= eop_rgb_1;//eop_rgb	    ;			
 				end	
 		4'b0011:begin
 					r_fb			<= r_data[8:1]	;			
 					g_fb			<= g_data[8:1]	;
 					b_fb			<= b_data[8:1]	;
-					data_fb_valid	<= data_rgb_valid;
-					sop_fb		  	<= sop_rgb		 ;
-					eop_fb	      	<= eop_rgb	     ;			
+					data_fb_valid	<= HDR_valid;
+					sop_fb		  	<= HDR_sop		 ;
+					eop_fb	      	<= HDR_eop	     ;			
 				end
 		4'b0111:begin
 					r_fb			<= rgb_tm[2];			
@@ -575,12 +643,12 @@ always @( posedge sys_clk_b )
 					eop_fb	      	<= sop_tm		;			
 				end
 		default:begin
-					r_fb			<= r_data[7:0]	;			
-					g_fb			<= g_data[7:0]	;
-					b_fb			<= b_data[7:0]	;
-					data_fb_valid	<= data_rgb_valid;
-					sop_fb		  	<= sop_rgb		;
-					eop_fb	      	<= eop_rgb	    ;				
+					r_fb			<= r_data_0;				
+					g_fb			<= g_data_0;		
+					b_fb			<= b_data_0;		
+					data_fb_valid	<= data_rgb_valid_0;
+					sop_fb		  	<= sop_rgb_0		;
+					eop_fb	      	<= eop_rgb_0	    ;			
 				end
 	endcase
 
@@ -590,35 +658,6 @@ wire       valid_o_test;
 wire [7:0] r_o_test ;   
 wire [7:0] g_o_test ;
 wire [7:0] b_o_test ;
-
-
-
-	
-	
-	
-	
-//convert raw to rgb
-raw2rgb_bilinear_interp 
-#(
-	.DATA_WIDTH		( 8	)
-)
-raw2rgb_bilinear_interp_inst
-(
-	.clk			( sys_clk_b    ),
-	.reset_n        ( reset_n_b	   ),
-	.raw_data       (raw2rgb_data  ),
-	.raw_valid      (raw2rgb_valid ),
-	.raw_sop	    (raw2rgb_sop   ),
-	.raw_eop	    (raw2rgb_eop   ),
-	.r_data_o       ( r_data			),
-	.g_data_o       ( g_data			),
-	.b_data_o       ( b_data			),
-	.data_o_valid   ( data_rgb_valid	),
-	.sop_o	        ( sop_rgb		  	),
-	.eop_o	        ( eop_rgb	      	)
-);
-
-
 
 
 always_ff @(posedge sys_clk_b  or negedge reset_n_b)

@@ -54,7 +54,8 @@ wire ready_read_behind  = (rdusedw_1 >= 'd1000) & (rdusedw_2 >= 'd1000);
 wire ready_read_ahead           = ready_read_behind;
 wire p_ready_read = ready_read_behind & !sh_ready_read;
 //wire p_ready_read2 = ready_read2 & !sh_ready_read2;
-
+reg valid_read_fifo_1;
+reg valid_read_fifo_2;
 always @(posedge clk_sys or negedge reset_n)
 	if (~reset_n )
 		sh_ready_read <=1'b0;
@@ -243,8 +244,7 @@ always @(posedge clk_sys, negedge reset_n)
 		sh_reg <='0;
 	else 
 		sh_reg <={sh_reg[1:0],rdreq1};
-reg valid_read_fifo_1;
-reg valid_read_fifo_2;
+
 reg sh_valid_read_fifo_1;
 reg sh_valid_read_fifo_2;
 reg sel_frame_1_for_fifo;

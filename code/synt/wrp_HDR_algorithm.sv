@@ -11,13 +11,19 @@ module wrp_HDR_algorithm
 	input wire							clk,
 //
 	input wire							asi_snk_0_valid_i,
-	input wire		[DATA_WIDTH-1: 0] 	asi_snk_0_data_i,
+	input wire		[DATA_WIDTH-1: 0] 	asi_snk_0_data_r_i,
+	input wire		[DATA_WIDTH-1: 0] 	asi_snk_0_data_g_i,
+	input wire		[DATA_WIDTH-1: 0] 	asi_snk_0_data_b_i,	
 	input wire							asi_snk_0_startofpacket_i,
 	input wire							asi_snk_0_endofpacket_i,	
-	input wire		[DATA_WIDTH-1: 0] 	asi_snk_1_data_i,	
+	input wire		[DATA_WIDTH-1: 0] 	asi_snk_1_data_r_i,	
+	input wire		[DATA_WIDTH-1: 0] 	asi_snk_1_data_g_i,
+	input wire		[DATA_WIDTH-1: 0] 	asi_snk_1_data_b_i,
 	
 	output logic						aso_src_valid_o,
-	output logic	[DATA_WIDTH+1: 0]	aso_src_data_o,
+	output logic	[DATA_WIDTH+1: 0]	aso_src_data_r_o,
+	output logic	[DATA_WIDTH+1: 0]	aso_src_data_g_o,
+	output logic	[DATA_WIDTH+1: 0]	aso_src_data_b_o,	
 	output logic						aso_src_startofpacket_o,
 	output logic						aso_src_endofpacket_o
 );
@@ -27,18 +33,42 @@ HDR_algorithm
 #(
 	.DATA_WIDTH		( DATA_WIDTH	) 
 )
-HDR_algorithm_Y
+HDR_algorithm_r
 (
 	.clk			( clk					),
-	.data_i0        ( asi_snk_0_data_i 		),
-	.data_i1        ( asi_snk_1_data_i		),
-	.data_o         ( aso_src_data_o		)
+	.data_i0        ( asi_snk_0_data_r_i 	),
+	.data_i1        ( asi_snk_1_data_r_i	),
+	.data_o         ( aso_src_data_r_o		)
+);
+
+HDR_algorithm 
+#(
+	.DATA_WIDTH		( DATA_WIDTH	) 
+)
+HDR_algorithm_g
+(
+	.clk			( clk					),
+	.data_i0        ( asi_snk_0_data_g_i 	),
+	.data_i1        ( asi_snk_1_data_g_i	),
+	.data_o         ( aso_src_data_g_o		)
+);
+
+HDR_algorithm 
+#(
+	.DATA_WIDTH		( DATA_WIDTH	) 
+)
+HDR_algorithm_b
+(
+	.clk			( clk					),
+	.data_i0        ( asi_snk_0_data_b_i 	),
+	.data_i1        ( asi_snk_1_data_b_i	),
+	.data_o         ( aso_src_data_b_o		)
 );
 
 delay_rg
 #(
 	.W				( 3				),
-	.D				( 21+2			)
+	.D				( 21+2-8			)
 )
 delay_weight
 (
