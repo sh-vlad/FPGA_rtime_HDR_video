@@ -184,8 +184,10 @@ wire [31:0]         reg_addr_buf_1;
 wire [31:0]         reg_addr_buf_2;
 wire clk_cam;
 wire [3:0] hps_switch;
+wire [7:0] parallax_corr;
 wire clk_23;
 reg [3:0] reg_hps_switch;
+reg [7:0] reg_parallax_corr;
 
 logic [63:0] data_ddr;
 `ifdef DEBUG_OFF
@@ -391,6 +393,7 @@ hps_register_ov5640 hps_register_ov5640_inst
 	.reg_addr_buf_1        (reg_addr_buf_1              ), // ->
 	.reg_addr_buf_2        (reg_addr_buf_2              ), // ->
 	.hps_switch            (hps_switch                  ), // ->
+	.parallax_corr         (parallax_corr               ), // ->
 	.start_write_image2ddr (start_write_image2ddr       ), // ->
 	.avl_h2f_write     (avl_h2f_dsp.avl_write_slave_port) // <-
 
@@ -478,26 +481,26 @@ convert2avl_stream_raw convert2avl_stream_raw_inst
  
  //
 		
-parallax_fix
+parallax_fix/*
 #(
 	.CAM_DIFFERENCE ( 130 )
-)
+)*/
 parallax_fix_inst
 (
-	.clk						( sys_clk_b		),
-	.reset_n                    ( reset_n_b		),
+	.clk						( sys_clk_b					),
+	.reset_n                    ( reset_n_b					),
+	.parallax_corr				( reg_parallax_corr			),
+	.raw_data_0                 ( prx_fxd_raw_data_0		),
+	.raw_data_1                 ( prx_fxd_raw_data_1		),
+	.raw_data_valid             ( prx_fxd_raw_data_valid	),
+	.raw_data_sop               ( prx_fxd_raw_data_sop		),
+	.raw_data_eop               ( prx_fxd_raw_data_eop		),
 	
-	.raw_data_0                 ( prx_fxd_raw_data_0),
-	.raw_data_1                 ( prx_fxd_raw_data_1),
-	.raw_data_valid             ( prx_fxd_raw_data_valid),
-	.raw_data_sop               ( prx_fxd_raw_data_sop),
-	.raw_data_eop               ( prx_fxd_raw_data_eop),
-	
-	.prlx_fxd_data_0            (raw_data_0    ),
-	.prlx_fxd_data_1            (raw_data_1    ),
-	.prlx_fxd_data_valid        (raw_data_valid),
-	.prlx_fxd_data_sop          (raw_data_sop  ),
-	.prlx_fxd_data_eop          (raw_data_eop  )
+	.prlx_fxd_data_0            (raw_data_0    				),
+	.prlx_fxd_data_1            (raw_data_1    				),
+	.prlx_fxd_data_valid        (raw_data_valid				),
+	.prlx_fxd_data_sop          (raw_data_sop  				),
+	.prlx_fxd_data_eop          (raw_data_eop  				)
 );
 //
  //convert raw to rgb
@@ -507,12 +510,12 @@ raw2rgb_bilinear_interp
 )
 raw2rgb_bilinear_interp_inst_0
 (
-	.clk			( sys_clk_b    ),
-	.reset_n        ( reset_n_b	   ),
-	.raw_data       (raw_data_0  ),
-	.raw_valid      (raw_data_valid ),
-	.raw_sop	    (raw_data_sop   ),
-	.raw_eop	    (raw_data_eop   ),
+	.clk			( sys_clk_b    		),
+	.reset_n        ( reset_n_b	   		),
+	.raw_data       ( raw_data_0  		),
+	.raw_valid      ( raw_data_valid 	),
+	.raw_sop	    ( raw_data_sop   	),
+	.raw_eop	    ( raw_data_eop   	),
 	.r_data_o       ( r_data_0			),
 	.g_data_o       ( g_data_0			),
 	.b_data_o       ( b_data_0			),
@@ -572,10 +575,16 @@ wrp_HDR_algorithm_inst
 );
 
 
-always @( posedge sys_clk_b )
-	if(start_frame)
-		reg_hps_switch <= hps_switch;
-		/*
+always @( posedge sys_clk_b or negedge reset_n_b)
+	if ( !reset_n_b )
+		reg_parallax_corr <= 8'd10;
+	else
+		if(start_frame) 
+		begin
+			reg_hps_switch     <= hps_switch;
+			reg_parallax_corr  <= parallax_corr;
+		end
+/*
 //mode mux
 always @( posedge sys_clk_b )
 	case ( reg_hps_switch )
@@ -630,7 +639,7 @@ always @( posedge sys_clk_b )
 					r_fb			<= r_data[8:1]	;			
 					g_fb			<= g_data[8:1]	;
 					b_fb			<= b_data[8:1]	;
-					data_fb_valid	<= HDR_valid;
+					data_fb_valid	<= HDR_valid	;
 					sop_fb		  	<= HDR_sop		 ;
 					eop_fb	      	<= HDR_eop	     ;			
 				end
@@ -688,9 +697,9 @@ wrp_tone_mapping_inst
 (
 	.clk		( sys_clk_b					),
 	.reset_n    ( reset_n_b					),
-    .sop        ( sop_rgb					),
-	.eop        ( eop_rgb					),
-	.valid      ( data_rgb_valid			),
+    .sop        ( HDR_sop					),
+	.eop        ( HDR_eop					),
+	.valid      ( HDR_valid					),
 	.data       ( rgb_arr/*{r_data, g_data, b_data }*/	),
 	.data_o		( rgb_tm					),
     .sop_o		( sop_tm					),
@@ -698,8 +707,8 @@ wrp_tone_mapping_inst
 	.valid_o	( data_tm_valid				)	
 );
 
-
-//instans frame buffer here ->
+	
+	//instans frame buffer here ->
 
 // 	
 

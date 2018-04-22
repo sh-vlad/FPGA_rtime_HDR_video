@@ -2,14 +2,15 @@
 //
 
 `timescale 1 ns / 1 ns
-module parallax_fix
+module parallax_fix/*
 #(
 	parameter CAM_DIFFERENCE = 32
-)
+)*/
 (
 
 	input wire				clk,
 	input wire				reset_n,
+	input wire	[7 : 0]		parallax_corr,
 	
 	input wire	[ 7: 0]		raw_data_0,
 	input wire	[ 7: 0]		raw_data_1,
@@ -55,13 +56,13 @@ always @( posedge clk or negedge reset_n )
 	else
 		if ( cnt_rd == 12'd1280 )
 			cnt_rd <= 12'h0;
-		else if ( cnt_wr == CAM_DIFFERENCE )
+		else if ( cnt_wr == parallax_corr )
 			cnt_rd <= 1'h1;
 		else if ( cnt_rd != 12'h0 )
 			cnt_rd <= cnt_rd + 1'h1;
 			
-assign wr_1 = raw_data_valid && ( cnt_wr < (1280-CAM_DIFFERENCE) );  			
-assign wr_0 = raw_data_valid && ( cnt_wr >= CAM_DIFFERENCE ); 
+assign wr_1 = raw_data_valid && ( cnt_wr < (1280-parallax_corr) );  			
+assign wr_0 = raw_data_valid && ( cnt_wr >= parallax_corr ); 
 
 assign rd_0 = ( cnt_rd > 0 ) ? 1'h1: 1'h0;
 	
@@ -89,8 +90,8 @@ fifo_parallax_fix fifo_parallax_fix_1
 	.usedw      ()
 );		
 
-assign prlx_fxd_data_0 = ( cnt_rd < (1280-CAM_DIFFERENCE) ) ? q_0 : 7'h1;
-assign prlx_fxd_data_1 = ( cnt_rd < (1280-CAM_DIFFERENCE) ) ? q_1 : 7'h1;
+assign prlx_fxd_data_0 = ( cnt_rd < (1280-parallax_corr) ) ? q_0 : 7'h1;
+assign prlx_fxd_data_1 = ( cnt_rd < (1280-parallax_corr) ) ? q_1 : 7'h1;
 assign w_prlx_fxd_data_valid = ( cnt_rd > 0 ) ? 1'h1 : 7'h0;
 assign w_prlx_fxd_data_sop = ( cnt_rd == 1 ) ? 1'h1 : 7'h0;
 assign w_prlx_fxd_data_eop = ( cnt_rd == 1280 ) ? 1'h1 : 7'h0;
