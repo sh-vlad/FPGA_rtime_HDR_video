@@ -116,11 +116,14 @@ reg		[ 1: 0]		sh_VSYNC;
 wire	[ 7: 0]		raw_data_0;
 wire	[ 7: 0]		raw_data_1;
 wire				raw_data_valid;
-wire				raw_data_2_valid;
 wire				raw_data_sop;
-wire				raw_data_2_sop;
 wire				raw_data_eop;
-wire				raw_data_2_eop;
+
+wire	[ 7: 0]		prx_fxd_raw_data_0;
+wire	[ 7: 0]		prx_fxd_raw_data_1;
+wire				prx_fxd_raw_data_valid;
+wire				prx_fxd_raw_data_sop;
+wire				prx_fxd_raw_data_eop;
 //
 wire				HDR_valid;			
 wire	[ 9: 0]		HDR_data;			
@@ -170,6 +173,7 @@ wire [3:0] hps_switch;
 wire clk_23;
 reg [3:0] reg_hps_switch;
 
+logic [63:0] data_ddr;
 `ifdef DEBUG_OFF
 de10_nan0_hdr de10_nan0_hdr_inst
 (
@@ -280,6 +284,8 @@ pll_2 pll_2_inst
 	.outclk_0 		( clk_23	    ),		//100MHz
 	.locked   		( 	)
 );
+wire err_ch0;
+wire err_ch1;
 assign pixel_clk_out = pixel_clk;
 assign clk_cam_0_o = err_ch0 ? clk_23 : pll_clk_cam_0_o ;
 assign clk_cam_1_o = err_ch1 ? clk_23 : pll_clk_cam_0_o ;
@@ -313,11 +319,10 @@ wire done_write_frame;
 wire start_frame;	
 wire start_frame2;	
 reg [1:0] valid_data_ddr;	
-wire [63:0] data_ddr;
+
 wire ready_read;
 wire ready_read2;
-wire err_ch0;
-wire err_ch1;
+
 
 reg [14:0] cnt_clk24;
 wire stop = cnt_clk24 == 'd2500;
@@ -377,33 +382,6 @@ hps_register_ov5640 hps_register_ov5640_inst
 
 );
 
-convert2avl_stream_raw convert2avl_stream_raw_inst
-(
-	.pclk_1   	       	      ( clk_cam_0_i	                  ),
-	.pclk_2   	       	      ( clk_cam_1_i	                  ),
-	._ready_read              ( ready_read                    ),
-	._ready_read2             ( ready_read2                   ),
-	.clk_sys	       	      ( sys_clk_b		              ),
-	.reset_n	       	      ( reset_n_b		              ),
-	.VSYNC_1  	       	      ( VSYNC_0 		              ),
-	.VSYNC_2  	       	      ( VSYNC_1		                  ),
-	.HREF_1   	       	      ( HREF_0  & ready_read  	      ),
-	.HREF_2   	       	      ( HREF_1  & ready_read2   	  ),
-	.D1     	       	      ( cam_0_data	                  ),
-	.D2     	       	      ( cam_1_data	                  ),	                 
-	.RAW_1           	      ( raw_data_0	                  ),
-	.RAW_2           	      ( raw_data_1	                  ),
-	.valid_RAW     	          ( raw_data_valid                ),                   
-	.err_ch0                  (err_ch0                        ),
-	.err_ch1                  (err_ch1                        ),
-	.SOF    	       	      ( raw_data_sop	              ),
-	.EOF    	       	      ( raw_data_eop	              ),
-	.start_frame     	      (start_frame                    ),
-	.start_frame2     	      (start_frame2                   )
-	
-);
-
-
 sdram_write sdram_write_inst
 (	
 	.clk_100                  (sys_clk_b                         ),
@@ -441,6 +419,58 @@ read_data_ddr read_data_ddr_inst
 );
 `else
 `endif
+//
+convert2avl_stream_raw convert2avl_stream_raw_inst
+(
+	.pclk_1   	       	      ( clk_cam_0_i	                  ),
+	.pclk_2   	       	      ( clk_cam_1_i	                  ),
+	._ready_read              ( ready_read                    ),
+	._ready_read2             ( ready_read2                   ),
+	.clk_sys	       	      ( sys_clk_b		              ),
+	.reset_n	       	      ( reset_n_b		              ),
+	.VSYNC_1  	       	      ( VSYNC_0 		              ),
+	.VSYNC_2  	       	      ( VSYNC_1		                  ),
+	.HREF_1   	       	      ( HREF_0  & ready_read  	      ),
+	.HREF_2   	       	      ( HREF_1  & ready_read2   	  ),
+	.D1     	       	      ( cam_0_data	                  ),
+	.D2     	       	      ( cam_1_data	                  ),	                 
+	.RAW_1           	      ( prx_fxd_raw_data_0	                  ),
+	.RAW_2           	      ( prx_fxd_raw_data_1	                  ),
+	.valid_RAW     	          ( prx_fxd_raw_data_valid                ),                   
+	.err_ch0                  (err_ch0                        ),
+	.err_ch1                  (err_ch1                        ),
+	.SOF    	       	      ( prx_fxd_raw_data_sop	              ),
+	.EOF    	       	      ( prx_fxd_raw_data_eop	              ),
+	.start_frame     	      (start_frame                    ),
+	.start_frame2     	      (start_frame2                   )
+	
+);
+//
+		
+parallax_fix
+#(
+	.CAM_DIFFERENCE ( 130 )
+)
+parallax_fix_inst
+(
+	.clk						( sys_clk_b		),
+	.reset_n                    ( reset_n_b		),
+	
+	.raw_data_0                 ( prx_fxd_raw_data_0),
+	.raw_data_1                 ( prx_fxd_raw_data_1),
+	.raw_data_valid             ( prx_fxd_raw_data_valid),
+	.raw_data_sop               ( prx_fxd_raw_data_sop),
+	.raw_data_eop               ( prx_fxd_raw_data_eop),
+	
+	.prlx_fxd_data_0            (raw_data_0    ),
+	.prlx_fxd_data_1            (raw_data_1    ),
+	.prlx_fxd_data_valid        (raw_data_valid),
+	.prlx_fxd_data_sop          (raw_data_sop  ),
+	.prlx_fxd_data_eop          (raw_data_eop  )
+);
+//
+
+
  assign SIOC_0  =SIOC_o ? 1'b0 : 1'bz;
  assign SIOD_0  =SIOD_o ? 1'b0 : 1'bz;
  
