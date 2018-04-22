@@ -167,8 +167,10 @@ wire [31:0]         reg_addr_buf_1;
 wire [31:0]         reg_addr_buf_2;
 wire clk_cam;
 wire [3:0] hps_switch;
+wire [7:0] parallax_corr;
 wire clk_23;
 reg [3:0] reg_hps_switch;
+reg [7:0] reg_parallax_corr;
 
 `ifdef DEBUG_OFF
 de10_nan0_hdr de10_nan0_hdr_inst
@@ -372,6 +374,7 @@ hps_register_ov5640 hps_register_ov5640_inst
 	.reg_addr_buf_1        (reg_addr_buf_1              ), // ->
 	.reg_addr_buf_2        (reg_addr_buf_2              ), // ->
 	.hps_switch            (hps_switch                  ), // ->
+	.parallax_corr         (parallax_corr               ), // ->
 	.start_write_image2ddr (start_write_image2ddr       ), // ->
 	.avl_h2f_write     (avl_h2f_dsp.avl_write_slave_port) // <-
 
@@ -476,8 +479,11 @@ wrp_HDR_algorithm_inst
 
 
 always @( posedge sys_clk_b )
-	if(start_frame)
-		reg_hps_switch <= hps_switch;
+	if(start_frame) 
+	begin
+		reg_hps_switch     <= hps_switch;
+		reg_parallax_corr  <= parallax_corr;
+	end
 //mode mux
 always @( posedge sys_clk_b )
 	case ( reg_hps_switch )
