@@ -299,7 +299,7 @@ always @(posedge pclk_2, negedge reset_n)
 wire wrclk_behind =  sel_stream ? pclk_2: pclk_1;
 wire [9:0] data_behind  =  sel_stream ? reg_RAW_2 : reg_RAW_1;
 wire       wrreq_behind =  sel_stream ? sh_HREF_2 : sh_HREF_1;
-fifo_dvp  fifo_dvp_1
+fifo_dvp2  fifo_dvp_1
 (
 	.wrclk   (pclk_1    ),
 	.rdclk   (clk_sys         ),

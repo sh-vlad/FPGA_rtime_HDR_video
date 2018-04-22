@@ -188,7 +188,7 @@ wire [7:0] parallax_corr;
 wire clk_23;
 reg [3:0] reg_hps_switch;
 reg [7:0] reg_parallax_corr;
-
+wire [1:0] select_initial_cam;
 logic [63:0] data_ddr;
 `ifdef DEBUG_OFF
 de10_nan0_hdr de10_nan0_hdr_inst
@@ -372,16 +372,22 @@ assign 	RESETB_1 =RESETB_0;
 assign PWDN_0      = !reset_n_b;
 assign PWDN_1      = !reset_n_b;
 `ifdef DEBUG_OFF
-SCCB_interface SCCB_interface_inst
+
+SCCB_camera_config SCCB_camera_config_inst
 (
-	.clk               (sys_clk_b                   ),
-	.start             (start_ov5640                ), // <-
-	.address           (address_ov5640              ), // <-
-	.data              (data_ov5640                 ), // <-
-	.ready             (ready_ov5640                ), // ->
-	.SIOC_oe           (SIOC_o                      ), // ->
-	.SIOD_oe           (SIOD_o                      ) // ->
+	.clk_sys            (sys_clk_b         ),   
+	.reset_n            (reset_n_b         ),
+	.select_initial_cam (select_initial_cam), // <-
+	.ready_ov5640       (ready_ov5640      ), //->
+	.start_ov5640       (start_ov5640      ), // <-
+	.address_ov5640     (address_ov5640    ), // <-
+	.data_ov5640        (data_ov5640       ), // <-
+	.SIOC_0             (SIOC_0            ),
+	.SIOD_0             (SIOD_0            ),
+	.SIOC_1             (SIOC_1            ),
+	.SIOD_1             (SIOD_1            )
 );
+
 hps_register_ov5640 hps_register_ov5640_inst
 (
 	.clk_sys               (sys_clk_b                   ),
@@ -394,6 +400,7 @@ hps_register_ov5640 hps_register_ov5640_inst
 	.reg_addr_buf_2        (reg_addr_buf_2              ), // ->
 	.hps_switch            (hps_switch                  ), // ->
 	.parallax_corr         (parallax_corr               ), // ->
+	.select_cam_initial    (select_initial_cam          ), // ->
 	.start_write_image2ddr (start_write_image2ddr       ), // ->
 	.avl_h2f_write     (avl_h2f_dsp.avl_write_slave_port) // <-
 
@@ -464,12 +471,6 @@ convert2avl_stream_raw convert2avl_stream_raw_inst
 );
 
 
-
- assign SIOC_0  =SIOC_o ? 1'b0 : 1'bz;
- assign SIOD_0  =SIOD_o ? 1'b0 : 1'bz;
- 
- assign SIOC_1  =SIOC_o ? 1'b0 : 1'bz;
- assign SIOD_1  =SIOD_o ? 1'b0 : 1'bz;
  
  //===========================================//
  //===========================================//
