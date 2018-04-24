@@ -1,4 +1,4 @@
-
+//Author: ShVlad / e-mail: shvladspb@gmail.com
 module min_max_detector
 #(
     parameter W = 8

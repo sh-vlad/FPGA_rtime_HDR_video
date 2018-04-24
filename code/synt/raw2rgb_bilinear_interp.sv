@@ -125,10 +125,10 @@ always @( posedge clk or negedge reset_n )
 
 always @( posedge clk or negedge reset_n )
 	if ( !reset_n )
-		last_line_num	<= 3'h0;
+		last_line_num	<= 2'h0;
 	else
 		if ( last_line_num == 2'h2 && wait_cnt == 7'd100 )
-			last_line_num	<= 3'h0;
+			last_line_num	<= 2'h0;
 		else if ( wait_cnt == 7'd100 ) 
 			last_line_num	<= last_line_num + 1'h1;
 			

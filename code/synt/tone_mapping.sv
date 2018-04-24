@@ -1,4 +1,4 @@
-
+//Author: ShVlad / e-mail: shvladspb@gmail.com
 module tone_mapping
 #(
     parameter W = 10

@@ -2,10 +2,7 @@
 //
 
 `timescale 1 ns / 1 ns
-module parallax_fix/*
-#(
-	parameter CAM_DIFFERENCE = 32
-)*/
+module parallax_fix
 (
 
 	input wire				clk,
@@ -36,7 +33,7 @@ wire				rd_1;
 wire	[7 :0]		q_0;
 wire	[7 :0]		q_1;
 
-wire				w_prlx_fxd_data_vali;
+wire				w_prlx_fxd_data_valid;
 wire				w_prlx_fxd_data_sop;
 wire				w_prlx_fxd_data_eop;
 
@@ -92,9 +89,9 @@ fifo_parallax_fix fifo_parallax_fix_1
 
 assign prlx_fxd_data_0 = ( cnt_rd < (1280-parallax_corr) ) ? q_0 : 7'h1;
 assign prlx_fxd_data_1 = ( cnt_rd < (1280-parallax_corr) ) ? q_1 : 7'h1;
-assign w_prlx_fxd_data_valid = ( cnt_rd > 0 ) ? 1'h1 : 7'h0;
-assign w_prlx_fxd_data_sop = ( cnt_rd == 1 ) ? 1'h1 : 7'h0;
-assign w_prlx_fxd_data_eop = ( cnt_rd == 1280 ) ? 1'h1 : 7'h0;
+assign w_prlx_fxd_data_valid = ( cnt_rd > 12'h0 ) ? 1'h1 : 7'h0;
+assign w_prlx_fxd_data_sop = ( cnt_rd == 12'h1 ) ? 1'h1 : 7'h0;
+assign w_prlx_fxd_data_eop = ( cnt_rd == 12'd1280 ) ? 1'h1 : 7'h0;
 
 always @( posedge clk )
 	begin

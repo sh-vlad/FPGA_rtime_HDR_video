@@ -1,4 +1,4 @@
-//`define PIPELINE
+//Author: ShVlad / e-mail: shvladspb@gmail.com
 
 `timescale 1 ns / 1 ns
 module wrp_conv_filter
