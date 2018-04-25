@@ -1,107 +1,52 @@
-//Author: ShVlad / e-mail: shvladspb@gmail.com
-//
+//Author:           ShVlad / e-mail: shvladspb@gmail.com
+//Author:  Andrey Papushin / e-mail: andrey.papushin@gmail.com    
 
 `timescale 1 ns / 1 ns
 module FPGA_rtime_HDR_video_top
 (
 //clocks
-	input wire  				clk50      ,             
-	input wire					clk_cam_0_i,
-	input wire					clk_cam_1_i,	
-	output wire					clk_cam_0_o,
-	output wire					clk_cam_1_o,	
-//camera 1 ports
-	input wire         			VSYNC_0    ,
-	input wire         			HREF_0     ,
-	input wire [7:0]   			cam_0_data ,
-	output wire                 PWDN_0     , 
-	output reg                 	RESETB_0   , 
-	output wire                 SIOC_0     , 
-	inout  wire                 SIOD_0     , 	
-//camera 2 ports
-	input wire         			VSYNC_1    ,
-	input wire         			HREF_1     ,
-	input wire [7:0]   			cam_1_data ,
-	output wire                 PWDN_1     , 
-	output wire                 RESETB_1   , 
-	output wire                 SIOC_1     , 
-	inout  wire                 SIOD_1     , 
+	input wire  				clk50        ,             
+	input wire					clk_cam_0_i  ,
+	input wire					clk_cam_1_i  ,	
+	output wire					clk_cam_0_o  ,
+	output wire					clk_cam_1_o  ,	
+//camera 1 ports                             
+	input wire         			VSYNC_0      ,
+	input wire         			HREF_0       ,
+	input wire [7:0]   			cam_0_data   ,
+	output wire                 PWDN_0       , 
+	output reg                 	RESETB_0     , 
+	output wire                 SIOC_0       , 
+	inout  wire                 SIOD_0       , 	
+//camera 2 ports                             
+	input wire         			VSYNC_1      ,
+	input wire         			HREF_1       ,
+	input wire [7:0]   			cam_1_data   ,
+	output wire                 PWDN_1       , 
+	output wire                 RESETB_1     , 
+	output wire                 SIOC_1       , 
+	inout  wire                 SIOD_1       , 
 	
-	input wire [3:0]			switches,
 //HDMI
-	output wire					data_enable,
-	output wire					hsync,
-	output wire					vsync,
-	output wire		[23: 0]		data_HDMI,
+	output wire					data_enable  ,
+	output wire					hsync        ,
+	output wire					vsync        ,
+	output wire		[23: 0]		data_HDMI    ,
 	output wire					pixel_clk_out,
 	
-	input wire              	HDMI_TX_INT,	
-    inout wire              	HDMI_I2C_SCL,
-    inout wire              	HDMI_I2C_SDA,
+	input wire              	HDMI_TX_INT  ,	
+    inout wire              	HDMI_I2C_SCL ,
+    inout wire              	HDMI_I2C_SDA ,
+// ddr3	
+	ddr3_ifc.ddr3_port          ddr3_mem     , 
+// hps_io
+	hps_ifc.hps_io_port         hps_io          
 	
-	output wire        hps_io_hps_io_emac1_inst_TX_CLK   , 
-	output wire        hps_io_hps_io_emac1_inst_TXD0     ,
-	output wire        hps_io_hps_io_emac1_inst_TXD1     ,
-	output wire        hps_io_hps_io_emac1_inst_TXD2     ,
-	output wire        hps_io_hps_io_emac1_inst_TXD3     ,
-	input  wire        hps_io_hps_io_emac1_inst_RXD0     ,
-	inout  wire        hps_io_hps_io_emac1_inst_MDIO     ,
-	output wire        hps_io_hps_io_emac1_inst_MDC      ,
-	input  wire        hps_io_hps_io_emac1_inst_RX_CTL   ,
-	output wire        hps_io_hps_io_emac1_inst_TX_CTL   ,
-	input  wire        hps_io_hps_io_emac1_inst_RX_CLK   ,
-	input  wire        hps_io_hps_io_emac1_inst_RXD1     ,
-	input  wire        hps_io_hps_io_emac1_inst_RXD2     ,
-	input  wire        hps_io_hps_io_emac1_inst_RXD3     ,
-	inout  wire        hps_io_hps_io_sdio_inst_CMD       ,
-	inout  wire        hps_io_hps_io_sdio_inst_D0        ,
-	inout  wire        hps_io_hps_io_sdio_inst_D1        ,
-	output wire        hps_io_hps_io_sdio_inst_CLK       ,
-	inout  wire        hps_io_hps_io_sdio_inst_D2        ,
-	inout  wire        hps_io_hps_io_sdio_inst_D3        ,
-	inout  wire        hps_io_hps_io_usb1_inst_D0        ,
-	inout  wire        hps_io_hps_io_usb1_inst_D1        ,
-	inout  wire        hps_io_hps_io_usb1_inst_D2        ,
-	inout  wire        hps_io_hps_io_usb1_inst_D3        ,
-	inout  wire        hps_io_hps_io_usb1_inst_D4        ,
-	inout  wire        hps_io_hps_io_usb1_inst_D5        ,
-	inout  wire        hps_io_hps_io_usb1_inst_D6        ,
-	inout  wire        hps_io_hps_io_usb1_inst_D7        ,
-	input  wire        hps_io_hps_io_usb1_inst_CLK       ,
-	output wire        hps_io_hps_io_usb1_inst_STP       ,
-	input  wire        hps_io_hps_io_usb1_inst_DIR       ,
-	input  wire        hps_io_hps_io_usb1_inst_NXT       ,
-	output wire        hps_io_hps_io_spim1_inst_CLK      ,
-	output wire        hps_io_hps_io_spim1_inst_MOSI     ,
-	input  wire        hps_io_hps_io_spim1_inst_MISO     ,
-	output wire        hps_io_hps_io_spim1_inst_SS0      ,
-	input  wire        hps_io_hps_io_uart0_inst_RX       ,
-	output wire        hps_io_hps_io_uart0_inst_TX       ,
-	inout  wire        hps_io_hps_io_i2c0_inst_SDA       ,
-	inout  wire        hps_io_hps_io_i2c0_inst_SCL       ,
-	inout  wire        hps_io_hps_io_i2c1_inst_SDA       ,
-	inout  wire        hps_io_hps_io_i2c1_inst_SCL       ,
-	output wire [14:0] memory_mem_a                   ,                  
-	output wire [2:0]  memory_mem_ba                  ,                 
-	output wire        memory_mem_ck                  ,                 
-	output wire        memory_mem_ck_n                ,               
-	output wire        memory_mem_cke                 ,                
-	output wire        memory_mem_cs_n                ,               
-	output wire        memory_mem_ras_n               ,              
-	output wire        memory_mem_cas_n               ,              
-	output wire        memory_mem_we_n                ,               
-	output wire        memory_mem_reset_n             ,            
-	inout  wire [31:0] memory_mem_dq                  ,                 
-	inout  wire [3:0]  memory_mem_dqs                 ,                
-	inout  wire [3:0]  memory_mem_dqs_n               ,              
-	output wire        memory_mem_odt                 ,                
-	output wire [3:0]  memory_mem_dm                  ,                 
-	input  wire        memory_oct_rzqin  
 );
 `ifdef DEBUG_OFF
-avl_ifc        #(    16,    32,      4)     avl_h2f_dsp()  ; 
-sdram_ifc      #(   29,    64,      8)      f2h_sdram0()   ; 
-sdram_ifc      #(   30,    32,      4)      f2h_sdram1()   ; 
+avl_ifc        #(    16,    32,     4)     avl_h2f_dsp()     ; 
+sdram_ifc      #(   29,    64,      8)     f2h_sdram_write() ; 
+sdram_ifc      #(   30,    32,      4)     f2h_sdram_read()  ; 
 `else
 `endif
 wire				sys_clk;
@@ -110,8 +55,7 @@ wire	[ 1: 0]		pll_lock;
 wire				pixel_clk;	
 wire				reset_n_b;
 //
-reg 	[ 3: 0]		switches_resync[2:0];
-reg		[ 1: 0]		sh_VSYNC;
+
 //
 wire	[ 7: 0]		raw_data_0;
 wire	[ 7: 0]		raw_data_1;
@@ -183,6 +127,7 @@ wire                SIOC_o;
 wire [31:0]         reg_addr_buf_1;
 wire [31:0]         reg_addr_buf_2;
 wire clk_cam;
+wire xclk_cam;
 wire [3:0] hps_switch;
 wire [7:0] parallax_corr;
 wire clk_23;
@@ -190,89 +135,19 @@ reg [3:0] reg_hps_switch;
 reg [7:0] reg_parallax_corr;
 wire [1:0] select_initial_cam;
 logic [63:0] data_ddr;
+wire err_ch0;
+wire err_ch1;
 `ifdef DEBUG_OFF
-de10_nan0_hdr de10_nan0_hdr_inst
+// SoC sub-system module generated by qsys      
+de10_nan0_hdr_ifc de10_nan0_hdr_ifc_inst
 (
-	.avl_h2f_dsp_write                ( avl_h2f_dsp.write              ),
-	.avl_h2f_dsp_chipselect           ( avl_h2f_dsp.chipselect         ),
-	.avl_h2f_dsp_address              ( avl_h2f_dsp.address            ),
-	.avl_h2f_dsp_byteenable           ( avl_h2f_dsp.byteenable         ),
-	.avl_h2f_dsp_readdata             ( avl_h2f_dsp.readdata           ),
-	.avl_h2f_dsp_writedata            ( avl_h2f_dsp.writedata          ),
-	.f2h_sdram0_address               ( f2h_sdram0.address             ),
-	.f2h_sdram0_burstcount            ( f2h_sdram0.burstcount          ),
-	.f2h_sdram0_waitrequest           ( f2h_sdram0.waitrequest         ),
-	.f2h_sdram0_writedata             ( f2h_sdram0.writedata           ),
-	.f2h_sdram0_byteenable            ( f2h_sdram0.byteenable          ),
-	.f2h_sdram0_write                 ( f2h_sdram0.write               ),            
-	.f2h_sdram1_address               ( f2h_sdram1.address             ),
-	.f2h_sdram1_burstcount            ( f2h_sdram1.burstcount          ),
-	.f2h_sdram1_waitrequest           ( f2h_sdram1.waitrequest         ),
-	.f2h_sdram1_readdata              ( f2h_sdram1.readdata            ),
-	.f2h_sdram1_readdatavalid         ( f2h_sdram1.readdatavalid       ),
-	.f2h_sdram1_read                  ( f2h_sdram1.read                ),
-	.clk_clk                          ( clk50                          ),
-	.clk_0_clk                        ( sys_clk_b                          ),
-	.reset_in_reset_n                 ( reset_n                          ),
-	.h2f_reset_out_reset_n            ( reset_n                            ),
-	.hps_io_hps_io_emac1_inst_TX_CLK  (  hps_io_hps_io_emac1_inst_TX_CLK  ),
-	.hps_io_hps_io_emac1_inst_TXD0    (  hps_io_hps_io_emac1_inst_TXD0    ),
-	.hps_io_hps_io_emac1_inst_TXD1    (  hps_io_hps_io_emac1_inst_TXD1    ),
-	.hps_io_hps_io_emac1_inst_TXD2    (  hps_io_hps_io_emac1_inst_TXD2    ),
-	.hps_io_hps_io_emac1_inst_TXD3    (  hps_io_hps_io_emac1_inst_TXD3    ),
-	.hps_io_hps_io_emac1_inst_RXD0    (  hps_io_hps_io_emac1_inst_RXD0    ),
-	.hps_io_hps_io_emac1_inst_MDIO    (  hps_io_hps_io_emac1_inst_MDIO    ),
-	.hps_io_hps_io_emac1_inst_MDC     (  hps_io_hps_io_emac1_inst_MDC     ),
-	.hps_io_hps_io_emac1_inst_RX_CTL  (  hps_io_hps_io_emac1_inst_RX_CTL  ),
-	.hps_io_hps_io_emac1_inst_TX_CTL  (  hps_io_hps_io_emac1_inst_TX_CTL  ),
-	.hps_io_hps_io_emac1_inst_RX_CLK  (  hps_io_hps_io_emac1_inst_RX_CLK  ),
-	.hps_io_hps_io_emac1_inst_RXD1    (  hps_io_hps_io_emac1_inst_RXD1    ),
-	.hps_io_hps_io_emac1_inst_RXD2    (  hps_io_hps_io_emac1_inst_RXD2    ),
-	.hps_io_hps_io_emac1_inst_RXD3    (  hps_io_hps_io_emac1_inst_RXD3    ),
-	.hps_io_hps_io_sdio_inst_CMD      (  hps_io_hps_io_sdio_inst_CMD      ),
-	.hps_io_hps_io_sdio_inst_D0       (  hps_io_hps_io_sdio_inst_D0       ),
-	.hps_io_hps_io_sdio_inst_D1       (  hps_io_hps_io_sdio_inst_D1       ),
-	.hps_io_hps_io_sdio_inst_CLK      (  hps_io_hps_io_sdio_inst_CLK      ),
-	.hps_io_hps_io_sdio_inst_D2       (  hps_io_hps_io_sdio_inst_D2       ),
-	.hps_io_hps_io_sdio_inst_D3       (  hps_io_hps_io_sdio_inst_D3       ),
-	.hps_io_hps_io_usb1_inst_D0       (  hps_io_hps_io_usb1_inst_D0       ),
-	.hps_io_hps_io_usb1_inst_D1       (  hps_io_hps_io_usb1_inst_D1       ),
-	.hps_io_hps_io_usb1_inst_D2       (  hps_io_hps_io_usb1_inst_D2       ),
-	.hps_io_hps_io_usb1_inst_D3       (  hps_io_hps_io_usb1_inst_D3       ),
-	.hps_io_hps_io_usb1_inst_D4       (  hps_io_hps_io_usb1_inst_D4       ),
-	.hps_io_hps_io_usb1_inst_D5       (  hps_io_hps_io_usb1_inst_D5       ),
-	.hps_io_hps_io_usb1_inst_D6       (  hps_io_hps_io_usb1_inst_D6       ),
-	.hps_io_hps_io_usb1_inst_D7       (  hps_io_hps_io_usb1_inst_D7       ),
-	.hps_io_hps_io_usb1_inst_CLK      (  hps_io_hps_io_usb1_inst_CLK      ),
-	.hps_io_hps_io_usb1_inst_STP      (  hps_io_hps_io_usb1_inst_STP      ),
-	.hps_io_hps_io_usb1_inst_DIR      (  hps_io_hps_io_usb1_inst_DIR      ),
-	.hps_io_hps_io_usb1_inst_NXT      (  hps_io_hps_io_usb1_inst_NXT      ),
-	.hps_io_hps_io_spim1_inst_CLK     (  hps_io_hps_io_spim1_inst_CLK     ),
-	.hps_io_hps_io_spim1_inst_MOSI    (  hps_io_hps_io_spim1_inst_MOSI    ),
-	.hps_io_hps_io_spim1_inst_MISO    (  hps_io_hps_io_spim1_inst_MISO    ),
-	.hps_io_hps_io_spim1_inst_SS0     (  hps_io_hps_io_spim1_inst_SS0     ),
-	.hps_io_hps_io_uart0_inst_RX      (  hps_io_hps_io_uart0_inst_RX      ),
-	.hps_io_hps_io_uart0_inst_TX      (  hps_io_hps_io_uart0_inst_TX      ),
-	.hps_io_hps_io_i2c0_inst_SDA      (  hps_io_hps_io_i2c0_inst_SDA      ),
-	.hps_io_hps_io_i2c0_inst_SCL      (  hps_io_hps_io_i2c0_inst_SCL      ),
-	.hps_io_hps_io_i2c1_inst_SDA      (  hps_io_hps_io_i2c1_inst_SDA      ),
-	.hps_io_hps_io_i2c1_inst_SCL      (  hps_io_hps_io_i2c1_inst_SCL      ),
-	.memory_mem_a                     (  memory_mem_a                     ),
-	.memory_mem_ba                    (  memory_mem_ba                    ),
-	.memory_mem_ck                    (  memory_mem_ck                    ),
-	.memory_mem_ck_n                  (  memory_mem_ck_n                  ),
-	.memory_mem_cke                   (  memory_mem_cke                   ),
-	.memory_mem_cs_n                  (  memory_mem_cs_n                  ),
-	.memory_mem_ras_n                 (  memory_mem_ras_n                 ),
-	.memory_mem_cas_n                 (  memory_mem_cas_n                 ),
-	.memory_mem_we_n                  (  memory_mem_we_n                  ),
-	.memory_mem_reset_n               (  memory_mem_reset_n               ),
-	.memory_mem_dq                    (  memory_mem_dq                    ),
-	.memory_mem_dqs                   (  memory_mem_dqs                   ),
-	.memory_mem_dqs_n                 (  memory_mem_dqs_n                 ),
-	.memory_mem_odt                   (  memory_mem_odt                   ),
-	.memory_mem_dm                    (  memory_mem_dm                    ),
-	.memory_oct_rzqin                 (  memory_oct_rzqin                 )
+	.clk50              (clk50                                  ),            
+	.clk100             (sys_clk_b                              ),          
+	.avl_h2f_dsp        (avl_h2f_dsp.avl_master_port            ),                 
+	.f2h_sdram_write    (f2h_sdram_write.sdram_write_slave_port ),               	             
+	.f2h_sdram_read     (f2h_sdram_read.sdram_read_slave_port   ),                                
+	.hps_io_port        (hps_io.hps_io_port                     ),
+    .ddr3_mem           (ddr3_mem.ddr3_port                     )
 );
 `else
 `endif	
@@ -285,26 +160,17 @@ pll_0 pll_0_inst
 );
 pll_1 pll_1_inst
 (
-	.refclk   		( clk50			),	//50MHz
+	.refclk   		( clk50			), //50MHz
 	.rst      		( 1'h0			),
-	.outclk_0 		( sys_clk		),	//100MHz
-	.outclk_1 		( pll_clk_cam_0_o),	//24MHz
-	.outclk_2 		( /*clk_cam_1_o	*/),//24MHz
-	.outclk_3 		( clk_cam	),		//24MHz
+	.outclk_0 		( sys_clk		), //100MHz
+	.outclk_1 		( xclk_cam      ), //24MHz
+	.outclk_2 		( clk_23        ), //23MHz
 	.locked   		( pll_lock[1]	)
 );
-pll_2 pll_2_inst
-(
-	.refclk   		( clk50			),		//50MHz
-	.rst      		( 1'h0			),
-	.outclk_0 		( clk_23	    ),		//100MHz
-	.locked   		( 	)
-);
-wire err_ch0;
-wire err_ch1;
+
+
 assign pixel_clk_out = pixel_clk;
-assign clk_cam_0_o = err_ch0 ? clk_23 : pll_clk_cam_0_o ;
-assign clk_cam_1_o = err_ch1 ? clk_23 : pll_clk_cam_0_o ;
+
 
 `ifdef GLOBAL_BUFFERS
 	GLOBAL global_sys_clk_inst
@@ -340,88 +206,65 @@ wire ready_read;
 wire ready_read2;
 
 
-reg [14:0] cnt_clk24;
-wire stop = cnt_clk24 == 'd2500;
-reg running;
-reg sh_reset_n;
-wire p_reset_n = reset_n_b & !sh_reset_n;
-always @(posedge clk_cam, negedge reset_n_b)
-	if (~reset_n_b) 
-		sh_reset_n <='0;
-	else 
-		sh_reset_n <= 1;
-always @(posedge clk_cam, negedge reset_n_b)
-	if (~reset_n_b) 
-		running <='0;
-	else if(stop)
-		running <= '0;
-	else if(p_reset_n)
-		running <= 1;
-always @(posedge clk_cam, negedge reset_n_b)
-	if (~reset_n_b) 
-		cnt_clk24 <='0;
-	else if(running)
-		cnt_clk24 <= cnt_clk24+1;
-		
-always @(posedge clk_cam, negedge reset_n_b)
-	if (~reset_n_b) 
-		RESETB_0 <='0;
-	else if(stop)
-		RESETB_0 <= 1;
-assign 	RESETB_1 =RESETB_0;
-assign PWDN_0      = !reset_n_b;
-assign PWDN_1      = !reset_n_b;
-`ifdef DEBUG_OFF
 
+`ifdef DEBUG_OFF
+// configurate camera
 SCCB_camera_config SCCB_camera_config_inst
 (
-	.clk_sys            (sys_clk_b         ),   
-	.reset_n            (reset_n_b         ),
-	.select_initial_cam (select_initial_cam), // <-
-	.ready_ov5640       (ready_ov5640      ), //->
-	.start_ov5640       (start_ov5640      ), // <-
-	.address_ov5640     (address_ov5640    ), // <-
-	.data_ov5640        (data_ov5640       ), // <-
-	.SIOC_0             (SIOC_0            ),
-	.SIOD_0             (SIOD_0            ),
-	.SIOC_1             (SIOC_1            ),
-	.SIOD_1             (SIOD_1            )
+	.clk_sys               (sys_clk_b                      ),   
+	.reset_n               (reset_n_b                      ),
+	.select_initial_cam    (select_initial_cam             ), // <-
+	.ready_ov5640          (ready_ov5640                   ), // ->
+	.start_ov5640          (start_ov5640                   ), // <-
+	.address_ov5640        (address_ov5640                 ), // <-
+	.data_ov5640           (data_ov5640                    ), // <-
+	.xclk_cam              (xclk_cam                       ), // <- xclk 24 MHz
+	.clk_23                (clk_23                         ),
+	.err_ch0               (err_ch0                        ),
+	.err_ch1               (err_ch1                        ),
+	.clk_cam_0_o           (clk_cam_0_o                    ),
+    .clk_cam_1_o           (clk_cam_1_o                    ),
+	.RESETB_0              (RESETB_0                       ),
+	.RESETB_1              (RESETB_1                       ),
+	.PWDN_0                (PWDN_0                         ),
+	.PWDN_1                (PWDN_1                         ),
+	.SIOC_0                (SIOC_0                         ),
+	.SIOD_0                (SIOD_0                         ),
+	.SIOC_1                (SIOC_1                         ),
+	.SIOD_1                (SIOD_1                         )
 );
 
 hps_register_ov5640 hps_register_ov5640_inst
 (
-	.clk_sys               (sys_clk_b                   ),
-	.reset_n               (reset_n_b                   ),
-	.ready_ov5640          (ready_ov5640                ), // <-
-	.start_ov5640          (start_ov5640                ), // ->
-	.address_ov5640        (address_ov5640              ), // ->
-	.data_ov5640           (data_ov5640                 ), // ->
-	.reg_addr_buf_1        (reg_addr_buf_1              ), // ->
-	.reg_addr_buf_2        (reg_addr_buf_2              ), // ->
-	.hps_switch            (hps_switch                  ), // ->
-	.parallax_corr         (parallax_corr               ), // ->
-	.select_cam_initial    (select_initial_cam          ), // ->
-	.start_write_image2ddr (start_write_image2ddr       ), // ->
-	.avl_h2f_write     (avl_h2f_dsp.avl_write_slave_port) // <-
+	.clk_sys               (sys_clk_b                       ),
+	.reset_n               (reset_n_b                       ),
+	.ready_ov5640          (ready_ov5640                    ), // <-
+	.start_ov5640          (start_ov5640                    ), // ->
+	.address_ov5640        (address_ov5640                  ), // ->
+	.data_ov5640           (data_ov5640                     ), // ->
+	.reg_addr_buf_1        (reg_addr_buf_1                  ), // ->
+	.reg_addr_buf_2        (reg_addr_buf_2                  ), // ->
+	.hps_switch            (hps_switch                      ), // ->
+	.parallax_corr         (parallax_corr                   ), // ->
+	.select_cam_initial    (select_initial_cam              ), // ->
+	.start_write_image2ddr (start_write_image2ddr           ), // ->
+	.avl_h2f_write         (avl_h2f_dsp.avl_write_slave_port) // <-
 
 );
 
 sdram_write sdram_write_inst
 (	
-	.clk_100                  (sys_clk_b                         ),
-    .clk_200                  (sys_clk_b                         ),
-    .reset_n                  (reset_n_b                         ),
-    .start_frame1             (start_frame                       ),
-    .start_frame2             (start_frame2                      ),
-    .start_write_image2ddr    (start_write_image2ddr             ),
-    .data_ddr                 (data_ddr                          ),
-    .valid_data_ddr           (valid_data_ddr[1]                 ),
-    .reg_addr_buf_1           (reg_addr_buf_1                    ),
-    .reg_addr_buf_2           (reg_addr_buf_2                    ),
-    .end_frame                (end_frame                         ),
-    ._ready_read              (ready_read                        ),
-    ._ready_read2             (ready_read2                       ),
-    .f2h_sdram2               (f2h_sdram0.sdram_write_master_port)
+	.clk_100               (sys_clk_b                         ),
+    .reset_n               (reset_n_b                         ),
+    .start_frame           (start_frame                       ),
+    .start_write_image2ddr (start_write_image2ddr             ),
+    .data_ddr              (data_ddr                          ),
+    .valid_data_ddr        (valid_data_ddr[1]                 ),
+    .reg_addr_buf_1        (reg_addr_buf_1                    ),
+    .reg_addr_buf_2        (reg_addr_buf_2                    ),
+    .end_frame             (end_frame                         ),
+    ._ready_read           (ready_read                        ),
+    .f2h_sdram2            (f2h_sdram_write.sdram_write_master_port)
 
 );
 
@@ -431,7 +274,6 @@ read_data_ddr read_data_ddr_inst
 	.reset_b                  (reset_n_b                        ),
 	.line_request             (line_request                     ),
 	.done_write_frame         (end_frame                        ),
-	.start_read_image_from_ddr(start_write_image2ddr            ),
 	.frame_buffer_ready       (frame_buffer_ready               ),
 	.r_data                   (r_data_ddr                       ),
 	.g_data                   (g_data_ddr                       ),
@@ -439,7 +281,7 @@ read_data_ddr read_data_ddr_inst
 	.valid_rgb                (data_rgb_valid_ddr               ),
 	.addr_read_ddr1           ({reg_addr_buf_1,1'b0}            ),
 	.addr_read_ddr2           ({reg_addr_buf_2,1'b0}            ),
-	.f2h_sdram                (f2h_sdram1.sdram_read_master_port)
+	.f2h_sdram                (f2h_sdram_read.sdram_read_master_port)
 );
 `else
 `endif
@@ -449,22 +291,22 @@ convert2avl_stream_raw convert2avl_stream_raw_inst
 	.pclk_1   	       	      ( clk_cam_0_i	                  ),
 	.pclk_2   	       	      ( clk_cam_1_i	                  ),
 	._ready_read              ( ready_read                    ),
-	._ready_read2             ( ready_read2                   ),
+	._ready_read2             ( ready_read                   ),
 	.clk_sys	       	      ( sys_clk_b		              ),
 	.reset_n	       	      ( reset_n_b		              ),
 	.VSYNC_1  	       	      ( VSYNC_0 		              ),
 	.VSYNC_2  	       	      ( VSYNC_1		                  ),
 	.HREF_1   	       	      ( HREF_0  & ready_read  	      ),
-	.HREF_2   	       	      ( HREF_1  & ready_read2   	  ),
+	.HREF_2   	       	      ( HREF_1  & ready_read     	  ),
 	.D1     	       	      ( cam_0_data	                  ),
 	.D2     	       	      ( cam_1_data	                  ),	                 
-	.RAW_1           	      ( prx_fxd_raw_data_0	                  ),
-	.RAW_2           	      ( prx_fxd_raw_data_1	                  ),
-	.valid_RAW     	          ( prx_fxd_raw_data_valid                ),                   
+	.RAW_1           	      ( prx_fxd_raw_data_0	          ),
+	.RAW_2           	      ( prx_fxd_raw_data_1	          ),
+	.valid_RAW     	          ( prx_fxd_raw_data_valid        ),                   
 	.err_ch0                  (err_ch0                        ),
 	.err_ch1                  (err_ch1                        ),
-	.SOF    	       	      ( prx_fxd_raw_data_sop	              ),
-	.EOF    	       	      ( prx_fxd_raw_data_eop	              ),
+	.SOF    	       	      ( prx_fxd_raw_data_sop	      ),
+	.EOF    	       	      ( prx_fxd_raw_data_eop	      ),
 	.start_frame     	      (start_frame                    ),
 	.start_frame2     	      (start_frame2                   )
 	

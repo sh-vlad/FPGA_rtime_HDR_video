@@ -1,29 +1,31 @@
-
+//////////////////////////////////////////////////////
+//Name File     : sdram_write                       //
+//Author        : Andrey Papushin                   //
+//Email         : andrey.papushin@gmail.com         //
+//Standart      : IEEE 1800—2009(SystemVerilog-2009)//
+//Start design  : 03.04.2018                        //
+//Last revision : 25.04.2018                        //
+//////////////////////////////////////////////////////
 module sdram_write
 (
-	input  wire  						    clk_100         	,   
-	input  wire  						    clk_200         	,   
+	input  wire  						    clk_100         	,    
 	input  wire 						    reset_n         	,
-	input  wire                             start_frame1     	,  // импульс старта цикла синхронизатора
-	input  wire                             start_frame2     	,  // импульс старта цикла синхронизатора
+	input  wire                             start_frame         ,
 	input  wire                             start_write_image2ddr     	,  //
 	input  wire  [63:0]                     data_ddr            ,
     input  wire                             valid_data_ddr      ,
-	input  wire  [31:0]                     reg_addr_buf_1  	,  // адрес 1-го буфера в ddr памяти
-	input  wire  [31:0]                     reg_addr_buf_2  	,  // адрес 1-го буфера в ddr памяти
+	input  wire  [31:0]                     reg_addr_buf_1  	,  
+	input  wire  [31:0]                     reg_addr_buf_2  	,  
 	output wire                             end_frame           ,
-	output wire                             _ready_read           ,
-	output wire                             _ready_read2           ,
+	output wire                             _ready_read         ,
 	sdram_ifc.sdram_write_master_port       f2h_sdram2             // avl интерфейс к sdram 
 );
-reg [2:0]running_write_ddr;
+reg [1:0]running_write_ddr;
 wire         [95:0]     data_fifo_frame  ;
-wire start_frame = start_frame2;
-wire ready_write_ddr  =   running_write_ddr[2];
+wire ready_write_ddr  =   running_write_ddr[1];
 
 
 assign _ready_read = running_write_ddr[1];
-assign _ready_read2 = running_write_ddr[2];
 wire last_burst;
 // запись сырого сигнала во время работы синхронизатора
 write_to_buf_frame write_to_buf_frame_inst
@@ -34,8 +36,8 @@ write_to_buf_frame write_to_buf_frame_inst
 	.start_frame         (start_frame     ), 
 	.valid_data_ddr      (valid_data_ddr & ready_write_ddr   ),
 	.data_ddr            (data_ddr          ), 
-	.end_frame            (end_frame          ), 
-	.last_burst            (last_burst          ), 
+	.end_frame           (end_frame          ), 
+	.last_burst          (last_burst          ), 
     .data_fifo_frame     (data_fifo_frame   )  // ->
 );
 
@@ -78,7 +80,7 @@ wire [95:0] data_fifo_in  = data_fifo_frame;
 wire        data_write     =  data_fifo_in[93] ; // avl_write на f=100MHz
 // интервал чтения из fifo 64 элементов
 reg [1:0]reg_end;
-always_ff @(posedge clk_200  or negedge reset_n)
+always_ff @(posedge clk_100  or negedge reset_n)
 	if (~reset_n)
 		reg_end <= 2'd0;
 	else if(end_read_fifo & last_burst)
@@ -86,7 +88,7 @@ always_ff @(posedge clk_200  or negedge reset_n)
 	else if(reg_end == 2'd1)
 		reg_end <= 2'd3;
 // интервал чтения из fifo 64 элементов
-always_ff @(posedge clk_200  or negedge reset_n)
+always_ff @(posedge clk_100  or negedge reset_n)
 	if (~reset_n)
 		running_read <= 1'd0;
 	else if(end_read_fifo)
@@ -94,13 +96,13 @@ always_ff @(posedge clk_200  or negedge reset_n)
 	else if(start_read  )
 		running_read <= 1'd1;
 		
-always_ff @(posedge clk_200  or negedge reset_n)
+always_ff @(posedge clk_100  or negedge reset_n)
 	if (~reset_n)
 		ctrl_buff <= 1'd0;
 	else if(start_frame & ready_write_ddr)
 		ctrl_buff <= ~ctrl_buff;	
 // интервал чтения из fifo 64 элементов
-always_ff @(posedge clk_200  or negedge reset_n)
+always_ff @(posedge clk_100  or negedge reset_n)
 	if (~reset_n)
 		run_read_fifo_64 <= 1'd0;
 	else if(end_read_fifo_burst)
@@ -111,19 +113,17 @@ always_ff @(posedge clk_100  or negedge reset_n)
 	if (~reset_n)
 		running_write_ddr <='0;
 	else if(start_write_image2ddr)
-		running_write_ddr <=3'b001;
-	else if(running_write_ddr[0] & start_frame1)
+		running_write_ddr <=2'b01;
+	else if(running_write_ddr[0] & start_frame)
 		running_write_ddr[1] <=1'b1;
-	else if(running_write_ddr[0] & start_frame2)
-		running_write_ddr[2] <=1'b1;
 // сдвиговый регистр на f=200 MHz
-always_ff @(posedge clk_200  or negedge reset_n)
+always_ff @(posedge clk_100  or negedge reset_n)
 	if (~reset_n)
 		sh_reg_200MHz <= 8'd0;
 	else             //           [6:4]            [3]        [2]      [1]           [0]
 		sh_reg_200MHz <= {f2h_sdram2.write, sh_reg_200MHz[5:3], end_read_fifo, rdreq, ready_read, running_read};
 // дополнительный сигнал		
-always_ff @(posedge clk_200  or negedge reset_n)
+always_ff @(posedge clk_100  or negedge reset_n)
 	if (~reset_n)
 		s <= 1'd0;
 	else if(p_ready_read)
@@ -131,13 +131,13 @@ always_ff @(posedge clk_200  or negedge reset_n)
 	else if( !(data_fifo_out[94] | data_fifo_out[95])) // ждем пока выходы очереди не обнулятся
 		s <= 1'd0;	
 // регистр после fifo
-always_ff @(posedge clk_200  or negedge reset_n)
+always_ff @(posedge clk_100  or negedge reset_n)
 	if (~reset_n)
 		reg_data_fifo_out <= 96'd0;
 	else if(!f2h_sdram2.waitrequest)
 		reg_data_fifo_out <=  { (data_fifo_out[93] & run_read_fifo_64 & !p_rdreq) ,data_fifo_out[92:0]};
 // длина берста *
-always_ff @(posedge clk_200  or negedge reset_n)
+always_ff @(posedge clk_100  or negedge reset_n)
 	if (~reset_n)
 		data_burstcount <= 8'd0;
 	else if(!f2h_sdram2.waitrequest)
@@ -148,7 +148,7 @@ always_ff @(posedge clk_200  or negedge reset_n)
 sdram_fifo sdram_fifo_inst 
 (
 	.wrclk   (clk_100        ),
-	.rdclk   (clk_200        ),
+	.rdclk   (clk_100        ),
 	.data    (data_fifo_in   ),
 	.rdreq   (rdreq          ),//
 	.wrreq   (data_write     ),
@@ -173,16 +173,10 @@ assign f2h_sdram2.address    = data_address; //reg_data_fifo_out[92:64];
 assign f2h_sdram2.byteenable = 8'HFF; 
 assign f2h_sdram2.burstcount = data_burstcount;		
 
-reg [5:0]count_sdram_burst;
-// счетчик загружаемых элементов берста в fifo 
-always_ff @(posedge clk_200  or negedge reset_n)
-	if (~reset_n)
-		count_sdram_burst <= 7'd0;
-	else if(f2h_sdram2.write)
-		count_sdram_burst <= count_sdram_burst + 6'd1;
+
 
 // адрес шины авалон на f=100MHz
-always_ff @(posedge clk_200  or negedge reset_n)
+always_ff @(posedge clk_100  or negedge reset_n)
 	if (~reset_n)
 		data_address <= 29'd0;
 	else if(start_frame & !ctrl_buff & !ready_write_ddr)

@@ -43,7 +43,7 @@ always_ff @( posedge clk_sys or negedge reset_n )
 		
 always_ff @( posedge clk_sys or negedge reset_n )
 	if(~reset_n)
-		parallax_corr <='0;
+		parallax_corr <='d10;
 	else if(valid_parallax_corr)
 		parallax_corr <=  avl_h2f_write.writedata[7:0];
 		

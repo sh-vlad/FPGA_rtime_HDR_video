@@ -87,13 +87,13 @@
  <interface name="hps_io" internal="hps_0.hps_io" type="conduit" dir="end" />
  <interface name="memory" internal="hps_0.memory" type="conduit" dir="end" />
  <interface name="reset_in" internal="clk_0.clk_in_reset" type="reset" dir="end" />
- <module name="clk_0" kind="clock_source" version="17.1" enabled="1">
+ <module name="clk_0" kind="clock_source" version="15.1" enabled="1">
   <parameter name="clockFrequency" value="50000000" />
   <parameter name="clockFrequencyKnown" value="true" />
   <parameter name="inputClockFrequency" value="0" />
   <parameter name="resetSynchronousEdges" value="NONE" />
  </module>
- <module name="clk_1" kind="clock_source" version="17.1" enabled="1">
+ <module name="clk_1" kind="clock_source" version="15.1" enabled="1">
   <parameter name="clockFrequency" value="100000000" />
   <parameter name="clockFrequencyKnown" value="true" />
   <parameter name="inputClockFrequency" value="0" />
@@ -108,7 +108,7 @@
   <parameter name="WIDTH_BE" value="4" />
   <parameter name="WIDTH_DATA" value="32" />
  </module>
- <module name="hps_0" kind="altera_hps" version="17.1" enabled="1">
+ <module name="hps_0" kind="altera_hps" version="15.1" enabled="1">
   <parameter name="ABSTRACT_REAL_COMPARE_TEST" value="false" />
   <parameter name="ABS_RAM_MEM_INIT_FILENAME" value="meminit" />
   <parameter name="ACV_PHY_CLK_ADD_FR_PHASE" value="0.0" />
@@ -183,10 +183,8 @@
   <parameter name="DUPLICATE_AC" value="false" />
   <parameter name="ED_EXPORT_SEQ_DEBUG" value="false" />
   <parameter name="EMAC0_Mode" value="N/A" />
-  <parameter name="EMAC0_PTP" value="false" />
   <parameter name="EMAC0_PinMuxing" value="Unused" />
   <parameter name="EMAC1_Mode" value="RGMII" />
-  <parameter name="EMAC1_PTP" value="false" />
   <parameter name="EMAC1_PinMuxing" value="HPS I/O Set 0" />
   <parameter name="ENABLE_ABS_RAM_MEM_INIT" value="false" />
   <parameter name="ENABLE_BONDING" value="false" />
@@ -222,7 +220,6 @@
   <parameter name="F2SDRAM_Width" value="64,32" />
   <parameter name="F2SINTERRUPT_Enable" value="false" />
   <parameter name="F2S_Width" value="0" />
-  <parameter name="FIX_READ_LATENCY" value="8" />
   <parameter name="FORCED_NON_LDC_ADDR_CMD_MEM_CK_INVERT" value="false" />
   <parameter name="FORCED_NUM_WRITE_FR_CYCLE_SHIFTS" value="0" />
   <parameter name="FORCE_DQS_TRACKING" value="AUTO" />
@@ -241,6 +238,7 @@
   <parameter name="FPGA_PERIPHERAL_INPUT_CLOCK_FREQ_I2C1_SCL_IN" value="100" />
   <parameter name="FPGA_PERIPHERAL_INPUT_CLOCK_FREQ_I2C2_SCL_IN" value="100" />
   <parameter name="FPGA_PERIPHERAL_INPUT_CLOCK_FREQ_I2C3_SCL_IN" value="100" />
+  <parameter name="FPGA_PERIPHERAL_INPUT_CLOCK_FREQ_SDIO_CLK_IN" value="100" />
   <parameter name="FPGA_PERIPHERAL_INPUT_CLOCK_FREQ_SPIS0_SCLK_IN" value="100" />
   <parameter name="FPGA_PERIPHERAL_INPUT_CLOCK_FREQ_SPIS1_SCLK_IN" value="100" />
   <parameter name="FPGA_PERIPHERAL_INPUT_CLOCK_FREQ_USB0_CLK_IN" value="100" />
@@ -640,7 +638,7 @@
  </module>
  <connection
    kind="avalon"
-   version="17.1"
+   version="15.1"
    start="hps_0.h2f_axi_master"
    end="h2f_bridge_dsp_0.avl">
   <parameter name="arbitrationPriority" value="1" />
@@ -649,32 +647,32 @@
  </connection>
  <connection
    kind="clock"
-   version="17.1"
+   version="15.1"
    start="clk_1.clk"
    end="h2f_bridge_dsp_0.clock_dsp" />
  <connection
    kind="clock"
-   version="17.1"
+   version="15.1"
    start="clk_1.clk"
    end="hps_0.f2h_sdram0_clock" />
  <connection
    kind="clock"
-   version="17.1"
+   version="15.1"
    start="clk_1.clk"
    end="hps_0.f2h_sdram1_clock" />
  <connection
    kind="clock"
-   version="17.1"
+   version="15.1"
    start="clk_1.clk"
    end="hps_0.h2f_axi_clock" />
  <connection
    kind="reset"
-   version="17.1"
+   version="15.1"
    start="clk_0.clk_reset"
    end="clk_1.clk_in_reset" />
  <connection
    kind="reset"
-   version="17.1"
+   version="15.1"
    start="clk_0.clk_reset"
    end="h2f_bridge_dsp_0.reset" />
  <interconnectRequirement for="$system" name="qsys_mm.clockCrossingAdapter" value="HANDSHAKE" />
