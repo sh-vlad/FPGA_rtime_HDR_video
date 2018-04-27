@@ -1,11 +1,10 @@
 //////////////////////////////////////////////////////
-//Name File     : module write_to_buf_frame
+//Name File     : write_to_buf_frame                //
 //Author        : Andrey Papushin                   //
-//Email         : a.s.papushin@npk-pelengator.ru    //
+//Email         : andrey.papushin@gmail.com         //
 //Standart      : IEEE 1800—2009(SystemVerilog-2009)//
-//Company       : npk pelengator                    //
-//Start design  : 11.05.2017                        //
-//Last revision : 22.08.2017                        //
+//Start design  : 03.04.2018                        //
+//Last revision : 25.04.2018                        //
 //////////////////////////////////////////////////////
 module write_to_buf_frame
 (
@@ -14,13 +13,13 @@ module write_to_buf_frame
 	output logic                            end_frame,
 	input  wire                             start_frame     	,  // импульс старта цикла синхронизатора
     input logic                             valid_data_ddr      ,
-    output logic                             last_burst      ,
+    output logic                            last_burst          ,
 	input  wire         [31:0]              reg_addr_buf_1  	,  // адрес 1-го буфера в ddr память                          end_write_buf       ,
 	input  wire         [63:0]              data_ddr            ,
 	output wire         [95:0]              data_fifo_frame
 );
 
-//reg        last_burst       ; // сигнал завершения чтения данных из fifo, когда уже нет записи (выгрузить то что осталось из фифо)
+
 reg [28:0] data_address     ; // avl_address на f=100MHz
 reg [ 6:0] count_unit_burst ; // счетчик передач внутри берста
 reg [13:0] count_burst      ; // счетчик берстов 
@@ -30,14 +29,7 @@ reg [13:0] count_burst      ; // счетчик берстов
 wire last_unit_burst = (count_unit_burst == 'd31) & valid_data_ddr; // последнее переданное слово в берсте
 wire  end_write_buf   = last_unit_burst & last_burst_href; // импульс на последний пиксель фрейма
 
-//reg [ 7:0] max_units_in_fifo; // максимальное заполненность очереди
-//reg [15:0] count_full       ; // число потерянных слов
-// запись в ddr память параметров
-//wire write_log             = sh3_end_read_fifo; 
-//wire sel_addr_2            = (count_burst == 'd4095) & last_unit_burst; // ставим на шину адрес второго буфера
-/* полезные данные для записи в ddr память */
-//wire [63:0] data_ddr       = running_mode ? {strbs, sig_in[3], sig_in[2], sig_in[1], sig_in[0]} : 64'd0;	
-/* вход fifo: полезные данные (64 бита) + адрес(29 бит)  + 2 доп. бита*/
+
 assign data_fifo_frame   = {last_unit_burst, end_write_buf, valid_data_ddr, data_address, data_ddr} ;
 assign end_frame = last_unit_burst  & last_burst_href & last_burst;
 // дополнительное время для выгрузки данных из fifo и завершения берста

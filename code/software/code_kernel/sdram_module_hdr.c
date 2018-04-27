@@ -1,0 +1,58 @@
+#include <linux/module.h>
+#include <linux/init.h>
+#include <linux/module.h>
+#include <linux/slab.h>
+#include <linux/fs.h> 
+#include <linux/platform_device.h>
+#include <linux/miscdevice.h> 
+#include <linux/of_irq.h>
+#include <linux/phy.h>
+#include <asm/uaccess.h>
+#include <linux/ioport.h>
+#include <asm/io.h>
+#include <linux/slab.h> 
+#include <linux/pagemap.h>
+#include <linux/vmalloc.h>
+#include <linux/delay.h>
+
+
+unsigned long addr_buf_write_1;
+unsigned long addr_buf_write_2;
+static unsigned int * b0_ptr1 = NULL;
+static unsigned int * b0_ptr2 = NULL;
+static dma_addr_t handle1;
+static dma_addr_t handle2;
+static int __iomem *fpga_reg_addr;
+static int demo_init(void)
+{
+	printk("The module is successfully added to kernel!\n");
+	// allocation of two buffers 
+	b0_ptr1 = dma_alloc_coherent( NULL, 4194304, &handle1, GFP_KERNEL | GFP_DMA ); // 4 MB
+	b0_ptr2 = dma_alloc_coherent( NULL, 4194304, &handle2, GFP_KERNEL | GFP_DMA ); // 4 MB 
+	printk("allocation of two buffers \n");
+	// Address byte to address word
+	addr_buf_write_1 = handle1 >> 3;
+	addr_buf_write_2 = handle2 >> 3;
+	printk("hps_addr_1 = %X\n", handle1);
+	printk("hps_addr_2 = %X\n", handle2);
+	printk("fpga_addr_write_1 = %X\n", addr_buf_write_1);
+	printk("fpga_addr_write_2 = %X\n", addr_buf_write_2);
+	return 0;
+}
+
+static void demo_exit(void)
+{	
+	printk("exit\n");
+	if( b0_ptr1 )
+        	dma_free_coherent(NULL, 4194304, b0_ptr1, handle1 );
+	if( b0_ptr2 )
+        	dma_free_coherent(NULL, 4194304, b0_ptr2, handle2 );
+}
+
+module_init(demo_init);
+module_exit(demo_exit);
+
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("Andrey Papushin  andrey.papushin@gmail.com");
+MODULE_DESCRIPTION("allocation of two buffers for hdr image");
+MODULE_VERSION("1.0");

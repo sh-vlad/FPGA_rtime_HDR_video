@@ -9,6 +9,16 @@ module SCCB_camera_config
 	input  logic                        start_ov5640      ,
 	input  logic [15:0]                 address_ov5640    ,
 	input  logic [7:0]                  data_ov5640       ,
+	input  logic                        xclk_cam          ,
+	input  logic                        clk_23            ,
+	input  logic                        err_ch0           ,
+	input  logic                        err_ch1           ,
+	output logic                        clk_cam_0_o       ,
+	output logic                        clk_cam_1_o       ,
+	output logic                        RESETB_0          ,
+	output logic                        RESETB_1          ,
+	output logic                        PWDN_0            ,
+	output logic                        PWDN_1            ,
 	output logic                        SIOC_0            , 
 	inout  logic                        SIOD_0            ,
 	output logic                        SIOC_1            , 
@@ -59,5 +69,42 @@ begin
 		end
 	endcase
 end			
+
+reg [14:0] cnt_clk24;
+wire stop = cnt_clk24 == 'd2500;
+reg running;
+reg sh_reset_n;
+wire p_reset_n = reset_n & !sh_reset_n;
+always @(posedge xclk_cam, negedge reset_n)
+	if (~reset_n) 
+		sh_reset_n <='0;
+	else 
+		sh_reset_n <= 1;
+always @(posedge xclk_cam, negedge reset_n)
+	if (~reset_n) 
+		running <='0;
+	else if(stop)
+		running <= '0;
+	else if(p_reset_n)
+		running <= 1;
+always @(posedge xclk_cam, negedge reset_n)
+	if (~reset_n) 
+		cnt_clk24 <='0;
+	else if(running)
+		cnt_clk24 <= cnt_clk24+1;
+		
+always @(posedge xclk_cam, negedge reset_n)
+	if (~reset_n) 
+		RESETB_0 <='0;
+	else if(stop)
+		RESETB_0 <= 1;
+		
+assign 	RESETB_1 =RESETB_0;
+assign PWDN_0      = !reset_n;
+assign PWDN_1      = !reset_n;
+
+assign clk_cam_0_o = err_ch0 ? clk_23 : xclk_cam ;
+assign clk_cam_1_o = err_ch1 ? clk_23 : xclk_cam ;
+
 
 endmodule

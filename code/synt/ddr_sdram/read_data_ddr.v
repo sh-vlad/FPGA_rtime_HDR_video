@@ -1,10 +1,16 @@
-
+//////////////////////////////////////////////////////
+//Name File     : read_data_ddr                     //
+//Author        : Andrey Papushin                   //
+//Email         : andrey.papushin@gmail.com         //
+//Standart      : IEEE 1800—2009(SystemVerilog-2009)//
+//Start design  : 02.04.2018                        //
+//Last revision : 23.04.2018                        //
+//////////////////////////////////////////////////////
 module read_data_ddr
 (
 	input  wire  						    clk_100         ,    
 	input  wire 						    reset_b         ,
 	input  wire                             line_request	,
-	input  wire                             start_read_image_from_ddr	,
 	input  wire                             done_write_frame	,
 	output  reg                             frame_buffer_ready	,
 	output reg  [7:0]                       r_data          ,
@@ -14,7 +20,7 @@ module read_data_ddr
 	input  wire [29:0]                      addr_read_ddr1   ,
 	input  wire [29:0]                      addr_read_ddr2   ,
 	output reg  [7:0]                       count_read_frame ,
-	sdram_ifc.sdram_read_master_port        f2h_sdram         // avl интерфейс к sdram 
+	sdram_ifc.sdram_read_master_port        f2h_sdram         // avalon interface sdram <-> read_data_ddr
 );
 reg ready_new_frame;
 reg ctrl_buff;
