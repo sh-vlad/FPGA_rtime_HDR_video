@@ -175,7 +175,7 @@ assign end_read_fifo_burst        = data_fifo_out[95] & run_read_fifo_64 & !s;
 
 /* interface  avl_sdram to  */
 assign f2h_sdram2.write      = reg_data_fifo_out[93];// 
-assign f2h_sdram2.writedata  = reg_data_fifo_out[63:0];	
+assign f2h_sdram2.writedata  = { reg_data_fifo_out[31:0], reg_data_fifo_out[63:32] };//reg_data_fifo_out[63:0];	
 assign f2h_sdram2.address    = data_address; //
 assign f2h_sdram2.byteenable = 8'HFF; 
 assign f2h_sdram2.burstcount = data_burstcount;		

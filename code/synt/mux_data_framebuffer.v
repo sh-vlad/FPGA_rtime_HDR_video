@@ -68,8 +68,8 @@ always @( posedge clk or negedge reset_n)
 assign enable_tone_mapping = reg_hps_switch[2];
 	
 always @( posedge clk )
-	case (reg_hps_switch )
-		4'b0001:begin
+	casex (reg_hps_switch )
+		4'b??01:begin
 					r_fb			<= 	r_cam_0		        ;    
 					g_fb			<=  g_cam_0		        ;
 					b_fb			<=  b_cam_0		        ;
@@ -77,7 +77,7 @@ always @( posedge clk )
 					sop_fb		  	<=  sop_cam_0		;
 					eop_fb	      	<=  eop_cam_0	    ;
 				end	                                        
-		4'b0010:begin                                      
+		4'b??10:begin                                      
 					r_fb			<= r_cam_1		        ;
 					g_fb			<= g_cam_1		        ;
 					b_fb			<= b_cam_1		        ;
@@ -85,22 +85,14 @@ always @( posedge clk )
 					sop_fb		  	<= sop_cam_1		    ;
 					eop_fb	      	<= eop_cam_1	        ;
 				end	                                        
-		4'b0011:begin                                       
+		4'b??11:begin                                       
 					r_fb			<= r_hdr		        ;  			
 					g_fb			<= g_hdr		        ;  
 					b_fb			<= b_hdr		        ;  
 					data_fb_valid	<= data_valid_hdr       ; 
 					sop_fb		  	<= sop_hdr		        ;  
 					eop_fb	      	<= eop_hdr	            ;  			
-				end                                         
-		4'b0111:begin                                       
-					r_fb			<= r_tm		         	;	
-					g_fb			<= g_tm		            ;
-					b_fb			<= b_tm		            ;
-					data_fb_valid	<= data_valid_tm     ;
-					sop_fb		  	<= sop_tm		    ; 
-					eop_fb	      	<= eop_tm            ;			
-				end                                         
+				end                              
 		default:begin                                     
 					r_fb			<= r_cam_0		       	;
 					g_fb			<= g_cam_0		        ;
