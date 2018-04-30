@@ -4,40 +4,37 @@
 //Email         : andrey.papushin@gmail.com         //
 //Standart      : IEEE 1800—2009(SystemVerilog-2009)//
 //Start design  : 27.02.2018                        //
-//Last revision : 09.04.2018                        //
+//Last revision : 30.04.2018                        //
 //////////////////////////////////////////////////////
 module convert2avl_stream_raw
 (
-	input wire             pclk_1   	   ,
-	input wire             pclk_2   	   ,
-	input wire             clk_sys	       ,
-	input wire             reset_n	       ,
-	input wire             _ready_read  	   ,
-	input wire             _ready_read2  	   ,
-	input wire             VSYNC_1  	   ,
-	input wire             VSYNC_2  	   ,
-	input wire             HREF_1   	   ,
-	input wire             HREF_2   	   ,
-	input wire [7:0]       D1     	       ,
-	input wire [7:0]       D2     	       ,	                               
-	output logic [7:0]     RAW_1           ,
-	output logic [7:0]     RAW_2           ,
-	output logic           valid_RAW     ,                                       
-//	output logic           valid_RAW_2     , 
-	output logic           start_frame2    ,
-	output logic           SOF    	       ,
-	//output logic           SOF_2    	       ,
-	output logic           EOF    	       ,
-	//output logic           EOF_2    	       ,
-	output logic           err_ch0    	       ,
-	output logic           err_ch1    	       ,
-	output logic           start_frame     ,
-	output logic [63:0]    data_ddr        ,
-	output logic [7:0]     count_frame_1   ,
-	output logic [7:0]     count_frame_2   ,
-	output logic [9:0]     count_href_1   ,
-	output logic [9:0]     count_href_2   ,
-	output reg [11:0]counter_valid_raw,
+	input wire             pclk_1   	    ,
+	input wire             pclk_2   	    ,
+	input wire             clk_sys	        ,
+	input wire             reset_n	        ,
+	input wire             _ready_read      ,
+	input wire             _ready_read2     ,
+	input wire             VSYNC_1  	    ,
+	input wire             VSYNC_2  	    ,
+	input wire             HREF_1   	    ,
+	input wire             HREF_2   	    ,
+	input wire   [7:0]     D1     	        ,
+	input wire   [7:0]     D2     	        ,	                               
+	output logic [7:0]     RAW_1            ,
+	output logic [7:0]     RAW_2            ,
+	output logic           valid_RAW        ,                                       
+	output logic           start_frame2     ,
+	output logic           SOF    	        ,
+	output logic           EOF    	        ,
+	output logic           err_ch0    	    ,
+	output logic           err_ch1    	    ,
+	output logic           start_frame      ,
+	output logic [63:0]    data_ddr         ,
+	output logic [ 7:0]    count_frame_1    ,
+	output logic [ 7:0]    count_frame_2    ,
+	output logic [ 9:0]    count_href_1     ,
+	output logic [ 9:0]    count_href_2     ,
+	output reg   [11:0]    counter_valid_raw,
     output logic           valid_data_ddr
 	
 );
@@ -53,7 +50,6 @@ reg _sh_ready_read;
 wire ready_read_behind  = (rdusedw_1 >= 'd1000) & (rdusedw_2 >= 'd1000);
 wire ready_read_ahead           = ready_read_behind;
 wire p_ready_read = ready_read_behind & !sh_ready_read;
-//wire p_ready_read2 = ready_read2 & !sh_ready_read2;
 reg valid_read_fifo_1;
 reg valid_read_fifo_2;
 always @(posedge clk_sys or negedge reset_n)
@@ -61,11 +57,7 @@ always @(posedge clk_sys or negedge reset_n)
 		sh_ready_read <=1'b0;
 	else 
 		sh_ready_read <=ready_read_behind;
-//always @(posedge clk_sys or negedge reset_n)
-//	if (~reset_n )
-//		sh_ready_read2 <=1'b0;
-//	else 
-//		sh_ready_read2 <=ready_read2;
+
 reg sh_VSYNC_1;
 reg sh_VSYNC_2;
 reg sh_HREF_1;		

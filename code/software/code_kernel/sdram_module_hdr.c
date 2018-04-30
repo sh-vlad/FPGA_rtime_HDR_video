@@ -15,16 +15,66 @@
 #include <linux/vmalloc.h>
 #include <linux/delay.h>
 
+struct ioregion {
+	char* name;
+	unsigned long address;
+	unsigned long size;
+	void __iomem* base;
+};
+static struct {
+	void __iomem *addr_buf_1;
+	void __iomem *addr_buf_2;
+} regs;
+static int ioregion_request(struct ioregion* region_p) {
+	/* reserve our memory region */
+	if (NULL == request_mem_region(region_p->address, region_p->size,
+				       region_p->name))
+		return (-EBUSY);
+	/* ioremap our memory region */
+	region_p->base = ioremap_nocache(region_p->address, region_p->size);
+	if (NULL == region_p->base) {
+		release_mem_region(region_p->address, region_p->size);
+		return (-ENOMEM);
+	}
+	return (0);
+}
+static void ioregion_release(struct ioregion* region_p) {
+	iounmap(region_p->base);
+	region_p->base = NULL;
+	release_mem_region(region_p->address, region_p->size);
 
-unsigned long addr_buf_write_1;
-unsigned long addr_buf_write_2;
+	return;
+}
+static struct ioregion regions_tab[] = {
+	{"HDR", 0xC0000000UL, 32UL, NULL},
+	{NULL, 0x0UL, 0UL, NULL}
+};
+
+#define init_regs()					         \
+do {							         \
+	regs.addr_buf_1 = (u8 *)regions_tab[0U].base + 0U;     \
+	regs.addr_buf_2 = (u8 *)regions_tab[0U].base + 4U;     \
+} while (0)
+#define write_to_fpga(arg1, arg2)				 \
+do {							         \
+	writel((arg1), regs.addr_buf_1);			 \
+	writel((arg2), regs.addr_buf_2);		  	 \
+} while (0)
+
+unsigned int addr_buf_write_1;
+unsigned int addr_buf_write_2;
 static unsigned int * b0_ptr1 = NULL;
 static unsigned int * b0_ptr2 = NULL;
 static dma_addr_t handle1;
 static dma_addr_t handle2;
-static int __iomem *fpga_reg_addr;
-static int demo_init(void)
+struct ioregion* region_p;
+
+static int framebuffer_init(void)
 {
+	int retval;
+	for (region_p = regions_tab; NULL != region_p->name; ++region_p) {
+		retval = ioregion_request(region_p);
+	}
 	printk("The module is successfully added to kernel!\n");
 	// allocation of two buffers 
 	b0_ptr1 = dma_alloc_coherent( NULL, 4194304, &handle1, GFP_KERNEL | GFP_DMA ); // 4 MB
@@ -37,20 +87,25 @@ static int demo_init(void)
 	printk("hps_addr_2 = %X\n", handle2);
 	printk("fpga_addr_write_1 = %X\n", addr_buf_write_1);
 	printk("fpga_addr_write_2 = %X\n", addr_buf_write_2);
+	init_regs();
+	write_to_fpga(addr_buf_write_1, addr_buf_write_2);
 	return 0;
 }
 
-static void demo_exit(void)
+static void framebuffer_exit(void)
 {	
 	printk("exit\n");
 	if( b0_ptr1 )
         	dma_free_coherent(NULL, 4194304, b0_ptr1, handle1 );
 	if( b0_ptr2 )
         	dma_free_coherent(NULL, 4194304, b0_ptr2, handle2 );
+	for (region_p = regions_tab; NULL != region_p->name; ++region_p)
+		if (NULL != region_p->base)
+			ioregion_release(region_p);
 }
 
-module_init(demo_init);
-module_exit(demo_exit);
+module_init(framebuffer_init);
+module_exit(framebuffer_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Andrey Papushin  andrey.papushin@gmail.com");

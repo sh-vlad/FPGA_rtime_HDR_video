@@ -4,7 +4,7 @@
 //Email         : andrey.papushin@gmail.com         //
 //Standart      : IEEE 1800—2009(SystemVerilog-2009)//
 //Start design  : 02.04.2018                        //
-//Last revision : 23.04.2018                        //
+//Last revision : 30.04.2018                        //
 //////////////////////////////////////////////////////
 module read_data_ddr
 (
@@ -86,7 +86,6 @@ always_ff @(posedge clk_100  or negedge reset_b)
 		ctrl_buff <= 1'd0;
 	else if(n_frame_buffer_ready)
 		ctrl_buff <= ~ctrl_buff;	
-// флаг валидности данных на f=100MHz
 always_ff @(posedge clk_100  or negedge reset_b)
 	if (~reset_b)
 		start_read  <= 1'd0;
@@ -157,7 +156,6 @@ reg [ 7:0] burstcount;
 reg        reg_read      ;  
 reg [29:0] reg_address   ;		
 reg [ 7:0] reg_burstcount;			
-/* интерфейс avl к sdram контроллеру */
 always_ff @(posedge clk_100  or negedge reset_b)
 	if (~reset_b)
 	begin
@@ -200,7 +198,4 @@ assign f2h_sdram.address   	=  reg_address    ;
 assign f2h_sdram.burstcount	=  8'd80;
 
 
-
-
-//
 endmodule

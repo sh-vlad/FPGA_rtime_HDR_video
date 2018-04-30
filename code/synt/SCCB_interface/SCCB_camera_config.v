@@ -1,5 +1,11 @@
-
-
+//////////////////////////////////////////////////////
+//Name File     : SCCB_camera_config                //
+//Author        : Andrey Papushin                   //
+//Email         : andrey.papushin@gmail.com         //
+//Standart      : IEEE 1800—2009(SystemVerilog-2009)//
+//Start design  : 03.04.2018                        //
+//Last revision : 30.04.2018                        //
+//////////////////////////////////////////////////////
 module SCCB_camera_config
 (
 	input  logic                        clk_sys           ,             
@@ -25,7 +31,8 @@ module SCCB_camera_config
 	inout  logic                        SIOD_1     	
 );
 
-
+reg                 reg_SIOD_0 ;
+reg                 reg_SIOD_1 ;  
 SCCB_interface SCCB_interface_inst
 (
 	.clk               (clk_sys                     ),
@@ -42,30 +49,30 @@ begin
 		2'b00: 
 		begin
 			SIOC_0  =SIOC_o ? 1'b0 : 1'bz;
-	        SIOD_0  =SIOD_o ? 1'b0 : 1'bz;
+	        reg_SIOD_0  =SIOD_o ? 1'b0 : 1'bz;
             SIOC_1  =SIOC_o ? 1'b0 : 1'bz;
-            SIOD_1  =SIOD_o ? 1'b0 : 1'bz;
+            reg_SIOD_1  =SIOD_o ? 1'b0 : 1'bz;
 		end
 		2'b01:
 		begin
 			SIOC_0  =SIOC_o ? 1'b0 : 1'bz;
-	        SIOD_0  =SIOD_o ? 1'b0 : 1'bz;
+	        reg_SIOD_0  =SIOD_o ? 1'b0 : 1'bz;
             SIOC_1  = 1'bz;
-            SIOD_1  = 1'bz;
+            reg_SIOD_1  = 1'bz;
 		end
 		2'b10:
 		begin
 			SIOC_0  = 1'bz;
-	        SIOD_0  = 1'bz;
+	        reg_SIOD_0  = 1'bz;
             SIOC_1  = SIOC_o ? 1'b0 : 1'bz;
-            SIOD_1  = SIOD_o ? 1'b0 : 1'bz;
+            reg_SIOD_1  = SIOD_o ? 1'b0 : 1'bz;
 		end
 		default:
 		begin
 			SIOC_0  = 1'bz;
-	        SIOD_0  = 1'bz;
+	        reg_SIOD_0  = 1'bz;
             SIOC_1  = 1'bz;
-            SIOD_1  = 1'bz;
+            reg_SIOD_1  = 1'bz;
 		end
 	endcase
 end			
@@ -102,7 +109,8 @@ always @(posedge xclk_cam, negedge reset_n)
 assign 	RESETB_1 =RESETB_0;
 assign PWDN_0      = !reset_n;
 assign PWDN_1      = !reset_n;
-
+assign SIOD_0      = reg_SIOD_0 ;
+assign SIOD_1      = reg_SIOD_1 ;
 assign clk_cam_0_o = err_ch0 ? clk_23 : xclk_cam ;
 assign clk_cam_1_o = err_ch1 ? clk_23 : xclk_cam ;
 

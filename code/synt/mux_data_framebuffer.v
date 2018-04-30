@@ -8,48 +8,48 @@
 //////////////////////////////////////////////////////
 module mux_data_framebuffer
 (
-	input  wire         clk                   ,
-	input  wire         reset_n               ,
-	input  wire         start_frame           ,
-	input  wire  [3:0]  hps_switch            ,
-	input  wire  [7:0]  parallax_corr         ,
-	output reg   [7:0]  reg_parallax_corr     ,
-	output wire         enable_tone_mapping   ,
-	                                        
-	input  wire [7:0]   r_cam_0		          ,
-	input  wire [7:0]   g_cam_0		          ,
-	input  wire [7:0]   b_cam_0		          ,
-	input  wire         data_valid_cam_0   ,
-	input  wire         sop_cam_0		  ,
-	input  wire         eop_cam_0	      ,
-	                                         
-	input  wire [7:0]   r_cam_1		          ,
-	input  wire [7:0]   g_cam_1		          ,
-	input  wire [7:0]   b_cam_1		          ,
-	input  wire         data_valid_cam_1   ,
-	input  wire         sop_cam_1		  ,
-	input  wire         eop_cam_1	      ,
-	                                         
-	input  wire [7:0]   r_hdr		          ,
-	input  wire [7:0]   g_hdr		          ,
-	input  wire [7:0]   b_hdr		          ,
-	input  wire         data_valid_hdr     ,
-	input  wire         sop_hdr		      ,
-	input  wire         eop_hdr	          ,
-	                                        
-	input  wire [7:0]   r_tm		          ,
-	input  wire [7:0]   g_tm		          ,
-	input  wire [7:0]   b_tm		          ,
-	input  wire         data_valid_tm      ,
-	input  wire         sop_tm		      ,
-	input  wire         eop_tm             ,
-	                                                                                  
-	output  wire [7:0]  r_fb		          ,
-	output  wire [7:0]  g_fb		          ,
-	output  wire [7:0]  b_fb		          ,
-	output  wire        data_fb_valid         ,
-	output  wire        sop_fb		          ,
-	output  wire        eop_fb	              
+	input  logic        clk                   ,
+	input  logic        reset_n               ,
+	input  logic        start_frame           ,
+	input  logic [3:0]  hps_switch            ,
+	input  logic [7:0]  parallax_corr         ,
+	output logic [7:0]  reg_parallax_corr     ,
+	output logic        enable_tone_mapping   ,
+	                            
+	input  logic[7:0]   r_cam_0		          ,
+	input  logic[7:0]   g_cam_0		          ,
+	input  logic[7:0]   b_cam_0		          ,
+	input  logic        data_valid_cam_0   ,
+	input  logic        sop_cam_0		  ,
+	input  logic        eop_cam_0	      ,
+	                                  
+	input  logic[7:0]   r_cam_1		          ,
+	input  logic[7:0]   g_cam_1		          ,
+	input  logic[7:0]   b_cam_1		          ,
+	input  logic        data_valid_cam_1   ,
+	input  logic        sop_cam_1		  ,
+	input  logic        eop_cam_1	      ,
+	                                  
+	input  logic[7:0]   r_hdr		          ,
+	input  logic[7:0]   g_hdr		          ,
+	input  logic[7:0]   b_hdr		          ,
+	input  logic        data_valid_hdr     ,
+	input  logic        sop_hdr		      ,
+	input  logic        eop_hdr	          ,
+	                                 
+	input  logic[7:0]   r_tm		          ,
+	input  logic[7:0]   g_tm		          ,
+	input  logic[7:0]   b_tm		          ,
+	input  logic        data_valid_tm      ,
+	input  logic        sop_tm		      ,
+	input  logic        eop_tm             ,
+	                                                                           
+	output logic [7:0]  r_fb		          ,
+	output logic [7:0]  g_fb		          ,
+	output logic [7:0]  b_fb		          ,
+	output logic        data_fb_valid         ,
+	output logic        sop_fb		          ,
+	output logic        eop_fb	              
 
 );
 

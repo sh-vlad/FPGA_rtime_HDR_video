@@ -13,7 +13,7 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
-//обработка нажатия кнопки " интерполяция " //
+
 
 UdpServer::UdpServer(QWidget *pwgt):QTextEdit(pwgt)
 {
@@ -24,7 +24,6 @@ UdpServer::UdpServer(QWidget *pwgt):QTextEdit(pwgt)
     QTimer* ptimer = new QTimer(this);
     ptimer->setInterval(3000);
     ptimer->start();
-    // подключаемся к серверу
     connect(ptimer, SIGNAL(timeout()), SLOT(slotSendDatagram()));
 }
 
@@ -59,7 +58,7 @@ void MainWindow::on_Slider_1_valueChanged(int value)
    // tmp = byte2<<16 | 0x3500;
    // vec.push_back(tmp);
     QByteArray Datagram;
-    QDataStream out(&Datagram, QIODevice::WriteOnly);  //передаем потоку указатель на QIODevice;
+    QDataStream out(&Datagram, QIODevice::WriteOnly);  
     UdpServer a;
     out << vec;
     a.m_pudp->writeDatagram(Datagram, QHostAddress(ip_addr_board),3333);
@@ -73,7 +72,7 @@ void MainWindow::on_Slider_2_valueChanged(int value)
     byte1 = (value >> 8) & 0xff;
     byte2 = (value >> 16) & 0xf;
     QByteArray Datagram;
-    QDataStream out(&Datagram, QIODevice::WriteOnly);  //передаем потоку указатель на QIODevice;
+    QDataStream out(&Datagram, QIODevice::WriteOnly);  
     UdpServer a;
     QVector<qint32> vec;
     tmp =( 2<<16) | 0x4; // addr =4, выбираем камеру 2
@@ -105,7 +104,7 @@ void MainWindow::on_radioButton_3_clicked()
     UdpServer a;
     quint32 tmp;
     QByteArray Datagram;
-    QDataStream out(&Datagram, QIODevice::WriteOnly);  //передаем потоку указатель на QIODevice;
+    QDataStream out(&Datagram, QIODevice::WriteOnly);  
     QVector<qint32> vec;
     tmp = 3<<16 | 0x2; //
     vec.push_back(tmp);
@@ -118,7 +117,7 @@ void MainWindow::on_radioButton_clicked()
     UdpServer a;
     quint32 tmp;
     QByteArray Datagram;
-    QDataStream out(&Datagram, QIODevice::WriteOnly);  //передаем потоку указатель на QIODevice;
+    QDataStream out(&Datagram, QIODevice::WriteOnly); 
     QVector<qint32> vec;
     tmp = 1<<16 | 0x2; //
     vec.push_back(tmp);
@@ -186,7 +185,7 @@ void MainWindow::on_on_apply_clicked()
     UdpServer a;
     quint32 tmp;
     QByteArray Datagram;
-    QDataStream out(&Datagram, QIODevice::WriteOnly);  //передаем потоку указатель на QIODevice;
+    QDataStream out(&Datagram, QIODevice::WriteOnly);  
     QVector<qint32> vec;
     tmp = div_coef<<16 | 0x5; //
     vec.push_back(tmp);
@@ -214,7 +213,7 @@ void MainWindow::on_Slider_3_valueChanged(int value)
     UdpServer a;
     quint32 tmp;
     QByteArray Datagram;
-    QDataStream out(&Datagram, QIODevice::WriteOnly);  //передаем потоку указатель на QIODevice;
+    QDataStream out(&Datagram, QIODevice::WriteOnly);  
     QVector<qint32> vec;
     qint8 parallax_corr = !(value % 2 ) ? (value & 0xff) : (value+1) & 0xff;
     tmp = parallax_corr<<16 | 0x3; //

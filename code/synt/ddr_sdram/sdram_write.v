@@ -4,14 +4,14 @@
 //Email         : andrey.papushin@gmail.com         //
 //Standart      : IEEE 1800—2009(SystemVerilog-2009)//
 //Start design  : 03.04.2018                        //
-//Last revision : 25.04.2018                        //
+//Last revision : 30.04.2018                        //
 //////////////////////////////////////////////////////
 module sdram_write
 (
 	input  wire  						    clk_100         	 ,    
 	input  wire 						    reset_n         	 ,
 	input  wire                             start_frame          ,
-	input  wire                             start_write_image2ddr,  //
+	input  wire                             start_write_image2ddr,  
 	
 	input  wire [7:0]                       r_fb		         ,
 	input  wire [7:0]                       g_fb		         ,
@@ -21,11 +21,11 @@ module sdram_write
 	input  wire  [31:0]                     reg_addr_buf_2  	 ,  
 	output wire                             end_frame            ,
 	output wire                             _ready_read          ,
-	sdram_ifc.sdram_write_master_port       f2h_sdram2             // avl интерфейс к sdram 
+	sdram_ifc.sdram_write_master_port       f2h_sdram2             
 );
-wire  [63:0]                     data_ddr             ;
-wire                             valid_data_ddr       ;
-
+reg [63:0]                       data_ddr             ;
+reg [1:0]                        valid_data_ddr       ;
+reg [1:0]                        running_write_ddr;
 always_ff @(posedge clk_100  or negedge reset_n)
 	if (~reset_n)
 		valid_data_ddr <= 2'd0;
@@ -43,14 +43,11 @@ always_ff @(posedge clk_100  or negedge reset_n)
 		data_ddr <= {data_ddr[31:0],8'd0, b_fb[7:0], g_fb[7:0], r_fb[7:0]};
 
 
-reg [1:0]running_write_ddr;
 wire         [95:0]     data_fifo_frame  ;
 wire ready_write_ddr  =   running_write_ddr[1];
-
+wire last_burst;
 
 assign _ready_read = running_write_ddr[1];
-wire last_burst;
-// запись сырого сигнала во время работы синхронизатора
 write_to_buf_frame write_to_buf_frame_inst
 (
 	.clk_100     		 (clk_100           ),
@@ -64,44 +61,38 @@ write_to_buf_frame write_to_buf_frame_inst
     .data_fifo_frame     (data_fifo_frame   )  // ->
 );
 
-reg        run_read_fifo_64; // интервал чтения одного берста из fifo
-reg        running_read     ; // интервал чтения из fifo 
-reg [28:0] data_address     ; // avl_address на f=100MHz
-reg [ 7:0] data_burstcount  ; // длина берста
-reg [ 6:0] count_unit_burst ; // счетчик передач внутри берста
-reg        s                ; // дополнительный сигнал
-reg [95:0] reg_data_fifo_out; // регистр на выходе фифо
-reg [ 7:0] max_units_in_fifo; // максимальное заполненность очереди
-reg [15:0] count_full       ; // число потерянных слов
-reg [7:0]  sh_reg_200MHz    ; // сдвиговый регистр на f=200MHz
+reg        run_read_fifo_64 ; // read one burst from fifo
+reg        running_read     ; 
+reg [28:0] data_address     ; 
+reg [ 7:0] data_burstcount  ; 
+reg [ 6:0] count_unit_burst ; 
+reg        s                ; 
+reg [95:0] reg_data_fifo_out; 
+reg [ 7:0] max_units_in_fifo; 
+reg [15:0] count_full       ; 
+reg [7:0]  sh_reg_200MHz    ; 
 
 
-wire [ 8:0] usedw              ; // текущая заполненность FiFo со стороны чтения
-wire [95:0] data_fifo_out      ; // выход очереди
-wire        full               ; // сигнал переполнения фифо
-wire        empty              ; // очередь пуста
-wire        sh_running_read    ; // задержанный на 1 такт  f=200MHz сигнал running_read
-wire        sh_ready_read      ; // задержанный на 1 такт  f=200MHz сигнал ready_read   
-wire        sh_rdrec           ; // задержанный на 1 такт  f=200MHz сигнал rdrec        
-wire        sh3_end_read_fifo  ; // задержанный на 3 такта f=200MHz импульс end_read_fifo
-wire        end_read_fifo_burst; // завершено чтение берста из фифо
-wire        end_read_fifo      ; // конец чтения из фифо (сигнал записан в ddr)
-/* FiFo заполнена 64 элемантами, можно начинать чтение*/ 
+wire [ 8:0] usedw              ; 
+wire [95:0] data_fifo_out      ; 
+wire        full               ; 
+wire        empty              ; 
+wire        sh_running_read    ; 
+wire        sh_ready_read      ; 
+wire        sh_rdrec           ; 
+wire        sh3_end_read_fifo  ; 
+wire        end_read_fifo_burst; 
+wire        end_read_fifo      ; 
+/* FiFo loaded 64 unit, can start read*/ 
 wire ready_read            = (usedw >= 'd30) & !f2h_sdram2.waitrequest & !run_read_fifo_64;
-//wire ready_read            = data_fifo_frame[95] & !f2h_sdram2.waitrequest & !run_read_fifo_64;
-wire p_ready_read          = ready_read & !sh_ready_read; // передний фронт  ready_read
-wire start_read            = p_ready_read & !running_read; // импульс начала чтения из FiFo
-wire start_read_burst_fifo = p_ready_read & !run_read_fifo_64; // импульс начала чтения берста из FiFo
+wire p_ready_read          = ready_read & !sh_ready_read; 
+wire start_read            = p_ready_read & !running_read; 
+wire start_read_burst_fifo = p_ready_read & !run_read_fifo_64; 
 reg ctrl_buff;
-/* сигнал разрешения чтения из FiFo */
 wire rdreq                 = run_read_fifo_64 & !f2h_sdram2.waitrequest & !empty;
-/* импульс начала чтения из FiFo (один раз выставляется)*/
 wire p_rdreq = rdreq & !sh_rdrec & !sh_running_read;
-
-/* вход fifo: полезные данные (64 бита) + адрес(29 бит)  + 2 доп. бита*/
 wire [95:0] data_fifo_in  = data_fifo_frame;
-wire        data_write     =  data_fifo_in[93] ; // avl_write на f=100MHz
-// интервал чтения из fifo 64 элементов
+wire        data_write     =  data_fifo_in[93] ;
 reg [1:0]reg_end;
 always_ff @(posedge clk_100  or negedge reset_n)
 	if (~reset_n)
@@ -110,7 +101,6 @@ always_ff @(posedge clk_100  or negedge reset_n)
 		reg_end <= 2'd1;
 	else if(reg_end == 2'd1)
 		reg_end <= 2'd3;
-// интервал чтения из fifo 64 элементов
 always_ff @(posedge clk_100  or negedge reset_n)
 	if (~reset_n)
 		running_read <= 1'd0;
@@ -124,7 +114,6 @@ always_ff @(posedge clk_100  or negedge reset_n)
 		ctrl_buff <= 1'd0;
 	else if(start_frame & ready_write_ddr)
 		ctrl_buff <= ~ctrl_buff;	
-// интервал чтения из fifo 64 элементов
 always_ff @(posedge clk_100  or negedge reset_n)
 	if (~reset_n)
 		run_read_fifo_64 <= 1'd0;
@@ -139,34 +128,29 @@ always_ff @(posedge clk_100  or negedge reset_n)
 		running_write_ddr <=2'b01;
 	else if(running_write_ddr[0] & start_frame)
 		running_write_ddr[1] <=1'b1;
-// сдвиговый регистр на f=200 MHz
 always_ff @(posedge clk_100  or negedge reset_n)
 	if (~reset_n)
 		sh_reg_200MHz <= 8'd0;
-	else             //           [6:4]            [3]        [2]      [1]           [0]
-		sh_reg_200MHz <= {f2h_sdram2.write, sh_reg_200MHz[5:3], end_read_fifo, rdreq, ready_read, running_read};
-// дополнительный сигнал		
+	else         
+		sh_reg_200MHz <= {f2h_sdram2.write, sh_reg_200MHz[5:3], end_read_fifo, rdreq, ready_read, running_read};	
 always_ff @(posedge clk_100  or negedge reset_n)
 	if (~reset_n)
 		s <= 1'd0;
 	else if(p_ready_read)
 		s <= 1'd1;	
-	else if( !(data_fifo_out[94] | data_fifo_out[95])) // ждем пока выходы очереди не обнулятся
+	else if( !(data_fifo_out[94] | data_fifo_out[95]))
 		s <= 1'd0;	
-// регистр после fifo
 always_ff @(posedge clk_100  or negedge reset_n)
 	if (~reset_n)
 		reg_data_fifo_out <= 96'd0;
 	else if(!f2h_sdram2.waitrequest)
 		reg_data_fifo_out <=  { (data_fifo_out[93] & run_read_fifo_64 & !p_rdreq) ,data_fifo_out[92:0]};
-// длина берста *
 always_ff @(posedge clk_100  or negedge reset_n)
 	if (~reset_n)
 		data_burstcount <= 8'd0;
 	else if(!f2h_sdram2.waitrequest)
 		data_burstcount <= 8'd32;
-		
-	//reg [28:0] data_address     ; 
+
 // fifo
 sdram_fifo sdram_fifo_inst 
 (
@@ -181,7 +165,7 @@ sdram_fifo sdram_fifo_inst
 	.rdusedw (usedw          )
 );	
 wire n_write_sdram = !f2h_sdram2.write &  sh_reg_200MHz[7];
-/* задержанные сигналы на f=200Mhz */
+/* delay signal */
 assign sh_running_read            = sh_reg_200MHz[0];
 assign sh_ready_read              = sh_reg_200MHz[1];
 assign sh_rdrec                   = sh_reg_200MHz[2];
@@ -189,7 +173,7 @@ assign sh3_end_read_fifo          = sh_reg_200MHz[5];
 assign end_read_fifo              = data_fifo_out[94] & running_read & !s;
 assign end_read_fifo_burst        = data_fifo_out[95] & run_read_fifo_64 & !s;
 
-/* интерфейс avl к sdram контроллеру */
+/* interface  avl_sdram to  */
 assign f2h_sdram2.write      = reg_data_fifo_out[93];// 
 assign f2h_sdram2.writedata  = reg_data_fifo_out[63:0];	
 assign f2h_sdram2.address    = data_address; //
@@ -197,8 +181,7 @@ assign f2h_sdram2.byteenable = 8'HFF;
 assign f2h_sdram2.burstcount = data_burstcount;		
 
 
-
-// адрес шины авалон на f=100MHz
+// addr_sdram_write
 always_ff @(posedge clk_100  or negedge reset_n)
 	if (~reset_n)
 		data_address <= 29'd0;

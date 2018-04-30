@@ -1,5 +1,11 @@
-
-
+//////////////////////////////////////////////////////
+//Name File     : h2f_bridge_dsp                    //
+//Author        : Andrey Papushin                   //
+//Email         : andrey.papushin@gmail.com         //
+//Standart      : IEEE 1800—2009(SystemVerilog-2009)//
+//Start design  : 03.04.2018                        //
+//Last revision : 30.04.2018                        //
+//////////////////////////////////////////////////////
 module h2f_bridge_dsp
 #(
 	parameter WIDTH_ADDR 	 =  8,
@@ -9,7 +15,7 @@ module h2f_bridge_dsp
 (         
 	input  logic  						clk_dsp,             
 	input  logic 				        reset_n,
-    //шина avalon моста h2f
+    //avl_ifc from  h2f bridge
 	input  logic						avl_write          ,
 	input  logic						avl_chipselect     ,
 	output logic						avl_waitrequest    ,
@@ -17,7 +23,7 @@ module h2f_bridge_dsp
 	input  logic	[WIDTH_BE  -1:0]    avl_byteenable     ,
 	output logic	[WIDTH_DATA-1:0]	avl_readdata       ,
 	input  logic	[WIDTH_DATA-1:0]	avl_writedata      ,
-	// авалон мастер                                                      
+	// avl_master                                                      
 	output  logic						avl_write_dsp      ,
 	output  logic						avl_chipselect_dsp ,
 	output  logic	[WIDTH_ADDR-1:0]    avl_address_dsp    ,
@@ -37,7 +43,7 @@ always_ff @( posedge clk_dsp or negedge reset_n )
 	else 
 		reg_avl_dsp <= union_avl_in;
 		
-// выходы шины avl к ЦОС
+// output avl_ifc to module hps_register
 assign avl_write_dsp        = reg_avl_dsp[WIDTH_ALL - 1                            ];
 assign avl_chipselect_dsp	= reg_avl_dsp[WIDTH_ALL - 2                            ];	
 assign avl_address_dsp      = reg_avl_dsp[WIDTH_ALL - 3: 2*WIDTH_DATA+WIDTH_BE     ];

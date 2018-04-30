@@ -1,3 +1,11 @@
+//////////////////////////////////////////////////////
+//Name File     : de10_nan0_hdr_ifc                 //
+//Author        : Andrey Papushin                   //
+//Email         : andrey.papushin@gmail.com         //
+//Standart      : IEEE 1800—2009(SystemVerilog-2009)//
+//Start design  : 03.04.2018                        //
+//Last revision : 30.04.2018                        //
+//////////////////////////////////////////////////////
 module de10_nan0_hdr_ifc
 (
 	input wire                              clk50          ,
