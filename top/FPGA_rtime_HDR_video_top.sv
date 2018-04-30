@@ -386,13 +386,6 @@ mux_data_framebuffer mux_data_framebuffer_inst
 	.data_valid_hdr             (data_valid_tm                          ),
 	.sop_hdr		            (sop_tm		                            ),
 	.eop_hdr	                (eop_tm	                                ),
-    // HDR + tone_mapping  rgb comp                                     
-	.r_tm		                (r_tm		                            ),
-	.g_tm		                (g_tm		                            ),
-	.b_tm		                (b_tm		                            ),
-	.data_valid_tm              (data_valid_tm                          ),
-	.sop_tm		                (sop_tm		                            ),
-	.eop_tm                     (eop_tm                                 ),
     // mux out                                                          
 	.r_fb		                (r_fb                                   ),
 	.g_fb		                (g_fb                                   ),
