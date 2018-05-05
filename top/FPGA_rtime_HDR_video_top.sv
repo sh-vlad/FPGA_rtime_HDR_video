@@ -66,12 +66,18 @@ wire [7:0]   b_data_1			    ;
 wire         data_rgb_valid_1	    ;
 wire         sop_rgb_1		  	    ;
 wire         eop_rgb_1	            ;
-// input data fot raw2rgb_bilinear_interp 
+// input data for gamma_correction 
 wire [7:0]   raw_data_0             ;
 wire [7:0]	 raw_data_1             ;
 wire		 raw_data_valid         ;
 wire		 raw_data_sop           ;
 wire		 raw_data_eop           ;  
+// input data fot raw2rgb_bilinear_interp 
+wire [7:0]   gamma_data_0             ;
+wire [7:0]	 gamma_data_1             ;
+wire		 gamma_data_valid         ;
+wire		 gamma_data_sop           ;
+wire		 gamma_data_eop           ;  
 // HDR output interface             
 wire [9:0]   r_hdr		            ;               
 wire [9:0]   g_hdr		            ; 
@@ -259,16 +265,32 @@ convert2avl_stream_raw convert2avl_stream_raw_inst
 	.HREF_2   	       	        ( HREF_1  & ready_read     	    ),
 	.D1     	       	        ( cam_0_data	                ),
 	.D2     	       	        ( cam_1_data	                ),            
-	.RAW_1           	        ( prx_fxd_raw_data_0	        ),
-	.RAW_2           	        ( prx_fxd_raw_data_1	        ),
-	.valid_RAW     	            ( prx_fxd_raw_data_valid        ),         
+	.RAW_1           	        ( raw_data_0	        ),
+	.RAW_2           	        ( raw_data_1	        ),
+	.valid_RAW     	            ( raw_data_valid        ),         
 	.err_ch0                    (err_ch0                        ),
 	.err_ch1                    (err_ch1                        ),
-	.SOF    	       	        ( prx_fxd_raw_data_sop	        ),
-	.EOF    	       	        ( prx_fxd_raw_data_eop	        ),
+	.SOF    	       	        ( raw_data_sop	        ),
+	.EOF    	       	        ( raw_data_eop	        ),
 	.start_frame     	        (start_frame                    ),
 	.start_frame2     	        (start_frame2                   )
 	
+);
+//gamma correction
+gamma_correction gamma_correction_inst
+(
+	.clk					( sys_clk_b			 ),
+	.reset_n                ( reset_n_b          ),
+	.raw_data_0             ( raw_data_0         ),
+	.raw_data_1             ( raw_data_1         ),
+	.raw_data_valid         ( raw_data_valid     ),
+	.raw_data_sop           ( raw_data_sop       ),
+	.raw_data_eop           ( raw_data_eop       ),
+	.gamma_data_0           ( gamma_data_0       ),
+	.gamma_data_1           ( gamma_data_1       ),
+	.gamma_data_valid       ( gamma_data_valid   ),
+	.gamma_data_sop         ( gamma_data_sop     ),
+	.gamma_data_eop         ( gamma_data_eop     )
 );
 // parallax elimination
 parallax_fix parallax_fix_inst
@@ -276,17 +298,17 @@ parallax_fix parallax_fix_inst
 	.clk				        ( sys_clk_b					    ),
 	.reset_n                    ( reset_n_b					    ),
 	.parallax_corr		        ( reg_parallax_corr			    ),
-	.raw_data_0                 ( prx_fxd_raw_data_0		    ),
-	.raw_data_1                 ( prx_fxd_raw_data_1		    ),
-	.raw_data_valid             ( prx_fxd_raw_data_valid	    ),
-	.raw_data_sop               ( prx_fxd_raw_data_sop		    ),
-	.raw_data_eop               ( prx_fxd_raw_data_eop		    ),
+	.raw_data_0                 ( gamma_data_0    	    ),
+	.raw_data_1                 ( gamma_data_1    	    ),
+	.raw_data_valid             ( gamma_data_valid	    ),
+	.raw_data_sop               ( gamma_data_sop  	    ),
+	.raw_data_eop               ( gamma_data_eop  	    ),
 	                                                           
-	.prlx_fxd_data_0            (raw_data_0    				    ),
-	.prlx_fxd_data_1            (raw_data_1    				    ),
-	.prlx_fxd_data_valid        (raw_data_valid				    ),
-	.prlx_fxd_data_sop          (raw_data_sop  				    ),
-	.prlx_fxd_data_eop          (raw_data_eop  				    )
+	.prlx_fxd_data_0            ( prx_fxd_raw_data_0	  			    ),
+	.prlx_fxd_data_1            ( prx_fxd_raw_data_1	  			    ),
+	.prlx_fxd_data_valid        ( prx_fxd_raw_data_valid  			    ),
+	.prlx_fxd_data_sop          ( prx_fxd_raw_data_sop	  			    ),
+	.prlx_fxd_data_eop          ( prx_fxd_raw_data_eop	  			    )
 );
 
 //convert raw from camera 0 to rgb 
@@ -298,10 +320,10 @@ raw2rgb_bilinear_interp_inst_0
 (
 	.clk			            ( sys_clk_b    		           ),
 	.reset_n                    ( reset_n_b	   		           ),
-	.raw_data                   ( raw_data_0  		           ),
-	.raw_valid                  ( raw_data_valid 	           ),
-	.raw_sop	                ( raw_data_sop   	           ),
-	.raw_eop	                ( raw_data_eop   	           ),
+	.raw_data                   ( prx_fxd_raw_data_0  		       ),
+	.raw_valid                  ( prx_fxd_raw_data_valid 	           ),
+	.raw_sop	                ( prx_fxd_raw_data_sop   	           ),
+	.raw_eop	                ( prx_fxd_raw_data_eop   	           ),
 	.r_data_o                   ( r_data_0			           ),
 	.g_data_o                   ( g_data_0			           ),
 	.b_data_o                   ( b_data_0			           ),
@@ -318,10 +340,10 @@ raw2rgb_bilinear_interp_inst_1
 (
 	.clk			            ( sys_clk_b                    ),
 	.reset_n                    ( reset_n_b	                   ),
-	.raw_data                   (raw_data_1                    ),
-	.raw_valid                  (raw_data_valid                ),
-	.raw_sop	                (raw_data_sop                  ),
-	.raw_eop	                (raw_data_eop                  ),
+	.raw_data                   (prx_fxd_raw_data_1  	                ),
+	.raw_valid                  (prx_fxd_raw_data_valid                ),
+	.raw_sop	                (prx_fxd_raw_data_sop                  ),
+	.raw_eop	                (prx_fxd_raw_data_eop                  ),
 	.r_data_o                   ( r_data_1			           ),
 	.g_data_o                   ( g_data_1			           ),
 	.b_data_o                   ( b_data_1			           ),
