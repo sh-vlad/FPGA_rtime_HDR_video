@@ -49,6 +49,8 @@ module FPGA_rtime_HDR_video_top
 );
 
 avl_ifc        #(    16,    32,     4)     avl_h2f_dsp()     ; 
+avl_ifc        #(     8,     8,     1)     mem_gamma_0()     ; 
+avl_ifc        #(     8,     8,     1)     mem_gamma_1()     ; 
 sdram_ifc      #(   29,    64,      8)     f2h_sdram_write() ; 
 sdram_ifc      #(   30,    32,      4)     f2h_sdram_read()  ; 
 
@@ -198,6 +200,8 @@ de10_nan0_hdr_ifc de10_nan0_hdr_ifc_inst
 	.clk50                      (clk50                                  ),            
 	.clk100                     (sys_clk_b                              ),          
 	.avl_h2f_dsp                (avl_h2f_dsp.avl_master_port            ),                 
+	.mem_gamma_0                (mem_gamma_0.mem_slave_port             ),                 
+	.mem_gamma_1                (mem_gamma_1.mem_slave_port             ),                 
 	.f2h_sdram_write            (f2h_sdram_write.sdram_write_slave_port ),               	             
 	.f2h_sdram_read             (f2h_sdram_read.sdram_read_slave_port   ),                                
 	.hps_io_port                (hps_io.hps_io_port                     ),

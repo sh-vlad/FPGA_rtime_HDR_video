@@ -11,12 +11,15 @@ module de10_nan0_hdr_ifc
 	input wire                              clk50          ,
 	input wire                              clk100         ,
 	avl_ifc.avl_master_port                 avl_h2f_dsp    ,   
+	avl_ifc.mem_slave_port                  mem_gamma_0    ,
+	avl_ifc.mem_slave_port                  mem_gamma_1    ,
 	sdram_ifc.sdram_write_slave_port        f2h_sdram_write,
 	sdram_ifc.sdram_read_slave_port         f2h_sdram_read ,
 	hps_ifc.hps_io_port                     hps_io_port    ,
 	ddr3_ifc.ddr3_port                      ddr3_mem     
 );
 wire reset_n;
+  
 
 de10_nan0_hdr de10_nan0_hdr_inst
 (
@@ -30,6 +33,18 @@ de10_nan0_hdr de10_nan0_hdr_inst
 	.avl_h2f_dsp_byteenable           ( avl_h2f_dsp.byteenable         ),
 	.avl_h2f_dsp_readdata             ( avl_h2f_dsp.readdata           ),
 	.avl_h2f_dsp_writedata            ( avl_h2f_dsp.writedata          ),
+	.memory_gamma_0_address           ( mem_gamma_0.address            ),
+	.memory_gamma_0_chipselect        ( mem_gamma_0.chipselect         ),
+	.memory_gamma_0_clken             ( mem_gamma_0.clken              ),
+	.memory_gamma_0_write             ( mem_gamma_0.write              ),
+	.memory_gamma_0_readdata          ( mem_gamma_0.readdata           ),
+	.memory_gamma_0_writedata         ( mem_gamma_0.writedata          ),
+	.memory_gamma_1_address           ( mem_gamma_1.address            ),
+	.memory_gamma_1_chipselect        ( mem_gamma_1.chipselect         ),
+	.memory_gamma_1_clken             ( mem_gamma_1.clken              ),
+	.memory_gamma_1_write             ( mem_gamma_1.write              ),
+	.memory_gamma_1_readdata          ( mem_gamma_1.readdata           ),
+	.memory_gamma_1_writedata         ( mem_gamma_1.writedata          ),
 	.f2h_sdram0_address               ( f2h_sdram_write.address        ),
 	.f2h_sdram0_burstcount            ( f2h_sdram_write.burstcount     ),
 	.f2h_sdram0_waitrequest           ( f2h_sdram_write.waitrequest    ),
