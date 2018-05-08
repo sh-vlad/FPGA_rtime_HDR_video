@@ -290,6 +290,13 @@ gamma_correction gamma_correction_inst
 	.raw_data_valid         ( raw_data_valid     ),
 	.raw_data_sop           ( raw_data_sop       ),
 	.raw_data_eop           ( raw_data_eop       ),
+	
+	.addr_0					( mem_gamma_0.address ),
+	.data_0                 ( mem_gamma_0.readdata),
+
+	.addr_1                 ( mem_gamma_1.address ),
+	.data_1                 ( mem_gamma_1.readdata),
+	
 	.gamma_data_0           ( gamma_data_0       ),
 	.gamma_data_1           ( gamma_data_1       ),
 	.gamma_data_valid       ( gamma_data_valid   ),

@@ -11,6 +11,12 @@ module gamma_correction
 	input wire				raw_data_valid,
 	input wire				raw_data_sop,
 	input wire				raw_data_eop,
+
+	output wire [ 7: 0]		addr_0,
+    input wire  [ 7: 0]		data_0,
+
+	output wire [ 7: 0]		addr_1,
+    input wire  [ 7: 0]		data_1,
 	
 	output wire	[ 7: 0]		gamma_data_0,
 	output wire	[ 7: 0]		gamma_data_1,
@@ -19,19 +25,11 @@ module gamma_correction
 	output wire				gamma_data_eop
 );
 
-gamma_rom gamma_rom_0
-(
-	.address	( raw_data_0	),
-	.clock      ( clk			),
-	.q          ( gamma_data_0	)
-);
-	
-gamma_rom gamma_rom_1
-(
-	.address	( raw_data_1	),
-	.clock      ( clk			),
-	.q          ( gamma_data_1	)
-);	
+assign addr_0 = raw_data_0; 	
+assign addr_1 = raw_data_1;
+
+assign gamma_data_0 = data_0; 	
+assign gamma_data_1 = data_1;
 
 delay_rg
 #(
