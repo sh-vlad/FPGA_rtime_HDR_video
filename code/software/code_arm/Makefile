@@ -1,21 +1,9 @@
-#
-TARGET = initial_reg_gui
 
-#
-
+TARGET = control_hdr
 CROSS_COMPILE = arm-linux-gnueabihf-
-CFLAGS = -static -g -Wall  -I${SOCEDS_DEST_ROOT}/ip/altera/hps/altera_hps/hwlib/include
-LDFLAGS =  -g -Wall  
-CC = $(CROSS_COMPILE)gcc
+CFLAGS = -std=c++11 -pthread
+CC = $(CROSS_COMPILE)g++
 ARCH= arm
 
-
-build: $(TARGET)
-$(TARGET): main.o initial_reg_camera_1280x720.o
-	$(CC) $(LDFLAGS)   $^ -o $@  
-%.o : %.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-.PHONY: clean
-clean:
-	rm -f $(TARGET) *.a *.o *~ 
+all:
+	$(CC) $(CFLAGS) main.cpp initial_reg_camera_1280x720.c -o $(TARGET)

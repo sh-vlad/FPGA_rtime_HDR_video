@@ -24,6 +24,7 @@ struct ioregion {
 static struct {
 	void __iomem *addr_buf_1;
 	void __iomem *addr_buf_2;
+	void __iomem *addr_buf_3;
 } regs;
 static int ioregion_request(struct ioregion* region_p) {
 	/* reserve our memory region */
@@ -54,19 +55,24 @@ static struct ioregion regions_tab[] = {
 do {							         \
 	regs.addr_buf_1 = (u8 *)regions_tab[0U].base + 0U;     \
 	regs.addr_buf_2 = (u8 *)regions_tab[0U].base + 4U;     \
+	regs.addr_buf_3 = (u8 *)regions_tab[0U].base + 64U;     \
 } while (0)
-#define write_to_fpga(arg1, arg2)				 \
+#define write_to_fpga(arg1, arg2, arg3)				 \
 do {							         \
 	writel((arg1), regs.addr_buf_1);			 \
 	writel((arg2), regs.addr_buf_2);		  	 \
+	writel((arg3), regs.addr_buf_3);		  	 \
 } while (0)
 
 unsigned int addr_buf_write_1;
 unsigned int addr_buf_write_2;
+unsigned int addr_buf_write_3;
 static unsigned int * b0_ptr1 = NULL;
 static unsigned int * b0_ptr2 = NULL;
+static unsigned int * b0_ptr3 = NULL;
 static dma_addr_t handle1;
 static dma_addr_t handle2;
+static dma_addr_t handle3;
 struct ioregion* region_p;
 
 static int framebuffer_init(void)
@@ -79,16 +85,20 @@ static int framebuffer_init(void)
 	// allocation of two buffers 
 	b0_ptr1 = dma_alloc_coherent( NULL, 4194304, &handle1, GFP_KERNEL | GFP_DMA ); // 4 MB
 	b0_ptr2 = dma_alloc_coherent( NULL, 4194304, &handle2, GFP_KERNEL | GFP_DMA ); // 4 MB 
+	b0_ptr3 = dma_alloc_coherent( NULL, 1048576, &handle3, GFP_KERNEL | GFP_DMA ); // 4 MB 
 	printk("allocation of two buffers \n");
 	// Address byte to address word
 	addr_buf_write_1 = handle1 >> 3;
 	addr_buf_write_2 = handle2 >> 3;
+	addr_buf_write_3 = handle3 >> 4;
 	printk("hps_addr_1 = %X\n", handle1);
 	printk("hps_addr_2 = %X\n", handle2);
+	printk("hps_addr_2 = %X\n", handle3);
 	printk("fpga_addr_write_1 = %X\n", addr_buf_write_1);
 	printk("fpga_addr_write_2 = %X\n", addr_buf_write_2);
+	printk("fpga_addr_write_3 = %X\n", addr_buf_write_3);
 	init_regs();
-	write_to_fpga(addr_buf_write_1, addr_buf_write_2);
+	write_to_fpga(addr_buf_write_1, addr_buf_write_2, addr_buf_write_3);
 	return 0;
 }
 
@@ -99,6 +109,9 @@ static void framebuffer_exit(void)
         	dma_free_coherent(NULL, 4194304, b0_ptr1, handle1 );
 	if( b0_ptr2 )
         	dma_free_coherent(NULL, 4194304, b0_ptr2, handle2 );
+	if( b0_ptr3 )
+        	dma_free_coherent(NULL, 1048576, b0_ptr3, handle3 );
+		
 	for (region_p = regions_tab; NULL != region_p->name; ++region_p)
 		if (NULL != region_p->base)
 			ioregion_release(region_p);

@@ -96,6 +96,11 @@
    type="avalon"
    dir="end" />
  <interface
+   name="f2h_sdram2"
+   internal="hps_0.f2h_sdram2_data"
+   type="avalon"
+   dir="end" />
+ <interface
    name="h2f_reset_out"
    internal="hps_0.h2f_reset"
    type="reset"
@@ -233,7 +238,7 @@
   <parameter name="F2H_AXI_CLOCK_FREQ" value="100" />
   <parameter name="F2H_SDRAM0_CLOCK_FREQ" value="100000000" />
   <parameter name="F2H_SDRAM1_CLOCK_FREQ" value="100000000" />
-  <parameter name="F2H_SDRAM2_CLOCK_FREQ" value="100" />
+  <parameter name="F2H_SDRAM2_CLOCK_FREQ" value="100000000" />
   <parameter name="F2H_SDRAM3_CLOCK_FREQ" value="100" />
   <parameter name="F2H_SDRAM4_CLOCK_FREQ" value="100" />
   <parameter name="F2H_SDRAM5_CLOCK_FREQ" value="100" />
@@ -244,8 +249,8 @@
   <parameter name="F2SCLK_SDRAMCLK_Enable" value="false" />
   <parameter name="F2SCLK_SDRAMCLK_FREQ" value="0" />
   <parameter name="F2SCLK_WARMRST_Enable" value="false" />
-  <parameter name="F2SDRAM_Type">Avalon-MM Write-Only,Avalon-MM Read-Only</parameter>
-  <parameter name="F2SDRAM_Width" value="64,32" />
+  <parameter name="F2SDRAM_Type">Avalon-MM Write-Only,Avalon-MM Read-Only,Avalon-MM Write-Only</parameter>
+  <parameter name="F2SDRAM_Width" value="64,32,32" />
   <parameter name="F2SINTERRUPT_Enable" value="false" />
   <parameter name="F2S_Width" value="0" />
   <parameter name="FIX_READ_LATENCY" value="8" />
@@ -780,6 +785,11 @@
    version="17.1"
    start="clk_1.clk"
    end="hps_0.f2h_sdram1_clock" />
+ <connection
+   kind="clock"
+   version="17.1"
+   start="clk_1.clk"
+   end="hps_0.f2h_sdram2_clock" />
  <connection
    kind="clock"
    version="17.1"

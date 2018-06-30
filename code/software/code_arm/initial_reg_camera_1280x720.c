@@ -1,15 +1,16 @@
 #include "initial_reg_camera_1280x720.h"
-void write_i2c(int *hps2fpga, uint16_t addr, uint8_t data)
+void write_i2c(int *hps2fpga, unsigned short addr, unsigned char data)
 {
 	*(hps2fpga  + addr) = data;
+	usleep (5000);
 }
 
-uint32_t reverse_byte(uint32_t value_in)
+unsigned int reverse_byte(unsigned int value_in)
 {
-	uint32_t byte0 = (value_in >> 24)         ;
-	uint32_t byte1 = (value_in >> 16)  & 0xff;
-	uint32_t byte2 = (value_in >> 8 )  & 0xff;
-	uint32_t byte3 = value_in        & 0xff;
+	unsigned int byte0 = (value_in >> 24)         ;
+	unsigned int byte1 = (value_in >> 16)  & 0xff;
+	unsigned int byte2 = (value_in >> 8 )  & 0xff;
+	unsigned int byte3 = value_in        & 0xff;
 	return (byte3<<23) |(byte2<<16) | (byte1<<8)  | byte0;
 	
 }
@@ -276,7 +277,6 @@ void initial_reg_camera_1280x720(int *hps2fpga)
 	write_i2c(hps2fpga, 0x3807,  0xa9      );
 	write_i2c(hps2fpga, 0x3808,  0x05      );
 	write_i2c(hps2fpga, 0x3809,  0x00      );
-	sleep (2);
 	write_i2c(hps2fpga, 0x380a,  0x02      );
 	write_i2c(hps2fpga, 0x380b,  0xd0      );
 	write_i2c(hps2fpga, 0x380c,  0x07      );
