@@ -109,7 +109,7 @@ set_location_assignment PIN_T8 -to hsync
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to hsync
 set_location_assignment PIN_V13 -to vsync
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to vsync
-set_global_assignment -name ENABLE_SIGNALTAP OFF
+set_global_assignment -name ENABLE_SIGNALTAP ON
 set_global_assignment -name USE_SIGNALTAP_FILE stp2.stp
 set_location_assignment PIN_AG5 -to pixel_clk_out
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to pixel_clk_out
@@ -569,6 +569,12 @@ set_instance_assignment -name GLOBAL_SIGNAL OFF -to de10_nan0_hdr_ifc_inst|de10_
 set_instance_assignment -name GLOBAL_SIGNAL OFF -to de10_nan0_hdr_ifc_inst|de10_nan0_hdr_inst|hps_0|hps_io|border|hps_sdram_inst|p0|umemphy|uread_datapath|reset_n_fifo_wraddress[3] -tag __hps_sdram_p0
 set_instance_assignment -name ENABLE_BENEFICIAL_SKEW_OPTIMIZATION_FOR_NON_GLOBAL_CLOCKS ON -to de10_nan0_hdr_ifc_inst|de10_nan0_hdr_inst|hps_0|hps_io|border|hps_sdram_inst -tag __hps_sdram_p0
 set_instance_assignment -name PLL_COMPENSATION_MODE DIRECT -to de10_nan0_hdr_ifc_inst|de10_nan0_hdr_inst|hps_0|hps_io|border|hps_sdram_inst|pll0|fbout -tag __hps_sdram_p0
+set_global_assignment -name VERILOG_FILE ../code/synt/hist/select_comp.v
+set_global_assignment -name VERILOG_FILE ../code/synt/Y_comp.v
+set_global_assignment -name VERILOG_FILE ../code/synt/hist/ram_freq_component.v
+set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/hist/hist_calc.sv
+set_global_assignment -name VERILOG_FILE ../code/synt/gamma_rom.v
+set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/gamma_correction.sv
 set_global_assignment -name VERILOG_FILE ../code/synt/mux_data_framebuffer.v
 set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/wrp_conv_filter.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../code/synt/filter.sv
@@ -627,3 +633,4 @@ set_global_assignment -name QIP_FILE ../code/synt/pll_2.qip
 set_global_assignment -name SIP_FILE ../code/synt/pll_2.sip
 set_global_assignment -name SIGNALTAP_FILE stp2.stp
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
+set_global_assignment -name SLD_FILE db/stp2_auto_stripped.stp

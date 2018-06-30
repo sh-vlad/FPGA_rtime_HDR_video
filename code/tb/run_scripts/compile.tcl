@@ -4,7 +4,11 @@ vlog  -sv -work dsp_work   ../../synt/imitator_dvp/imitator_dvp_ifc.v
 vlog  -sv -work dsp_work   ../../synt/dvp2avl_stream/fifo_dvp.v        
 vlog  -sv -work dsp_work   ../tb_imitator_dvp_ifc.v        
     
-	
+vlog  -sv -work dsp_work ../../synt/hist/select_comp.v
+vlog  -sv -work dsp_work ../../synt/Y_comp.v
+vlog  -sv -work dsp_work ../../synt/hist/ram_freq_component.v
+vlog  -sv -work dsp_work ../../synt/hist/hist_calc.sv
+vlog  -sv -work dsp_work ../../synt/gamma_correction.sv
 vlog  -sv -work dsp_work ../../synt/mux_data_framebuffer.v
 vlog  -sv -work dsp_work ../../synt/wrp_conv_filter.sv
 vlog  -sv -work dsp_work ../../synt/filter.sv

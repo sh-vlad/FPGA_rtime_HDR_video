@@ -17,7 +17,10 @@ module hps_register_ov5640
 	output logic [7:0]                  data_ov5640          ,
 	output logic [31:0]                 reg_addr_buf_1       ,
 	output logic [31:0]                 reg_addr_buf_2       ,
+	output logic [31:0]                 reg_addr_buf_3       ,
 	output logic [3:0]                  hps_switch           ,
+	output logic [3:0]                  hist_switch          ,
+	output logic                        hist_enable          ,
 	output logic [7:0]                  parallax_corr        ,
 	output logic [1:0]                  select_cam_initial   ,
 	output logic [7:0]                  div_coef             ,
@@ -44,7 +47,10 @@ localparam ADDR_coef_12       = 16'd12 ;
 localparam ADDR_coef_20       = 16'd13 ;
 localparam ADDR_coef_21       = 16'd14 ;
 localparam ADDR_coef_22       = 16'd15 ;
-localparam ADDR_enable_fb    = 16'hFFFF;
+localparam ADDR_BUF_3         = 16'd16 ;
+localparam ADDR_HIST_switch   = 16'd17 ;
+localparam ADDR_HIST_enable   = 16'd18 ;
+localparam ADDR_enable_fb     = 16'hFFFF;
 
 wire write_hps = avl_h2f_write.chipselect &  avl_h2f_write.write;
 reg [7:0]  data_camera;
@@ -58,7 +64,10 @@ enum logic [4:0]
 	config_camera       , 
 	write_BUF_1         ,
 	write_BUF_2         ,
+	write_BUF_3         ,
 	write_HPS_switch    ,
+	write_HIST_switch   ,
+	write_HIST_enable   ,
 	write_parallax_corr ,
 	write_select_camera ,
 	write_div_coef      ,
@@ -82,7 +91,10 @@ always_comb
 		case(avl_h2f_write.address)
 			ADDR_BUF_1        :   reg_sel = write_BUF_1         ;
 			ADDR_BUF_2        :   reg_sel = write_BUF_2         ;
+			ADDR_BUF_3        :   reg_sel = write_BUF_3         ;
 			ADDR_HPS_switch   :   reg_sel = write_HPS_switch    ;
+			ADDR_HIST_switch   :  reg_sel = write_HIST_switch   ;
+			ADDR_HIST_enable   :  reg_sel = write_HIST_enable   ;
 			ADDR_parallax_corr:   reg_sel = write_parallax_corr ;
 			ADDR_select_camera:   reg_sel = write_select_camera ;
 			ADDR_div_coef     :   reg_sel = write_div_coef      ;
@@ -109,6 +121,7 @@ always_ff @( posedge clk_sys or negedge reset_n )
 		reg_addr_buf_1        <= '0;
 		reg_addr_buf_2        <= '0;
 		hps_switch            <= '0;
+		hist_switch           <= '0;
 		parallax_corr         <= 'd10;
 		select_cam_initial    <= '0;
 		div_coef              <= 'd1;  
@@ -130,7 +143,10 @@ always_ff @( posedge clk_sys or negedge reset_n )
 		case(reg_sel)
 			write_BUF_1         :  reg_addr_buf_1        <= avl_h2f_write.writedata[31:0];
 			write_BUF_2         :  reg_addr_buf_2        <= avl_h2f_write.writedata[31:0];
+			write_BUF_3         :  reg_addr_buf_3        <= avl_h2f_write.writedata[31:0];
 			write_HPS_switch    :  hps_switch            <= avl_h2f_write.writedata[ 7:0];
+			write_HIST_switch   :  hist_switch           <= avl_h2f_write.writedata[ 3:0];
+			write_HIST_enable   :  hist_enable           <= avl_h2f_write.writedata[   0];
 			write_parallax_corr :  parallax_corr         <= avl_h2f_write.writedata[ 7:0];			
 			write_select_camera :  select_cam_initial    <= avl_h2f_write.writedata[ 1:0];			
 			write_div_coef      :  div_coef              <= avl_h2f_write.writedata[ 7:0];			
