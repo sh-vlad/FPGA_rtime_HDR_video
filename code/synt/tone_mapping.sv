@@ -10,7 +10,7 @@ module tone_mapping
 	input wire				eop,
 	input wire				valid,	
 	input wire	[W-1: 0]	data,
-	
+	input wire	[7:0]		reg_parallax_corr,		
 	output wire	[W-3: 0]	data_o	
 );
 
@@ -35,7 +35,8 @@ min_max_detector_inst
 	.data           ( data				),
 	.min            ( min				),
 	.max            ( max				),
-	.max_min_diff   ( max_min_diff		)
+	.max_min_diff   ( max_min_diff		),
+	.reg_parallax_corr (reg_parallax_corr)	
 );
 	
 always @( posedge clk )

@@ -456,7 +456,8 @@ wrp_tone_mapping_inst
 	.data_b_o                  ( b_tm                                   ),
     .sop_o		               ( sop_tm			                        ),
 	.eop_o                     ( eop_tm			                        ),
-	.valid_o	               ( data_valid_tm	                        )
+	.valid_o	               ( data_valid_tm	                        ),
+	.reg_parallax_corr		   ( reg_parallax_corr						)	
 );
 
 wrp_conv_filter 

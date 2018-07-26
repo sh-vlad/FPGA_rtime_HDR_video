@@ -13,6 +13,7 @@ module wrp_tone_mapping
 	input wire	[W-1: 0]	data_r_i,
 	input wire	[W-1: 0]	data_g_i,
 	input wire	[W-1: 0]	data_b_i,	
+	input wire	[7:0]		reg_parallax_corr,	
 	output reg	[W-3: 0]	data_r_o,
 	output reg	[W-3: 0]	data_g_o,
 	output reg	[W-3: 0]	data_b_o,	
@@ -39,7 +40,8 @@ tone_mapping_r
 	.eop        ( eop_i  	),
 	.valid      ( valid_i	),
 	.data       ( data_r_i	),
-	.data_o		( data_r  	)
+	.data_o		( data_r  	),
+	.reg_parallax_corr ( reg_parallax_corr )	
 );
 
 tone_mapping 
@@ -54,7 +56,8 @@ tone_mapping_g
 	.eop        ( eop_i  	),
 	.valid      ( valid_i	),
 	.data       ( data_g_i	),
-	.data_o		( data_g  	)
+	.data_o		( data_g  	),
+	.reg_parallax_corr ( reg_parallax_corr )	
 );
 
 tone_mapping 
@@ -69,7 +72,8 @@ tone_mapping_b
 	.eop        ( eop_i  	),
 	.valid      ( valid_i	),
 	.data       ( data_b_i	),
-	.data_o		( data_b  	)
+	.data_o		( data_b  	),
+	.reg_parallax_corr ( reg_parallax_corr )	
 );
 
 delay_rg
