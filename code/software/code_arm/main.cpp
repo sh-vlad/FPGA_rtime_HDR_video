@@ -34,6 +34,7 @@ void user();
 void initial_gamma_mem(unsigned char *lw_hps2fpga, double a);
 void poll_status_register(int *mem_freq);
 void build_hist(struct map new_max);
+void build_hist2(struct map new_max);
 struct map read_freq(int *mem_freq);
 void initial_reg_camera();
 void write_hist(int *mem_hist_write );
@@ -114,67 +115,67 @@ void build_hist(struct map new_max)
 	}
 	float s =  (float)200/new_max.max_freq;
 	
-	//if(new_max.index == 255)
-	//{
-	//	for(i=0; i<W-4; i++)
-	//	{
-	//		y_i = floor ((float)mas_freq[i] *s) ;
-	//		j=0;
-	//		if(y_i>0)
-	//		{
-	//			while (j < y_i)
-	//			{
-	//				new_hist_r[H-1-j][i] = new_R;
-	//				new_hist_g[H-1-j][i] = new_G;
-	//				new_hist_b[H-1-j][i] = new_B;
-	//				j++;
-	//			}
-	//		}
-	//	}
-	//	for(i=W-4; i < W; i++)
-	//	{
-	//		j=0;
-	//		while (j < H)
-	//		{
-	//				new_hist_r[H-1-j][i] = new_R;
-	//				new_hist_g[H-1-j][i] = new_G;
-	//				new_hist_b[H-1-j][i] = new_B;
-	//				j++;
-	//		}
-	//	}
-	//}
-	//else if(new_max.index == 0)
-	//{
-	//	for(i=0; i < 4; i++)
-	//	{
-	//		j=0;
-	//		while (j < H)
-	//		{
-	//				new_hist_r[H-1-j][i] = new_R;
-	//				new_hist_g[H-1-j][i] = new_G;
-	//				new_hist_b[H-1-j][i] = new_B;
-	//				j++;
-	//		}
-	//	}
-	//	
-	//	for(i=4; i<W; i++)
-	//	{
-	//		y_i = floor ((float)mas_freq[i] *s) ;
-	//		j=0;
-	//		if(y_i>0)
-	//		{
-	//			while (j < y_i)
-	//			{
-	//				new_hist_r[H-1-j][i] = new_R;
-	//				new_hist_g[H-1-j][i] = new_G;
-	//				new_hist_b[H-1-j][i] = new_B;
-	//				j++;
-	//			}
-	//		}
-	//	}
-	//}
-	//else
-	//{
+	if(new_max.index == 255)
+	{
+		for(i=0; i<W-4; i++)
+		{
+			y_i = floor ((float)mas_freq[i] *s) ;
+			j=0;
+			if(y_i>0)
+			{
+				while (j < y_i)
+				{
+					new_hist_r[H-1-j][i] = new_R;
+					new_hist_g[H-1-j][i] = new_G;
+					new_hist_b[H-1-j][i] = new_B;
+					j++;
+				}
+			}
+		}
+		for(i=W-4; i < W; i++)
+		{
+			j=0;
+			while (j < H)
+			{
+					new_hist_r[H-1-j][i] = new_R;
+					new_hist_g[H-1-j][i] = new_G;
+					new_hist_b[H-1-j][i] = new_B;
+					j++;
+			}
+		}
+	}
+	else if(new_max.index == 0)
+	{
+		for(i=0; i < 4; i++)
+		{
+			j=0;
+			while (j < H)
+			{
+					new_hist_r[H-1-j][i] = new_R;
+					new_hist_g[H-1-j][i] = new_G;
+					new_hist_b[H-1-j][i] = new_B;
+					j++;
+			}
+		}
+		
+		for(i=4; i<W; i++)
+		{
+			y_i = floor ((float)mas_freq[i] *s) ;
+			j=0;
+			if(y_i>0)
+			{
+				while (j < y_i)
+				{
+					new_hist_r[H-1-j][i] = new_R;
+					new_hist_g[H-1-j][i] = new_G;
+					new_hist_b[H-1-j][i] = new_B;
+					j++;
+				}
+			}
+		}
+	}
+	else
+	{
 		for(i=0; i<W; i++)
 		{
 			y_i = floor ((float)mas_freq[i] *s) ;
@@ -191,7 +192,53 @@ void build_hist(struct map new_max)
 			}
 		}
 		
-	//}
+	}
+}
+void build_hist2(struct map new_max)
+{
+	int i,j,t;
+	unsigned int y_i;
+	unsigned int y_mas[26];
+	unsigned char new_R;
+	unsigned char new_G;
+	unsigned char new_B;
+	unsigned char tmp;
+	switch(select_comp)
+	{
+		case R_comp: new_R = 255; new_G =   0; new_B =   0; break;
+		case G_comp: new_R =   0; new_G = 255; new_B =   0; break;
+		case B_comp: new_R =   0; new_G =   0; new_B = 255; break;
+		case Y_comp: new_R = 247; new_G = 148; new_B =  60; break;
+		default    : new_R = 247; new_G = 148; new_B =  60; break;
+	}
+	float s =  (float)200/new_max.max_freq;
+	
+
+    
+	for(i=0; i<W/10; i++)
+	{
+		y_i=0;
+		for( t=0;t<10;t++)
+			y_i += floor ((float)mas_freq[i*10+t] *s) ;
+		y_i = (float)y_i/10. ;
+		j=0;
+		if(y_i>0)
+		{	
+				while (j < y_i)
+				{
+					for( t=0;t<10;t++)
+					{
+						tmp = i*10+t;
+						new_hist_r[H-1-j][tmp] = new_R;
+						new_hist_g[H-1-j][tmp] = new_G;
+						new_hist_b[H-1-j][tmp] = new_B;
+					}
+					j++;
+				}
+		
+		}
+	}
+		
 }
 
 

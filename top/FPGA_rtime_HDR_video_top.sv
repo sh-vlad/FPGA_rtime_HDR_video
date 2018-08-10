@@ -138,7 +138,7 @@ wire         start_write_image2ddr  ;
 wire [31:0]  reg_addr_buf_1         ;
 wire [31:0]  reg_addr_buf_2         ;
 wire [31:0]  reg_addr_buf_3         ;
-
+wire [7:0]   y_component            ;
 wire         xclk_cam               ;
 wire         clk_23                 ;
 wire [3:0]   hps_switch             ;
@@ -511,6 +511,7 @@ select_comp select_comp_inst
 (
 	.clk                       (sys_clk_b                             ), 
 	.reset_n                   (reset_n_b                             ),
+	.start_frame               (start_frame                           ),
 	.hist_switch               (hist_switch                           ),
 	.rgb_valid                 (filter_valid                          ),
 	.r_comp                    (r_filter                              ),
@@ -519,7 +520,7 @@ select_comp select_comp_inst
 	.y_valid                   (valid_out_Y                           ),
 	.frame_end_rgb             (end_frame                             ),
 	.frame_end_y               (frame_end_y                           ),
-	.y_comp                    (Y_comp                                ),
+	.y_comp                    (y_component                           ),
 	.out_comp                  (data_hist                             ),
 	.frame_end_hist            (frame_end_hist                        ),
 	.out_valid                 (valid_data_hist                       )
@@ -536,7 +537,7 @@ Y_comp  Y_comp_inst
 	.frame_end_in              (end_frame                                   ),
 	.frame_end_out             (frame_end_y                                 ),
 	.valid_out                 (valid_out_Y                                 ),
-	.Y_comp                    (Y_comp                                      )
+	.Y_comp                    (y_component                                 )
 );
 // 
 hist_calc hist_calc_inst
@@ -544,10 +545,10 @@ hist_calc hist_calc_inst
 	.clk                       (sys_clk_b                                   ),
 	.reset_n                   (reset_n_b                                   ),
 	.valid_data                (valid_data_hist                             ),
-	.reg_parallax_corr         (reg_parallax_corr                                   ),
+	.reg_parallax_corr         (reg_parallax_corr                           ),
 	.data_comp                 (data_hist                                   ),
 	.frame_start               (start_frame                                 ),	
-	.frame_end                 (frame_end_hist                                   ),
+	.frame_end                 (frame_end_hist                              ),
 	.addr_buf                  ({reg_addr_buf_3,1'b0 }                      ),
 	.f2h_sdram                 (f2h_sdram_write_freq.sdram_write_master_port)
 );

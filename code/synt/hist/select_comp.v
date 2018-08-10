@@ -10,6 +10,7 @@ module select_comp
 (
 	input wire					           clk        ,
 	input wire					           reset_n    ,
+	input wire					           start_frame,
 	input wire  [ 3: 0]                    hist_switch,
     input wire                             rgb_valid  ,                                       
 	input wire  [ 7: 0]   		           r_comp     ,
@@ -24,12 +25,21 @@ module select_comp
 	output reg                            out_valid   	                                     	          	
 );
 
+reg [3:0] reg_hist_switch;
+
+always @( posedge clk or negedge reset_n)
+	if ( !reset_n )
+		reg_hist_switch <= '0;
+	else if(start_frame)
+		reg_hist_switch <= hist_switch;
+
+
 
 always_ff @(posedge clk, negedge reset_n)
 	if(~reset_n)
 		{frame_end_hist, out_valid, out_comp} <='0;
-	else
-		case(hist_switch)
+	else 
+		case(reg_hist_switch)
 			4'b0001 : {frame_end_hist, out_valid, out_comp} <={frame_end_rgb,rgb_valid, r_comp};
 			4'b0010 : {frame_end_hist, out_valid, out_comp} <={frame_end_rgb,rgb_valid, g_comp};
 			4'b0100 : {frame_end_hist, out_valid, out_comp} <={frame_end_rgb,rgb_valid, b_comp};

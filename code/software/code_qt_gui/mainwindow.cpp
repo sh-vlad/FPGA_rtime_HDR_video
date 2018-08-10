@@ -14,6 +14,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->Slider_2_2->setStyleSheet("QSlider::handle{ background-color: blue;} ");
     ui->Slider_2_3->setStyleSheet("QSlider::handle{ background-color: blue;} ");
     ui->Slider_3->setStyleSheet("QSlider::handle{ background-color: blue;} ");
+    QPixmap pixmap("logo.png");
+    ui->logo->setPixmap(pixmap);
 }
 
 MainWindow::~MainWindow()
@@ -401,15 +403,17 @@ void MainWindow::on_Button_NOT_FILTER_clicked()
 
 void MainWindow::on_doubleSpinBox_gamma_1_valueChanged(double arg1)
 {
-    float n;
+    double n;
+    double data_tmp;
     quint32 tmp;
     quint8 data;
     QVector<qint32> vec;
     vec.push_back(2);
-    n =(float)(255./pow(255.,arg1));
+    n =(double)(255./pow(255.,arg1));
     for(int i=0;i<256;i++)
     {
-        data = n*(pow(i,arg1));
+        data_tmp =(double) n*(pow(i,arg1));
+        data = round(data_tmp);
         tmp = (data<<16) | i; // addr =4, select camera 1,2
         vec.push_back(tmp);
     }

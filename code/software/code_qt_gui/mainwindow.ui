@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>912</width>
-    <height>462</height>
+    <height>593</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1878,6 +1878,112 @@
      <string>Gamma correction on FPGA</string>
     </property>
    </widget>
+   <widget class="QLabel" name="logo">
+    <property name="geometry">
+     <rect>
+      <x>520</x>
+      <y>410</y>
+      <width>281</width>
+      <height>131</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>560</x>
+      <y>420</y>
+      <width>171</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;TEAM EM076:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>720</x>
+      <y>420</y>
+      <width>181</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;Vladislav Sharshin&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;Andrey Papushin&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;Elena Kirichenko&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <zorder>Slider_1_1</zorder>
+   <zorder>length_mode_15</zorder>
+   <zorder>length_mode_16</zorder>
+   <zorder>Slider_2_1</zorder>
+   <zorder>label_1</zorder>
+   <zorder>label_2_1</zorder>
+   <zorder>length_mode_17</zorder>
+   <zorder>length_mode_18</zorder>
+   <zorder>ip_addr_board</zorder>
+   <zorder>radioButton</zorder>
+   <zorder>radioButton_2</zorder>
+   <zorder>radioButton_3</zorder>
+   <zorder>radioButton_4</zorder>
+   <zorder>length_mode_19</zorder>
+   <zorder>length_mode_20</zorder>
+   <zorder>coef_matrix_00</zorder>
+   <zorder>coef_matrix_10</zorder>
+   <zorder>coef_matrix_20</zorder>
+   <zorder>coef_matrix_01</zorder>
+   <zorder>coef_matrix_11</zorder>
+   <zorder>coef_matrix_21</zorder>
+   <zorder>coef_matrix_02</zorder>
+   <zorder>coef_matrix_12</zorder>
+   <zorder>coef_matrix_22</zorder>
+   <zorder>length_mode_21</zorder>
+   <zorder>label10</zorder>
+   <zorder>div_coef</zorder>
+   <zorder>length_mode_23</zorder>
+   <zorder>shift_coef</zorder>
+   <zorder>on_apply</zorder>
+   <zorder>Slider_3</zorder>
+   <zorder>label_3</zorder>
+   <zorder>Slider_1_2</zorder>
+   <zorder>Slider_1_3</zorder>
+   <zorder>label_1_2</zorder>
+   <zorder>label_1_3</zorder>
+   <zorder>Slider_2_2</zorder>
+   <zorder>Slider_2_3</zorder>
+   <zorder>label_2_2</zorder>
+   <zorder>label_2_3</zorder>
+   <zorder>length_mode_22</zorder>
+   <zorder>length_mode_24</zorder>
+   <zorder>length_mode_25</zorder>
+   <zorder>Button_BLUR</zorder>
+   <zorder>Button_SHARPEN</zorder>
+   <zorder>EMBOSS</zorder>
+   <zorder>Button_EDGE_DETECROR</zorder>
+   <zorder>radioButton_5</zorder>
+   <zorder>radioButton_6</zorder>
+   <zorder>Button_NOT_FILTER</zorder>
+   <zorder>doubleSpinBox_gamma_1</zorder>
+   <zorder>doubleSpinBox_gamma_2</zorder>
+   <zorder>length_mode_26</zorder>
+   <zorder>length_mode_27</zorder>
+   <zorder>radioButton_7</zorder>
+   <zorder>radioButton_8</zorder>
+   <zorder>radioButton_9</zorder>
+   <zorder>length_mode_28</zorder>
+   <zorder>radioButton_10</zorder>
+   <zorder>radioButton_11</zorder>
+   <zorder>radioButton_12</zorder>
+   <zorder>checkBox</zorder>
+   <zorder>length_mode_29</zorder>
+   <zorder>length_mode_30</zorder>
+   <zorder>label</zorder>
+   <zorder>label_2</zorder>
+   <zorder>logo</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
