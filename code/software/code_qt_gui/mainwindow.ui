@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>912</width>
-    <height>593</height>
+    <width>940</width>
+    <height>599</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,8 +17,8 @@
    <widget class="QSlider" name="Slider_1_1">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>30</y>
+      <x>160</x>
+      <y>20</y>
       <width>201</width>
       <height>19</height>
      </rect>
@@ -463,34 +463,34 @@
    <widget class="QLabel" name="length_mode_15">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>30</y>
-      <width>61</width>
-      <height>16</height>
+      <x>70</x>
+      <y>10</y>
+      <width>91</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>CAMERA 1</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;CAMERA 1&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QLabel" name="length_mode_16">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>70</y>
-      <width>61</width>
-      <height>16</height>
+      <x>70</x>
+      <y>50</y>
+      <width>91</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>CAMERA 2</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;CAMERA 2&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QSlider" name="Slider_2_1">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>70</y>
+      <x>160</x>
+      <y>60</y>
       <width>201</width>
       <height>19</height>
      </rect>
@@ -520,8 +520,8 @@
    <widget class="QLabel" name="label_1">
     <property name="geometry">
      <rect>
-      <x>310</x>
-      <y>30</y>
+      <x>370</x>
+      <y>20</y>
       <width>47</width>
       <height>13</height>
      </rect>
@@ -533,8 +533,8 @@
    <widget class="QLabel" name="label_2_1">
     <property name="geometry">
      <rect>
-      <x>310</x>
-      <y>70</y>
+      <x>370</x>
+      <y>60</y>
       <width>47</width>
       <height>13</height>
      </rect>
@@ -543,27 +543,19 @@
      <string>0</string>
     </property>
    </widget>
-   <widget class="QLabel" name="length_mode_17">
-    <property name="geometry">
-     <rect>
-      <x>330</x>
-      <y>310</y>
-      <width>161</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Set register AEC PK EXPOSURE:</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="length_mode_18">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>360</y>
-      <width>101</width>
+      <x>20</x>
+      <y>320</y>
+      <width>131</width>
       <height>16</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
     </property>
     <property name="text">
      <string>IP ADDR BOARD</string>
@@ -572,8 +564,8 @@
    <widget class="QLineEdit" name="ip_addr_board">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>360</y>
+      <x>30</x>
+      <y>350</y>
       <width>91</width>
       <height>21</height>
      </rect>
@@ -582,112 +574,24 @@
      <string>169.254.203.150</string>
     </property>
    </widget>
-   <widget class="QRadioButton" name="radioButton">
-    <property name="geometry">
-     <rect>
-      <x>660</x>
-      <y>170</y>
-      <width>111</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>14</pointsize>
-     </font>
-    </property>
-    <property name="toolTip">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;CAMERA 1&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-    <property name="text">
-     <string>Camera 1</string>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radioButton_2">
-    <property name="geometry">
-     <rect>
-      <x>660</x>
-      <y>193</y>
-      <width>111</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>14</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Camera 2</string>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radioButton_3">
-    <property name="geometry">
-     <rect>
-      <x>660</x>
-      <y>220</y>
-      <width>82</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>14</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>HDR</string>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radioButton_4">
-    <property name="geometry">
-     <rect>
-      <x>660</x>
-      <y>240</y>
-      <width>211</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>14</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>HDR + tone mapping</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="length_mode_19">
-    <property name="geometry">
-     <rect>
-      <x>660</x>
-      <y>150</y>
-      <width>141</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Select source video stream:</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="length_mode_20">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>140</y>
-      <width>81</width>
-      <height>16</height>
+      <x>710</x>
+      <y>250</y>
+      <width>151</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>PARALLAX CORRr</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Parallax Corr:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="coef_matrix_00">
     <property name="geometry">
      <rect>
-      <x>80</x>
-      <y>260</y>
+      <x>190</x>
+      <y>150</y>
       <width>41</width>
       <height>16</height>
      </rect>
@@ -699,8 +603,8 @@
    <widget class="QLineEdit" name="coef_matrix_10">
     <property name="geometry">
      <rect>
-      <x>80</x>
-      <y>280</y>
+      <x>190</x>
+      <y>170</y>
       <width>41</width>
       <height>16</height>
      </rect>
@@ -712,8 +616,8 @@
    <widget class="QLineEdit" name="coef_matrix_20">
     <property name="geometry">
      <rect>
-      <x>80</x>
-      <y>300</y>
+      <x>190</x>
+      <y>190</y>
       <width>41</width>
       <height>16</height>
      </rect>
@@ -725,8 +629,8 @@
    <widget class="QLineEdit" name="coef_matrix_01">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>260</y>
+      <x>240</x>
+      <y>150</y>
       <width>41</width>
       <height>16</height>
      </rect>
@@ -738,8 +642,8 @@
    <widget class="QLineEdit" name="coef_matrix_11">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>280</y>
+      <x>240</x>
+      <y>170</y>
       <width>41</width>
       <height>16</height>
      </rect>
@@ -751,8 +655,8 @@
    <widget class="QLineEdit" name="coef_matrix_21">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>300</y>
+      <x>240</x>
+      <y>190</y>
       <width>41</width>
       <height>16</height>
      </rect>
@@ -764,8 +668,8 @@
    <widget class="QLineEdit" name="coef_matrix_02">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>260</y>
+      <x>290</x>
+      <y>150</y>
       <width>41</width>
       <height>16</height>
      </rect>
@@ -777,8 +681,8 @@
    <widget class="QLineEdit" name="coef_matrix_12">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>280</y>
+      <x>290</x>
+      <y>170</y>
       <width>41</width>
       <height>16</height>
      </rect>
@@ -790,8 +694,8 @@
    <widget class="QLineEdit" name="coef_matrix_22">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>300</y>
+      <x>290</x>
+      <y>190</y>
       <width>41</width>
       <height>16</height>
      </rect>
@@ -803,76 +707,29 @@
    <widget class="QLabel" name="length_mode_21">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>280</y>
-      <width>71</width>
-      <height>16</height>
+      <x>210</x>
+      <y>120</y>
+      <width>111</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>coef_matrix</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label10">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>190</y>
-      <width>51</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>div_coef</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="div_coef">
-    <property name="geometry">
-     <rect>
-      <x>80</x>
-      <y>190</y>
-      <width>61</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>1</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="length_mode_23">
-    <property name="geometry">
-     <rect>
-      <x>160</x>
-      <y>190</y>
-      <width>61</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>shift_coef</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="shift_coef">
-    <property name="geometry">
-     <rect>
-      <x>220</x>
-      <y>190</y>
-      <width>61</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>0</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Coeff_matrix:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QPushButton" name="on_apply">
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>230</y>
-      <width>91</width>
-      <height>23</height>
+      <y>270</y>
+      <width>151</width>
+      <height>31</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
     </property>
     <property name="text">
      <string>apply</string>
@@ -881,8 +738,8 @@
    <widget class="QSlider" name="Slider_3">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>140</y>
+      <x>670</x>
+      <y>280</y>
       <width>171</width>
       <height>19</height>
      </rect>
@@ -918,8 +775,8 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>280</x>
-      <y>140</y>
+      <x>860</x>
+      <y>280</y>
       <width>47</width>
       <height>13</height>
      </rect>
@@ -931,8 +788,8 @@
    <widget class="QSlider" name="Slider_1_2">
     <property name="geometry">
      <rect>
-      <x>360</x>
-      <y>30</y>
+      <x>420</x>
+      <y>20</y>
       <width>201</width>
       <height>19</height>
      </rect>
@@ -1377,8 +1234,8 @@
    <widget class="QSlider" name="Slider_1_3">
     <property name="geometry">
      <rect>
-      <x>600</x>
-      <y>30</y>
+      <x>660</x>
+      <y>20</y>
       <width>201</width>
       <height>19</height>
      </rect>
@@ -1408,8 +1265,8 @@
    <widget class="QLabel" name="label_1_2">
     <property name="geometry">
      <rect>
-      <x>570</x>
-      <y>30</y>
+      <x>630</x>
+      <y>20</y>
       <width>47</width>
       <height>13</height>
      </rect>
@@ -1421,8 +1278,8 @@
    <widget class="QLabel" name="label_1_3">
     <property name="geometry">
      <rect>
-      <x>810</x>
-      <y>30</y>
+      <x>870</x>
+      <y>20</y>
       <width>47</width>
       <height>13</height>
      </rect>
@@ -1434,8 +1291,8 @@
    <widget class="QSlider" name="Slider_2_2">
     <property name="geometry">
      <rect>
-      <x>360</x>
-      <y>70</y>
+      <x>420</x>
+      <y>60</y>
       <width>201</width>
       <height>19</height>
      </rect>
@@ -1465,8 +1322,8 @@
    <widget class="QSlider" name="Slider_2_3">
     <property name="geometry">
      <rect>
-      <x>600</x>
-      <y>70</y>
+      <x>660</x>
+      <y>60</y>
       <width>201</width>
       <height>19</height>
      </rect>
@@ -1496,8 +1353,8 @@
    <widget class="QLabel" name="label_2_2">
     <property name="geometry">
      <rect>
-      <x>570</x>
-      <y>70</y>
+      <x>630</x>
+      <y>60</y>
       <width>47</width>
       <height>13</height>
      </rect>
@@ -1509,8 +1366,8 @@
    <widget class="QLabel" name="label_2_3">
     <property name="geometry">
      <rect>
-      <x>810</x>
-      <y>70</y>
+      <x>870</x>
+      <y>60</y>
       <width>47</width>
       <height>13</height>
      </rect>
@@ -1522,50 +1379,55 @@
    <widget class="QLabel" name="length_mode_22">
     <property name="geometry">
      <rect>
-      <x>160</x>
-      <y>90</y>
-      <width>61</width>
-      <height>16</height>
+      <x>230</x>
+      <y>80</y>
+      <width>71</width>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>BYTE 0</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;BYTE 0&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QLabel" name="length_mode_24">
     <property name="geometry">
      <rect>
-      <x>430</x>
-      <y>90</y>
-      <width>61</width>
-      <height>16</height>
+      <x>500</x>
+      <y>80</y>
+      <width>71</width>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>BYTE 1</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;BYTE 1&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QLabel" name="length_mode_25">
     <property name="geometry">
      <rect>
-      <x>680</x>
-      <y>90</y>
-      <width>61</width>
-      <height>16</height>
+      <x>740</x>
+      <y>80</y>
+      <width>71</width>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>BYTE 2</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;BYTE 2&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QPushButton" name="Button_BLUR">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>210</y>
-      <width>91</width>
+      <x>40</x>
+      <y>150</y>
+      <width>141</width>
       <height>23</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
     </property>
     <property name="text">
      <string>BLUR</string>
@@ -1574,11 +1436,16 @@
    <widget class="QPushButton" name="Button_SHARPEN">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>230</y>
-      <width>91</width>
+      <x>40</x>
+      <y>180</y>
+      <width>141</width>
       <height>23</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
     </property>
     <property name="text">
      <string>SHARPEN</string>
@@ -1587,11 +1454,16 @@
    <widget class="QPushButton" name="EMBOSS">
     <property name="geometry">
      <rect>
-      <x>100</x>
+      <x>40</x>
       <y>210</y>
-      <width>91</width>
+      <width>141</width>
       <height>23</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
     </property>
     <property name="text">
      <string>EMBOSS</string>
@@ -1600,60 +1472,44 @@
    <widget class="QPushButton" name="Button_EDGE_DETECROR">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>230</y>
-      <width>91</width>
+      <x>40</x>
+      <y>240</y>
+      <width>141</width>
       <height>23</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
     </property>
     <property name="text">
      <string>EDGE DETECTOR</string>
     </property>
    </widget>
-   <widget class="QRadioButton" name="radioButton_5">
-    <property name="geometry">
-     <rect>
-      <x>330</x>
-      <y>330</y>
-      <width>82</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>manual</string>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radioButton_6">
-    <property name="geometry">
-     <rect>
-      <x>330</x>
-      <y>350</y>
-      <width>82</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>auto</string>
-    </property>
-   </widget>
    <widget class="QPushButton" name="Button_NOT_FILTER">
     <property name="geometry">
      <rect>
-      <x>190</x>
-      <y>210</y>
-      <width>91</width>
+      <x>40</x>
+      <y>270</y>
+      <width>141</width>
       <height>23</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
     <property name="text">
-     <string>NOT FILTER</string>
+     <string>NO</string>
     </property>
    </widget>
    <widget class="QDoubleSpinBox" name="doubleSpinBox_gamma_1">
     <property name="geometry">
      <rect>
-      <x>680</x>
-      <y>330</y>
+      <x>180</x>
+      <y>340</y>
       <width>62</width>
       <height>22</height>
      </rect>
@@ -1677,8 +1533,8 @@
    <widget class="QDoubleSpinBox" name="doubleSpinBox_gamma_2">
     <property name="geometry">
      <rect>
-      <x>680</x>
-      <y>360</y>
+      <x>180</x>
+      <y>370</y>
       <width>62</width>
       <height>22</height>
      </rect>
@@ -1702,131 +1558,171 @@
    <widget class="QLabel" name="length_mode_26">
     <property name="geometry">
      <rect>
-      <x>750</x>
+      <x>250</x>
       <y>330</y>
-      <width>61</width>
-      <height>16</height>
+      <width>91</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>gamma 1</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;gamma 1&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QLabel" name="length_mode_27">
     <property name="geometry">
      <rect>
-      <x>750</x>
+      <x>250</x>
       <y>360</y>
-      <width>61</width>
+      <width>91</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;gamma 2&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="length_mode_30">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>320</y>
+      <width>201</width>
       <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>gamma 2</string>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radioButton_7">
-    <property name="geometry">
-     <rect>
-      <x>510</x>
-      <y>350</y>
-      <width>161</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>RAW gamma disable</string>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radioButton_8">
-    <property name="geometry">
-     <rect>
-      <x>510</x>
-      <y>330</y>
-      <width>121</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>RAW gamma enable</string>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radioButton_9">
-    <property name="geometry">
-     <rect>
-      <x>450</x>
-      <y>193</y>
-      <width>111</width>
-      <height>17</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <pointsize>14</pointsize>
+      <pointsize>12</pointsize>
      </font>
     </property>
     <property name="text">
-     <string>G comp</string>
+     <string>Gamma correction on FPGA:</string>
     </property>
    </widget>
-   <widget class="QLabel" name="length_mode_28">
+   <widget class="QLabel" name="logo">
     <property name="geometry">
      <rect>
-      <x>450</x>
-      <y>150</y>
-      <width>141</width>
-      <height>16</height>
+      <x>400</x>
+      <y>420</y>
+      <width>241</width>
+      <height>81</height>
      </rect>
     </property>
     <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>430</y>
+      <width>151</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;TEAM EM076:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Vladislav Sharshin&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Andrey Papushin&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Elena Kirichenko&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>390</x>
+      <y>130</y>
+      <width>201</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="title">
      <string>Select component for hist:</string>
     </property>
+    <widget class="QRadioButton" name="R_comp">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>111</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>R Comp</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="G_comp">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>111</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>G Comp</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="B_comp">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>60</y>
+       <width>111</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>B Comp</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="Y_comp">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>80</y>
+       <width>111</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Y Comp</string>
+     </property>
+    </widget>
    </widget>
-   <widget class="QRadioButton" name="radioButton_10">
+   <widget class="QCheckBox" name="checkBox">
     <property name="geometry">
      <rect>
-      <x>450</x>
-      <y>170</y>
-      <width>111</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>14</pointsize>
-     </font>
-    </property>
-    <property name="toolTip">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;CAMERA 1&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-    <property name="text">
-     <string>R comp</string>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radioButton_11">
-    <property name="geometry">
-     <rect>
-      <x>450</x>
-      <y>220</y>
-      <width>82</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>14</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>B comp</string>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radioButton_12">
-    <property name="geometry">
-     <rect>
-      <x>450</x>
-      <y>240</y>
-      <width>211</width>
+      <x>400</x>
+      <y>270</y>
+      <width>191</width>
       <height>31</height>
      </rect>
     </property>
@@ -1836,54 +1732,216 @@
      </font>
     </property>
     <property name="text">
-     <string>Y comp</string>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="checkBox">
-    <property name="geometry">
-     <rect>
-      <x>450</x>
-      <y>270</y>
-      <width>141</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
      <string>histogram to display</string>
     </property>
    </widget>
-   <widget class="QLabel" name="length_mode_29">
+   <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>310</y>
-      <width>121</width>
-      <height>16</height>
+      <x>660</x>
+      <y>130</y>
+      <width>261</width>
+      <height>121</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Gamma correction on ISP</string>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
     </property>
+    <property name="title">
+     <string>Select source video stream:</string>
+    </property>
+    <widget class="QRadioButton" name="radioButton_9">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>201</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;CAMERA 1&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string>Camera 1</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButton_11">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>191</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Camera 2 </string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButton_12">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>70</y>
+       <width>131</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>HDR</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButton_10">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>90</y>
+       <width>241</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>HDR + tone mapping</string>
+     </property>
+    </widget>
    </widget>
-   <widget class="QLabel" name="length_mode_30">
+   <widget class="QGroupBox" name="groupBox_3">
     <property name="geometry">
      <rect>
-      <x>680</x>
-      <y>310</y>
-      <width>141</width>
-      <height>16</height>
+      <x>390</x>
+      <y>320</y>
+      <width>251</width>
+      <height>81</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Gamma correction on FPGA</string>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
     </property>
+    <property name="title">
+     <string>Set register AEC PK EXPOSURE:</string>
+    </property>
+    <widget class="QRadioButton" name="radioButton_5">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>91</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>manual</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButton_6">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>82</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>auto</string>
+     </property>
+    </widget>
    </widget>
-   <widget class="QLabel" name="logo">
+   <widget class="QGroupBox" name="groupBox_4">
     <property name="geometry">
      <rect>
-      <x>520</x>
-      <y>410</y>
-      <width>281</width>
+      <x>660</x>
+      <y>320</y>
+      <width>251</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="title">
+     <string>Gamma correction on ISP:</string>
+    </property>
+    <widget class="QRadioButton" name="radioButton_8">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>201</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>RAW gamma enable</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButton_7">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>191</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>RAW gamma disable</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QLabel" name="qr">
+    <property name="geometry">
+     <rect>
+      <x>740</x>
+      <y>420</y>
+      <width>261</width>
       <height>131</height>
      </rect>
     </property>
@@ -1891,46 +1949,74 @@
      <string/>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="length_mode_28">
     <property name="geometry">
      <rect>
-      <x>560</x>
-      <y>420</y>
-      <width>171</width>
+      <x>80</x>
+      <y>120</y>
+      <width>81</width>
       <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;TEAM EM076:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Filters:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_2">
+   <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
-      <x>720</x>
-      <y>420</y>
-      <width>181</width>
-      <height>111</height>
+      <x>190</x>
+      <y>210</y>
+      <width>151</width>
+      <height>54</height>
      </rect>
     </property>
-    <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;Vladislav Sharshin&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;Andrey Papushin&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;Elena Kirichenko&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label10">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;div_coeff&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="div_coef">
+       <property name="text">
+        <string>1</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="length_mode_23">
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;shift_coeff&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="shift_coef">
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
+   <zorder>qr</zorder>
+   <zorder>logo</zorder>
    <zorder>Slider_1_1</zorder>
    <zorder>length_mode_15</zorder>
    <zorder>length_mode_16</zorder>
    <zorder>Slider_2_1</zorder>
    <zorder>label_1</zorder>
    <zorder>label_2_1</zorder>
-   <zorder>length_mode_17</zorder>
    <zorder>length_mode_18</zorder>
    <zorder>ip_addr_board</zorder>
-   <zorder>radioButton</zorder>
-   <zorder>radioButton_2</zorder>
-   <zorder>radioButton_3</zorder>
-   <zorder>radioButton_4</zorder>
-   <zorder>length_mode_19</zorder>
    <zorder>length_mode_20</zorder>
    <zorder>coef_matrix_00</zorder>
    <zorder>coef_matrix_10</zorder>
@@ -1964,33 +2050,29 @@
    <zorder>Button_SHARPEN</zorder>
    <zorder>EMBOSS</zorder>
    <zorder>Button_EDGE_DETECROR</zorder>
-   <zorder>radioButton_5</zorder>
-   <zorder>radioButton_6</zorder>
    <zorder>Button_NOT_FILTER</zorder>
    <zorder>doubleSpinBox_gamma_1</zorder>
    <zorder>doubleSpinBox_gamma_2</zorder>
    <zorder>length_mode_26</zorder>
    <zorder>length_mode_27</zorder>
-   <zorder>radioButton_7</zorder>
-   <zorder>radioButton_8</zorder>
-   <zorder>radioButton_9</zorder>
-   <zorder>length_mode_28</zorder>
-   <zorder>radioButton_10</zorder>
-   <zorder>radioButton_11</zorder>
-   <zorder>radioButton_12</zorder>
-   <zorder>checkBox</zorder>
-   <zorder>length_mode_29</zorder>
    <zorder>length_mode_30</zorder>
-   <zorder>label</zorder>
    <zorder>label_2</zorder>
-   <zorder>logo</zorder>
+   <zorder>groupBox</zorder>
+   <zorder>checkBox</zorder>
+   <zorder>groupBox_2</zorder>
+   <zorder>groupBox_3</zorder>
+   <zorder>groupBox_4</zorder>
+   <zorder>radioButton_5</zorder>
+   <zorder>shift_coef</zorder>
+   <zorder>div_coef</zorder>
+   <zorder>length_mode_28</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>912</width>
+     <width>940</width>
      <height>21</height>
     </rect>
    </property>
@@ -2016,11 +2098,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>700</x>
-     <y>92</y>
+     <y>81</y>
     </hint>
     <hint type="destinationlabel">
      <x>833</x>
-     <y>89</y>
+     <y>75</y>
     </hint>
    </hints>
   </connection>
@@ -2032,11 +2114,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>295</x>
-     <y>141</y>
+     <y>121</y>
     </hint>
     <hint type="destinationlabel">
      <x>356</x>
-     <y>135</y>
+     <y>115</y>
     </hint>
    </hints>
   </connection>
@@ -2048,11 +2130,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>195</x>
-     <y>205</y>
+     <y>191</y>
     </hint>
     <hint type="destinationlabel">
      <x>323</x>
-     <y>202</y>
+     <y>185</y>
     </hint>
    </hints>
   </connection>
@@ -2064,11 +2146,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>460</x>
-     <y>92</y>
+     <y>81</y>
     </hint>
     <hint type="destinationlabel">
      <x>593</x>
-     <y>89</y>
+     <y>75</y>
     </hint>
    </hints>
   </connection>
@@ -2080,11 +2162,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>200</x>
-     <y>92</y>
+     <y>81</y>
     </hint>
     <hint type="destinationlabel">
      <x>333</x>
-     <y>89</y>
+     <y>75</y>
     </hint>
    </hints>
   </connection>
@@ -2096,11 +2178,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>460</x>
-     <y>132</y>
+     <y>121</y>
     </hint>
     <hint type="destinationlabel">
      <x>593</x>
-     <y>129</y>
+     <y>115</y>
     </hint>
    </hints>
   </connection>
@@ -2112,11 +2194,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>700</x>
-     <y>132</y>
+     <y>121</y>
     </hint>
     <hint type="destinationlabel">
      <x>833</x>
-     <y>129</y>
+     <y>115</y>
     </hint>
    </hints>
   </connection>

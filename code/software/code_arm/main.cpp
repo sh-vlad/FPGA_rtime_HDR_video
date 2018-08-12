@@ -1,3 +1,5 @@
+//Author: Andrey Papushin                   //
+//Email : andrey.papushin@gmail.com         //
 #include "initial_reg_camera_1280x720.h"
 #include <stdio.h>
 #include <unistd.h>
@@ -20,10 +22,17 @@
 #define H 200
 #define W 256
 #define ADDR_BUF_3 0x3F900000
+bool  new_hist_bool_r[H][W];
+bool  new_hist_bool_g[H][W];
+bool  new_hist_bool_b[H][W];
+bool hist_overlay;
 unsigned char new_hist_r[H][W];
 unsigned char new_hist_g[H][W];
 unsigned char new_hist_b[H][W];
 unsigned int mas_freq[W];
+unsigned int mas_freq_r[W];
+unsigned int mas_freq_g[W];
+unsigned int mas_freq_b[W];
 struct map 
 {
 	unsigned int max_freq;
@@ -33,9 +42,13 @@ void hist();
 void user();
 void initial_gamma_mem(unsigned char *lw_hps2fpga, double a);
 void poll_status_register(int *mem_freq);
+void hist_build_all();
 void build_hist(struct map new_max);
 void build_hist2(struct map new_max);
 struct map read_freq(int *mem_freq);
+struct map read_freq_r(int *mem_freq);
+struct map read_freq_g(int *mem_freq);
+struct map read_freq_b(int *mem_freq);
 void initial_reg_camera();
 void write_hist(int *mem_hist_write );
 
@@ -96,7 +109,66 @@ struct map read_freq(int *mem_freq)
 //	printf("max = %u,  index = %u \n", new_max.max_freq,);
 	return new_max;
 }
-
+struct map read_freq_r(int *mem_freq)
+{
+	struct map new_max;
+	unsigned int tmp;
+	int i;
+	new_max.max_freq = 0;
+	new_max.index = 0;
+	for(i=0; i<W; i++)
+	{	
+		tmp = *(mem_freq  + i );
+		mas_freq_r[i] = tmp;
+		if(tmp > new_max.max_freq )
+		{
+			new_max.max_freq = tmp;
+			new_max.index    = i;
+		}
+	}
+//	printf("max = %u,  index = %u \n", new_max.max_freq,);
+	return new_max;
+}
+struct map read_freq_g(int *mem_freq)
+{
+	struct map new_max;
+	unsigned int tmp;
+	int i;
+	new_max.max_freq = 0;
+	new_max.index = 0;
+	for(i=0; i<W; i++)
+	{	
+		tmp = *(mem_freq  + i );
+		mas_freq_g[i] = tmp;
+		if(tmp > new_max.max_freq )
+		{
+			new_max.max_freq = tmp;
+			new_max.index    = i;
+		}
+	}
+//	printf("max = %u,  index = %u \n", new_max.max_freq,);
+	return new_max;
+}
+struct map read_freq_b(int *mem_freq)
+{
+	struct map new_max;
+	unsigned int tmp;
+	int i;
+	new_max.max_freq = 0;
+	new_max.index = 0;
+	for(i=0; i<W; i++)
+	{	
+		tmp = *(mem_freq  + i );
+		mas_freq_b[i] = tmp;
+		if(tmp > new_max.max_freq )
+		{
+			new_max.max_freq = tmp;
+			new_max.index    = i;
+		}
+	}
+//	printf("max = %u,  index = %u \n", new_max.max_freq,);
+	return new_max;
+}
 
 void build_hist(struct map new_max)
 {
@@ -281,7 +353,6 @@ void poll_status_register(int *mem_freq)
 	}
 	*(mem_freq  + 256) = 0;		
 }
-
 void initial_gamma_mem(unsigned char *lw_hps2fpga, double a)
 {
 	float n;
@@ -294,33 +365,154 @@ void initial_gamma_mem(unsigned char *lw_hps2fpga, double a)
 		*(lw_hps2fpga  + 256 + i) = data;
     }
 }
+
+void hist_build_all()
+{
+	for(int i=0; i<200; i++)
+					for(int j=0; j<256; j++)
+					{
+						if( ~new_hist_bool_r[i][j] & ~new_hist_bool_g[i][j]  & ~new_hist_bool_b[i][j])
+						{	
+							new_hist_r[i][j] =255;
+							new_hist_g[i][j] =255;
+							new_hist_b[i][j] =255;
+						}
+						else if ( ~new_hist_bool_r[i][j] & ~new_hist_bool_g[i][j]  & new_hist_bool_b[i][j])
+						{	
+							new_hist_r[i][j] =0;
+							new_hist_g[i][j]=0;
+							new_hist_b[i][j] =255;
+						}
+						else if ( ~new_hist_bool_r[i][j] & new_hist_bool_g[i][j]  & ~new_hist_bool_b[i][j])
+						{
+							new_hist_r[i][j] =0;
+							new_hist_g[i][j] =255;
+							new_hist_b[i][j] =0;
+						}
+						else if ( ~new_hist_bool_r[i][j] & new_hist_bool_g[i][j] & new_hist_bool_b[i][j])
+						{	
+							new_hist_r[i][j] =0;
+							new_hist_g[i][j] =255;
+							new_hist_b[i][j] =255;
+						}
+						else if ( new_hist_bool_r[i][j] & ~new_hist_bool_g[i][j]  & ~new_hist_bool_b[i][j])
+						{	
+							new_hist_r[i][j] =255;
+							new_hist_g[i][j] =0;
+							new_hist_b[i][j] =0;
+						}
+						else if ( new_hist_bool_r[i][j] & ~new_hist_bool_g[i][j]  & new_hist_bool_b[i][j])
+						{
+							new_hist_r[i][j] =255;
+							new_hist_g[i][j] =0;
+							new_hist_b[i][j] =255;
+						}
+						else if ( new_hist_bool_r[i][j] & new_hist_bool_g[i][j]  & ~new_hist_bool_b[i][j])
+						{
+							new_hist_r[i][j] =255;
+							new_hist_g[i][j] =255;
+							new_hist_b[i][j] =0;
+						}
+						else if (new_hist_bool_r[i][j] & new_hist_bool_g[i][j]  & new_hist_bool_b[i][j] )
+						{	
+							new_hist_r[i][j] =255;
+							new_hist_g[i][j] =255;
+							new_hist_b[i][j] =255;
+						}
+						
+					}
+}
+	
 void hist()
 {
+	int j;
 	int fd;
+	int *hps2fpga;
 	int *mem_hist_write;
 	int *mem_freq_read;
 	struct map new_max;
+	struct map new_max_r;
+	struct map new_max_g;
+	struct map new_max_b;
+	unsigned int max_freq_comp;
+	unsigned char y_i_r;
+	unsigned char y_i_g;
+	unsigned char y_i_b;
 	//unsigned int max_freq;
 	if( ( fd = open( "/dev/mem", ( O_RDWR | O_SYNC ) ) ) == -1 ) {
 		printf( "ERROR: could not open \"/dev/mem\"...\n" );
 		//return( 1 );
 	} 
+	hps2fpga = (int *)mmap( NULL, MEM_SPAN, ( PROT_READ | PROT_WRITE ), MAP_SHARED, fd, BASE_ADDR_H2F_BRIDGE );
 	mem_hist_write  = ( int * ) mmap( NULL, 0x64000, ( PROT_READ | PROT_WRITE ), MAP_SHARED, fd, ADDR_BUF_3  );
 	mem_freq_read   =(int *) mmap( NULL, 0x404, ( PROT_READ | PROT_WRITE ), MAP_SHARED, fd, ADDR_BUF_3 + 0x64000);
 	while(1)
 	{
+		if(!hist_overlay) {
 	//==== 1. Poll of the status register in ddr buffer =====//
-		poll_status_register( mem_freq_read );
-		//==== 2.          =====//
-		new_max = read_freq( mem_freq_read );
-		//==== 3.  =====//
-		build_hist(new_max);
-		//==== 4.  =====//
-		write_hist(mem_hist_write );
+			poll_status_register( mem_freq_read );
+			//==== 2.          =====//
+			new_max = read_freq( mem_freq_read );
+			//==== 3.  =====//
+			build_hist(new_max);
+			//==== 4.  =====//
+			write_hist(mem_hist_write );
+		}
+		else 
+		{
+			poll_status_register( mem_freq_read );
+			*(hps2fpga  + 17) = 1;
+			poll_status_register( mem_freq_read );
+			*(hps2fpga  + 17) = 2;
+			new_max_r = read_freq_r( mem_freq_read );
+			poll_status_register( mem_freq_read );
+			*(hps2fpga  + 17) = 4;
+			new_max_g = read_freq_g( mem_freq_read );
+			poll_status_register( mem_freq_read );
+			new_max_b = read_freq_b( mem_freq_read );
+			
+			max_freq_comp = new_max_r.max_freq > new_max_g.max_freq ? new_max_r.max_freq : new_max_g.max_freq;
+			max_freq_comp = max_freq_comp > new_max_b.max_freq ? max_freq_comp : new_max_b.max_freq;
+			float s =  (float)200/max_freq_comp;
+			for(int i=0; i<256; i++)
+			{
+				floor ((float)mas_freq[i] *s) ;
+				y_i_r = floor ((float)mas_freq_r[i] *s) ;
+				y_i_g = floor ((float)mas_freq_g[i] *s) ;
+				y_i_b = floor ((float)mas_freq_b[i] *s) ;
+				
+				j=0;
+				while (j < y_i_r)
+				{
+					new_hist_bool_r[H-1-j][i] = 1;
+					j++;
+				}
+				
+				j=0;
+				while (j < y_i_g)
+				{
+					new_hist_bool_g[H-1-j][i] = 1;
+					j++;
+				}
+				
+				j=0;
+				while (j < y_i_b)
+				{
+					new_hist_bool_b[H-1-j][i] = 1;
+					j++;
+				}
+			}
+				
+			hist_build_all();
+			//build_hist_overlay(new_max);
+			write_hist(mem_hist_write );
+			
+		}
+			
+			
 	}
 	
-	
-	if( munmap( mem_hist_write, 0x64000 ) != 0 ||  munmap( mem_freq_read, 0x404 ) != 0) 
+	if( munmap( mem_hist_write, 0x64000 ) != 0 ||  munmap( mem_freq_read, 0x404 ) != 0 ||  munmap( hps2fpga, MEM_SPAN ) != 0 ) 
 	{
 		printf( "ERROR: munmap() failed...\n" );
 		close( fd );
@@ -385,6 +577,7 @@ void user()
 	unsigned char data;
 	unsigned int tmp;
 	uint16_t num_camera;
+	hist_overlay =0;
 	socklen_t  clilen;
 	while(1) {
         clilen = sizeof(client);
@@ -409,6 +602,10 @@ void user()
 						default: select_comp = Y_comp;  break;
 					}
 				}
+				if(addr == 19 && data ==1)
+					hist_overlay =1;
+				else 
+					hist_overlay =0;
 			}
 		else
 			for(i=0;i<size-1;i++)
