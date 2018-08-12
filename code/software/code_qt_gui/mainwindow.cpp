@@ -6,6 +6,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->setWindowTitle("EM076 » Real-time HDR video");
     MainWindow::ip_addr_board = ui->ip_addr_board->text();
     ui->Slider_1_1->setStyleSheet("QSlider::handle{ background-color: blue;} ");
     ui->Slider_1_2->setStyleSheet("QSlider::handle{ background-color: blue;} ");
@@ -15,7 +16,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->Slider_2_3->setStyleSheet("QSlider::handle{ background-color: blue;} ");
     ui->Slider_3->setStyleSheet("QSlider::handle{ background-color: blue;} ");
     QPixmap pixmap("logo.png");
+    QPixmap qr_map("qr.png");
     ui->logo->setPixmap(pixmap);
+    ui->qr->setPixmap(qr_map);
+  //  ui->radioButton_11->group()
 }
 
 MainWindow::~MainWindow()
@@ -427,16 +431,18 @@ void MainWindow::on_doubleSpinBox_gamma_1_valueChanged(double arg1)
 
 void MainWindow::on_doubleSpinBox_gamma_2_valueChanged(double arg1)
 {
-    float n;
+    double n;
+    double data_tmp;
     quint32 tmp;
     quint8 data;
     QVector<qint32> vec;
     vec.push_back(2);
-    n =(float)(255./pow(255.,arg1));
+    n =(double)(255./pow(255.,arg1));
     for(int i=0;i<256;i++)
     {
-        data = n*(pow((double)i,arg1));
-        tmp = (data<<16) | (256+i);
+        data_tmp =(double) n*(pow(i,arg1));
+        data = round(data_tmp);
+        tmp = (data<<16) | (256+i); // addr =4, select camera 1,2
         vec.push_back(tmp);
     }
     QByteArray Datagram;
@@ -487,7 +493,7 @@ void MainWindow::on_radioButton_10_clicked()
     QDataStream out(&Datagram, QIODevice::WriteOnly);
     QVector<qint32> vec;
     vec.push_back(1);
-    tmp = 1<<16 | 0x11; //
+    tmp = 7<<16 | 0x2; //
     vec.push_back(tmp);
     out << vec;
     a.m_pudp->writeDatagram(Datagram, QHostAddress(ip_addr_board),3333);
@@ -501,7 +507,7 @@ void MainWindow::on_radioButton_9_clicked()
     QDataStream out(&Datagram, QIODevice::WriteOnly);
     QVector<qint32> vec;
     vec.push_back(1);
-    tmp = 2<<16 | 0x11; //
+    tmp = 1<<16 | 0x2; //
     vec.push_back(tmp);
     out << vec;
     a.m_pudp->writeDatagram(Datagram, QHostAddress(ip_addr_board),3333);
@@ -515,7 +521,7 @@ void MainWindow::on_radioButton_11_clicked()
     QDataStream out(&Datagram, QIODevice::WriteOnly);
     QVector<qint32> vec;
     vec.push_back(1);
-    tmp = 4<<16 | 0x11; //
+    tmp = 2<<16 | 0x2; //
     vec.push_back(tmp);
     out << vec;
     a.m_pudp->writeDatagram(Datagram, QHostAddress(ip_addr_board),3333);
@@ -529,7 +535,7 @@ void MainWindow::on_radioButton_12_clicked()
     QDataStream out(&Datagram, QIODevice::WriteOnly);
     QVector<qint32> vec;
     vec.push_back(1);
-    tmp = 8<<16 | 0x11; //
+    tmp = 3<<16 | 0x2; //
     vec.push_back(tmp);
     out << vec;
     a.m_pudp->writeDatagram(Datagram, QHostAddress(ip_addr_board),3333);
@@ -551,3 +557,79 @@ void MainWindow::on_checkBox_clicked()
     out << vec;
     a.m_pudp->writeDatagram(Datagram, QHostAddress(ip_addr_board),3333);
 }
+
+
+
+void MainWindow::on_R_comp_clicked()
+{
+    UdpServer a;
+    quint32 tmp;
+    QByteArray Datagram;
+    QDataStream out(&Datagram, QIODevice::WriteOnly);
+    QVector<qint32> vec;
+    vec.push_back(1);
+    tmp = 1<<16 | 0x11; //
+    vec.push_back(tmp);
+    out << vec;
+    a.m_pudp->writeDatagram(Datagram, QHostAddress(ip_addr_board),3333);
+}
+
+void MainWindow::on_G_comp_clicked()
+{
+    UdpServer a;
+    quint32 tmp;
+    QByteArray Datagram;
+    QDataStream out(&Datagram, QIODevice::WriteOnly);
+    QVector<qint32> vec;
+    vec.push_back(1);
+    tmp = 2<<16 | 0x11; //
+    vec.push_back(tmp);
+    out << vec;
+    a.m_pudp->writeDatagram(Datagram, QHostAddress(ip_addr_board),3333);
+}
+
+void MainWindow::on_B_comp_clicked()
+{
+    UdpServer a;
+    quint32 tmp;
+    QByteArray Datagram;
+    QDataStream out(&Datagram, QIODevice::WriteOnly);
+    QVector<qint32> vec;
+    vec.push_back(1);
+    tmp = 4<<16 | 0x11; //
+    vec.push_back(tmp);
+    out << vec;
+    a.m_pudp->writeDatagram(Datagram, QHostAddress(ip_addr_board),3333);
+}
+
+void MainWindow::on_Y_comp_clicked()
+{
+    UdpServer a;
+    quint32 tmp;
+    QByteArray Datagram;
+    QDataStream out(&Datagram, QIODevice::WriteOnly);
+    QVector<qint32> vec;
+    vec.push_back(1);
+    tmp = 8<<16 | 0x11; //
+    vec.push_back(tmp);
+    out << vec;
+    a.m_pudp->writeDatagram(Datagram, QHostAddress(ip_addr_board),3333);
+}
+
+/*void MainWindow::on_checkBox_2_clicked()
+{
+    UdpServer a;
+    quint32 tmp;
+    QByteArray Datagram;
+    QDataStream out(&Datagram, QIODevice::WriteOnly);
+    QVector<qint32> vec;
+    vec.push_back(1);
+    if( ui->checkBox_2->checkState() == 2 )
+        tmp = 1<<16 | 0x13; //
+    else
+        tmp = 0<<16 | 0x13; //
+    vec.push_back(tmp);
+    out << vec;
+    a.m_pudp->writeDatagram(Datagram, QHostAddress(ip_addr_board),3333);
+}
+*/

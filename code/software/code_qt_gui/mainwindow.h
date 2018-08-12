@@ -61,6 +61,11 @@ private slots:
     void on_radioButton_11_clicked();
     void on_radioButton_12_clicked();
     void on_checkBox_clicked();
+    void on_R_comp_clicked();
+    void on_G_comp_clicked();
+    void on_B_comp_clicked();
+    void on_Y_comp_clicked();
+    //void on_checkBox_2_clicked();
 };
 
 class UdpServer :public QTextEdit {
