@@ -109,7 +109,7 @@ set_location_assignment PIN_T8 -to hsync
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to hsync
 set_location_assignment PIN_V13 -to vsync
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to vsync
-set_global_assignment -name ENABLE_SIGNALTAP ON
+set_global_assignment -name ENABLE_SIGNALTAP OFF
 set_global_assignment -name USE_SIGNALTAP_FILE stp2.stp
 set_location_assignment PIN_AG5 -to pixel_clk_out
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to pixel_clk_out
@@ -632,5 +632,4 @@ set_global_assignment -name SIGNALTAP_FILE stp1.stp
 set_global_assignment -name QIP_FILE ../code/synt/pll_2.qip
 set_global_assignment -name SIP_FILE ../code/synt/pll_2.sip
 set_global_assignment -name SIGNALTAP_FILE stp2.stp
-set_global_assignment -name SLD_FILE db/stp2_auto_stripped.stp
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

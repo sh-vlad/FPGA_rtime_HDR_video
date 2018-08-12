@@ -68,7 +68,7 @@ HDR_algorithm_b
 delay_rg
 #(
 	.W				( 3				),
-	.D				( 21+2-8			)
+	.D				( 21+2-8+5			)
 )
 delay_weight
 (
