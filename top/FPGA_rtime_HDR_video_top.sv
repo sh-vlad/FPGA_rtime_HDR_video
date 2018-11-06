@@ -41,6 +41,8 @@ module FPGA_rtime_HDR_video_top
 	input wire              	HDMI_TX_INT  	,	
     inout wire              	HDMI_I2C_SCL 	,
     inout wire              	HDMI_I2C_SDA 	,
+//other	
+	input wire              	KEY_0  	,			
 // ddr3		
 	ddr3_ifc.ddr3_port          ddr3_mem     	, 
 // hps_io	
@@ -95,6 +97,13 @@ wire [7:0]   b_tm		            ;
 wire         data_valid_tm          ;  
 wire         sop_tm		            ; 
 wire         eop_tm                 ;
+//
+wire [7:0]   r_HSV_ch		         ; 
+wire [7:0]   g_HSV_ch		         ; 
+wire [7:0]   b_HSV_ch		         ; 
+wire         data_valid_HSV_ch       ;  
+wire         sop_HSV_ch		         ; 
+wire         eop_HSV_ch              ;
 // input video interface for framebuffer
 wire [7:0]	 r_fb                   ;
 wire [7:0]	 g_fb                   ;
@@ -421,12 +430,12 @@ mux_data_framebuffer mux_data_framebuffer_inst
 	.sop_cam_1		            (sop_rgb_1		                        ),
 	.eop_cam_1	                (eop_rgb_1	                            ),
     // HDR rgb comp                                                     
-	.r_hdr		                (r_tm  		                            ),
-	.g_hdr		                (g_tm 		                            ),
-	.b_hdr		                (b_tm 		                            ),
-	.data_valid_hdr             (data_valid_tm                          ),
-	.sop_hdr		            (sop_tm		                            ),
-	.eop_hdr	                (eop_tm	                                ),
+	.r_hdr		                (r_tm			                        ),
+	.g_hdr		                (g_tm			                        ),
+	.b_hdr		                (b_tm			                        ),
+	.data_valid_hdr             (data_valid_tm	                        ),
+	.sop_hdr		            (sop_tm		                     		),
+	.eop_hdr	                (eop_tm			                     	),
     // mux out                                                          
 	.r_fb		                (r_fb                                   ),
 	.g_fb		                (g_fb                                   ),
@@ -459,7 +468,42 @@ wrp_tone_mapping_inst
 	.valid_o	               ( data_valid_tm	                        ),
 	.reg_parallax_corr		   ( reg_parallax_corr						)	
 );
+//
+wire [ 7: 0] control_S;
+button_cnt 
+#(
+	.BUTTON_CNT_MAX		( 200			),
+	.WIDTH				( 8				)
+)
+button_cnt_inst
+(
+	.clk				( sys_clk_b		),
+	.rst	            ( !reset_n_b	),
+	.button	            ( !KEY_0		),
+	.button_cnt	        ( control_S 	)
+);
 
+HSV_changing HSV_changing_inst
+(
+	.clk						( sys_clk_b			),
+	.rst                        ( !reset_n_b		),
+	.r_in                       ( r_fb         		),
+	.g_in                       ( g_fb         		),
+	.b_in                       ( b_fb         		),
+	.valid_in                   ( data_fb_valid		),
+	.sop_in                     ( sop_fb		  	),
+	.eop_in	                    ( eop_fb	      	),
+	.r_out                      ( r_HSV_ch			),
+	.g_out                      ( g_HSV_ch			),
+	.b_out                      ( b_HSV_ch			),
+	.valid_out                  ( data_valid_HSV_ch	),
+	.sop_out                    ( sop_HSV_ch		),
+	.eop_out                    ( eop_HSV_ch		),
+	.control_S                  ( /*10*/{ 1'b0,control_S }	),
+	.control_V	                (  8'h0 				)
+);
+
+//
 wrp_conv_filter 
 #(
 	.DATA_WIDTH ( 8	),
@@ -469,12 +513,12 @@ wrp_conv_filter_inst
 (
 	.clk                       (sys_clk_b                               ), 
     .reset_n                   (reset_n_b                               ),
-    .data_r_i                  (r_fb		                            ), 
-    .data_g_i                  (g_fb		                            ),
-    .data_b_i                  (b_fb		                            ),
-    .valid_i                   (data_fb_valid                           ),
-    .sop_i	                   (sop_fb                                  ),
-    .eop_i                     (eop_fb                                  ),
+    .data_r_i                  (r_HSV_ch			                    ), 
+    .data_g_i                  (g_HSV_ch			                    ),
+    .data_b_i                  (b_HSV_ch			                    ),
+    .valid_i                   (data_valid_HSV_ch	                    ),
+    .sop_i	                   (sop_HSV_ch		                        ),
+    .eop_i                     (eop_HSV_ch		                        ),
     .coef                      (coef_conv                               ),
     .div_coef                  (div_coef                                ),
     .bias_factor               (shift_coef                              ),
