@@ -11,7 +11,7 @@ module HSV2RGB
 	output reg	[ 7: 0]			g,	
 	output reg	[ 7: 0]			b		
 );
-
+localparam DIV_DELAY = 9;
 //st1
 reg			[18: 0]		C;
 wire 		[22: 0]		div_H_60;
@@ -92,7 +92,7 @@ abs_inst
 delay_rg
 #(
 	.W				( 6				),
-	.D				( 4				)
+	.D				( 4	+ DIV_DELAY	)
 )
 delay_rg_chz
 (
@@ -104,7 +104,7 @@ delay_rg_chz
 delay_rg
 #(
 	.W				( 8				),
-	.D				( 3				)
+	.D				( 3	+ DIV_DELAY	)
 )
 delay_rg_m
 (
@@ -116,7 +116,7 @@ delay_rg_m
 delay_rg
 #(
 	.W				( 8				),
-	.D				( 3				)
+	.D				( 3	+ DIV_DELAY	)
 )
 delay_rg_C
 (

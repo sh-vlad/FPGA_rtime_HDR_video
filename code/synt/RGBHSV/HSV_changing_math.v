@@ -13,7 +13,7 @@ module HSV_changing_math
 	input wire	[ 8: 0]			control_S,
 	input wire	[ 8: 0]			control_V	
 );
-
+localparam DIV_DELAY = 9;
 wire [ 8: 0] sh_H;
 wire [10: 0] sh_S;
 wire [ 7: 0] sh_V;
@@ -30,7 +30,7 @@ reg [ 9: 0] V_summ;
 delay_rg
 #(
 	.W				( 9				),
-	.D				( 3				)
+	.D				( 3 + DIV_DELAY	)
 )
 delay_rg_H
 (
@@ -42,7 +42,7 @@ delay_rg_H
 delay_rg
 #(
 	.W				( 11			),
-	.D				( 2				)
+	.D				( 2 + DIV_DELAY	)
 )
 delay_rg_S
 (
@@ -54,7 +54,7 @@ delay_rg_S
 delay_rg
 #(
 	.W				( 8				),
-	.D				( 2				)
+	.D				( 2 + DIV_DELAY	)
 )
 delay_rg_V
 (

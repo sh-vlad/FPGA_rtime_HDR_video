@@ -72,7 +72,7 @@ HSV2RGB HSV2RGB_inst
 delay_rg
 #(
 	.W				( 3				),
-	.D				( 18			)
+	.D				( 18+27			)
 )
 delay_rg_C
 (

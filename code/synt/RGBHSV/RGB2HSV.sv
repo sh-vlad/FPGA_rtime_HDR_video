@@ -10,6 +10,7 @@ module RGB2HSV
 	output wire	[10: 0]			S,	
 	output wire	[ 7: 0]			V		
 );
+localparam DIV_DELAY = 9;
 //st0
 	reg	[ 7: 0] 	max;
 	reg	[ 7: 0] 	min;
@@ -103,7 +104,7 @@ always @( posedge clk )
 delay_rg
 #(
 	.W				( 5				),
-	.D				( 6				)
+	.D				( 6+DIV_DELAY	)
 )
 delay_rg_1
 (
@@ -170,7 +171,7 @@ delay_rg_S
 delay_rg
 #(
 	.W				( 8				),
-	.D				( 8				)
+	.D				( 8 + DIV_DELAY	)
 )
 delay_rg_V
 (
