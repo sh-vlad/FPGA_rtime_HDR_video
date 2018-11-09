@@ -66,6 +66,8 @@ private slots:
     void on_B_comp_clicked();
     void on_Y_comp_clicked();
     //void on_checkBox_2_clicked();
+    void on_Slider_4_valueChanged(int value);
+    void on_Slider_5_valueChanged(int value);
 };
 
 class UdpServer :public QTextEdit {

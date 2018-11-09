@@ -27,6 +27,8 @@ module hps_register_ov5640
 	output logic [7:0]                  shift_coef           ,
 	output logic signed 	[4:0]	    coef_conv[3][3]      ,
 	output logic                        start_write_image2ddr,
+	output logic [8:0]                  hps_control_S        ,
+	output logic [8:0]                  hps_control_V        ,
 	// bridge hps2-to-fpga                          
 	avl_ifc.avl_write_slave_port        avl_h2f_write    
 );
@@ -50,6 +52,8 @@ localparam ADDR_coef_22       = 16'd15 ;
 localparam ADDR_BUF_3         = 16'd16 ;
 localparam ADDR_HIST_switch   = 16'd17 ;
 localparam ADDR_HIST_enable   = 16'd18 ;
+localparam ADDR_CONTROL_S     = 16'd19 ;
+localparam ADDR_CONTROL_V     = 16'd20 ;
 localparam ADDR_enable_fb     = 16'hFFFF;
 
 wire write_hps = avl_h2f_write.chipselect &  avl_h2f_write.write;
@@ -81,7 +85,9 @@ enum logic [4:0]
 	write_coef_20       ,
 	write_coef_21       ,
 	write_coef_22       ,
-	write_enable_fb
+	write_enable_fb     ,
+	write_control_s     ,
+	write_control_v     
 }reg_sel;
 
 
@@ -109,6 +115,8 @@ always_comb
 			ADDR_coef_21      :   reg_sel = write_coef_21       ;
 			ADDR_coef_22      :   reg_sel = write_coef_22       ;
 			ADDR_enable_fb    :   reg_sel = write_enable_fb     ;
+			ADDR_CONTROL_S    :   reg_sel = write_control_s     ;
+			ADDR_CONTROL_V    :   reg_sel = write_control_v     ;
 			default           :   reg_sel = config_camera       ;
 		endcase
 	else
@@ -161,6 +169,8 @@ always_ff @( posedge clk_sys or negedge reset_n )
             write_coef_21       :  coef_conv[2][1]       <= avl_h2f_write.writedata[ 4:0];
             write_coef_22       :  coef_conv[2][2]       <= avl_h2f_write.writedata[ 4:0];
             write_enable_fb     :  reg_enable_fb         <= avl_h2f_write.writedata[   0];
+            write_control_s     :  hps_control_S         <= avl_h2f_write.writedata[ 8:0];
+            write_control_v     :  hps_control_V         <= avl_h2f_write.writedata[ 8:0];
             config_camera       :  data_camera           <= avl_h2f_write.writedata[ 7:0];
 		endcase	
 	end

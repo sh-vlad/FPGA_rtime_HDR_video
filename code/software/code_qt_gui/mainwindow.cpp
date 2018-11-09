@@ -633,3 +633,41 @@ void MainWindow::on_Y_comp_clicked()
     a.m_pudp->writeDatagram(Datagram, QHostAddress(ip_addr_board),3333);
 }
 */
+
+void MainWindow::on_Slider_4_valueChanged(int value)
+{
+    UdpServer a;
+    quint32 tmp;
+    QByteArray Datagram;
+    QDataStream out(&Datagram, QIODevice::WriteOnly);
+    QVector<qint32> vec;
+    vec.push_back(1);
+    quint32 control_s;
+    if(value >= 0)
+        control_s = value ;
+    else
+        control_s = 0x100 | (~value+1);
+    tmp = control_s<<16 | 0x13; //
+    vec.push_back(tmp);
+    out << vec;
+    a.m_pudp->writeDatagram(Datagram, QHostAddress(ip_addr_board),3333);
+}
+
+void MainWindow::on_Slider_5_valueChanged(int value)
+{
+    UdpServer a;
+    quint32 tmp;
+    QByteArray Datagram;
+    QDataStream out(&Datagram, QIODevice::WriteOnly);
+    QVector<qint32> vec;
+    vec.push_back(1);
+    quint32 control_v;
+    if(value >= 0)
+        control_v = value ;
+    else
+        control_v = 0x100 | (~value+1);
+    tmp = control_v<<16 | 0x14; //
+    vec.push_back(tmp);
+    out << vec;
+    a.m_pudp->writeDatagram(Datagram, QHostAddress(ip_addr_board),3333);
+}

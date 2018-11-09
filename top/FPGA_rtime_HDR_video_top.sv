@@ -143,6 +143,8 @@ wire [15:0]  address_ov5640         ;
 wire  [7:0]  data_ov5640            ;
 wire         ready_ov5640           ;
 wire         start_write_image2ddr  ;
+wire [ 8:0]  hps_control_S  		;
+wire [ 8:0]  hps_control_V 			;
 
 wire [31:0]  reg_addr_buf_1         ;
 wire [31:0]  reg_addr_buf_2         ;
@@ -267,6 +269,8 @@ hps_register_ov5640 hps_register_ov5640_inst
 	.coef_conv                  (coef_conv                       ),
 	.select_cam_initial         (select_initial_cam              ), // ->
 	.start_write_image2ddr      (start_write_image2ddr           ), // ->
+	.hps_control_S              (hps_control_S                   ), // ->
+	.hps_control_V              (hps_control_V                   ), // ->
 	.avl_h2f_write              (avl_h2f_dsp.avl_write_slave_port) // <-
  
 );
@@ -499,8 +503,8 @@ HSV_changing HSV_changing_inst
 	.valid_out                  ( data_valid_HSV_ch	),
 	.sop_out                    ( sop_HSV_ch		),
 	.eop_out                    ( eop_HSV_ch		),
-	.control_S                  ( /*10*/{ 1'b0,control_S }	),
-	.control_V	                (  8'h0 				)
+	.control_S                  ( hps_control_S  	),
+	.control_V	                ( hps_control_V 	)
 );
 
 //
