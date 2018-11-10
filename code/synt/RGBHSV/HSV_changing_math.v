@@ -85,18 +85,18 @@ HSV_changing_math_divider_V HSV_changing_math_divider_V_inst
 
 always @( posedge clk )
 	begin
-		S_mult_contr_div_100 <= S_div_100 * control_S[7:0];
-		V_mult_contr_div_100 <= V_div_100 * control_V[7:0];
+		S_mult_contr_div_100 <= S_div_100 * control_S[6:0];
+		V_mult_contr_div_100 <= V_div_100 * control_V[6:0];
 	end
 	
 always @( posedge clk )	
-	if ( control_S[8] )
+	if ( control_S[7] )
 		S_summ <= sh_S - S_mult_contr_div_100[18:7];
 	else
 		S_summ <= sh_S + S_mult_contr_div_100[18:7];
 		
 always @( posedge clk )		
-	if ( control_V[8] )
+	if ( control_V[7] )
 		V_summ <= sh_V - V_mult_contr_div_100[14:7];
 	else
 		V_summ <= sh_V + V_mult_contr_div_100[14:7];
